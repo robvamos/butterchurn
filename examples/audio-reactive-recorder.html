@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Butterchurn Audio Reactive Recorder</title>
+  <script src="/node_modules/butterchurn-presets-js/lib/butterchurnPresets.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1115;
+      --bg-accent: radial-gradient(circle at top right, rgba(108, 184, 255, 0.18), transparent 34%);
+      --panel: #171d25;
+      --panel-2: #10151b;
+      --panel-3: #212a35;
+      --field: #222c38;
+      --field-border: #3b4a5d;
+      --text: #f3f6fb;
+      --muted: #a9b7c8;
+      --accent: #6cb8ff;
+      --accent-soft: #17324f;
+      --accent-strong: #8fd0ff;
+      --tab: #1e2530;
+      --tab-active: #243244;
+      --tab-border: #3b4a5d;
+      --button-hover: #2b3643;
+      --meter-a: #55c2ff;
+      --meter-b: #9ce663;
+      --meter-c: #facc15;
+      --canvas-frame: #0b0d11;
+      --shadow: 0 22px 80px rgba(0, 0, 0, 0.42);
+      --font-ui: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      --font-display: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      background-image: var(--bg-accent);
+      color: var(--text);
+      font-family: var(--font-ui);
+      transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(340px, 410px) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      border-right: 1px solid var(--field-border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%), var(--panel);
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .sidebar-header {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0;
+      font-family: var(--font-display);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .tab-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tab-button {
+      min-height: 40px;
+      border: 1px solid var(--tab-border);
+      border-radius: 6px;
+      background: var(--tab);
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: var(--tab-active);
+      color: var(--text);
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    .panel-section {
+      display: none;
+      gap: 14px;
+    }
+
+    .panel-section.active {
+      display: grid;
+    }
+
+    .settings-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-card,
+    .settings-card {
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 22%), var(--panel-2);
+      padding: 14px;
+    }
+
+    .summary-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-stat {
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-3);
+      padding: 10px;
+    }
+
+    .summary-stat-label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .summary-stat-value {
+      margin-top: 6px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
+
+    .section-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+    }
+
+    .control-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .inline-actions {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    select,
+    input,
+    button {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--field);
+      color: var(--text);
+      font: inherit;
+    }
+
+    select,
+    input {
+      padding: 0 10px;
+    }
+
+    button {
+      cursor: pointer;
+      padding: 0 12px;
+      font-weight: 700;
+      transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--button-hover);
+      border-color: var(--accent);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .primary-action {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .download-link {
+      display: none;
+      width: 100%;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      color: var(--accent-strong);
+      text-decoration: none;
+      background: var(--accent-soft);
+      font-weight: 700;
+    }
+
+    .meter {
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--panel-3);
+    }
+
+    .meter-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--meter-a), var(--meter-b), var(--meter-c));
+      transition: width 80ms linear;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .log {
+      min-height: 124px;
+      max-height: 220px;
+      overflow: auto;
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      padding: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    .skin-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .skin-option {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: var(--panel-3);
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .skin-option.active {
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .skin-option-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .skin-option-name {
+      font-weight: 700;
+    }
+
+    .skin-option-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .skin-swatches {
+      display: flex;
+      gap: 6px;
+    }
+
+    .skin-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .settings-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 20%);
+    }
+
+    .stage-shell {
+      width: min(100%, 1320px);
+      display: grid;
+      gap: 14px;
+    }
+
+    .stage-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stage-title {
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
+
+    .canvas-frame {
+      border: 1px solid var(--field-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: var(--canvas-frame);
+      box-shadow: var(--shadow);
+    }
+
+    canvas {
+      width: min(100%, 1280px);
+      aspect-ratio: 16 / 9;
+      display: block;
+      background: #000;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--field-border);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .inline-actions,
+      .summary-grid,
+      .stage-header {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-header {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .button-row,
+      .tab-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <aside>
+      <div class="sidebar-header">
+        <div class="eyebrow">Audio2VideoPal Lab</div>
+        <h1>Butterchurn Recorder</h1>
+        <div class="subtitle">Microphone-reactive visuals, preset steering, and quick export from one live control room.</div>
+      </div>
+
+      <div class="tab-row">
+        <button id="studioTabButton" class="tab-button active" type="button" data-tab="studio">Studio</button>
+        <button id="settingsTabButton" class="tab-button" type="button" data-tab="settings">Settings</button>
+      </div>
+
+      <section id="studioPanel" class="panel-section active" data-panel="studio">
+        <div class="summary-card">
+          <div class="section-title">Session Snapshot</div>
+          <div class="summary-grid">
+            <div class="summary-stat">
+              <div class="summary-stat-label">Skin</div>
+              <div id="skinSummaryValue" class="summary-stat-value">Midnight Signal</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-label">Presets</div>
+              <div id="presetSummaryValue" class="summary-stat-value">0</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-label">Export</div>
+              <div id="formatSummaryValue" class="summary-stat-value">WebM</div>
+            </div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-label">Input</div>
+            <div id="audioSummaryValue" class="summary-stat-value">Default</div>
+          </div>
+          <div class="section-copy">Use Studio for capture and playback control. Settings keeps the visual layer and export defaults organized in one place.</div>
+        </div>
+
+        <div class="controls">
+          <div class="button-row">
+            <button id="startMicButton" class="primary-action" type="button">Start Mic</button>
+            <button id="stopMicButton" type="button" disabled>Stop</button>
+          </div>
+
+          <div class="control-group">
+            <label for="audioDeviceSelect">Audio Device</label>
+            <div class="inline-actions">
+              <select id="audioDeviceSelect">
+                <option value="">Default microphone</option>
+              </select>
+              <button id="refreshDevicesButton" type="button">Refresh</button>
+              <button id="requestMicPermissionButton" type="button">Allow Mic</button>
+            </div>
+            <div class="hint">After microphone permission is granted, the browser can reveal full device names and alternate inputs.</div>
+          </div>
+
+          <div class="control-group">
+            <label for="presetSelect">Preset</label>
+            <select id="presetSelect">
+              <option value="">Loading presets...</option>
+            </select>
+          </div>
+
+          <div class="button-row">
+            <button id="randomPresetButton" type="button">Random</button>
+            <button id="nextPresetButton" type="button">Next</button>
+          </div>
+
+          <div class="control-group">
+            <label for="cycleSeconds">Auto Cycle Seconds</label>
+            <input id="cycleSeconds" type="number" min="3" step="1" value="15">
+          </div>
+
+          <div class="control-group">
+            <label>Energy</label>
+            <div class="meter"><div id="meterFill" class="meter-fill"></div></div>
+          </div>
+
+          <div class="button-row">
+            <button id="startRecordingButton" class="primary-action" type="button" disabled>Record</button>
+            <button id="stopRecordingButton" type="button" disabled>Finish</button>
+          </div>
+
+          <a id="downloadLink" class="download-link" download="butterchurn-recording.webm">Download Video</a>
+
+          <div id="log" class="log"></div>
+        </div>
+      </section>
+
+      <section id="settingsPanel" class="panel-section" data-panel="settings">
+        <div class="settings-card">
+          <div class="section-title">Visual Skin Library</div>
+          <div class="section-copy">All palette, typography, button, stage, and meter variables are driven from the application theme catalog.</div>
+          <div id="skinGrid" class="skin-grid"></div>
+        </div>
+
+        <div class="settings-card">
+          <div class="section-title">Capture Defaults</div>
+          <div class="settings-grid">
+            <div class="control-group">
+              <label for="fpsSelect">Recording FPS</label>
+              <select id="fpsSelect">
+                <option value="30">30 FPS</option>
+                <option value="60" selected>60 FPS</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="bitrateSelect">Video Bitrate</label>
+              <select id="bitrateSelect">
+                <option value="5000000">5 Mbps</option>
+                <option value="10000000" selected>10 Mbps</option>
+                <option value="20000000">20 Mbps</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="formatSelect">Export Format</label>
+              <select id="formatSelect">
+                <option value="webm" selected>WebM</option>
+                <option value="mp4">MP4 (H.264)</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="resolutionSelect">Resolution</label>
+              <select id="resolutionSelect">
+                <option value="1280x720" selected>720p (1280x720)</option>
+                <option value="1920x1080">1080p (1920x1080)</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-note">MP4 conversion stays available, but WebM remains the fastest path while we iterate on the recorder.</div>
+        </div>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <div class="stage-shell">
+        <div class="stage-header">
+          <div>
+            <div class="stage-title">Live Visual Stage</div>
+            <div id="stagePresetLabel">Waiting for a preset...</div>
+          </div>
+          <div id="stageMetaLabel">720p • 60 FPS • WebM</div>
+        </div>
+
+        <div class="canvas-frame">
+          <canvas id="canvas" width="1280" height="720"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import butterchurn from "../dist/butterchurn.js";
+    import Recorder from "../src/recorder.js";
+    import { applySkin, defaultSkinId, getSkinById, skinCatalog } from "../src/skins.js";
+    import { loadSettings, saveSetting } from "../src/settingsDb.js";
+
+    const root = document.documentElement;
+    const canvas = document.getElementById("canvas");
+    const presetSelect = document.getElementById("presetSelect");
+    const startMicButton = document.getElementById("startMicButton");
+    const stopMicButton = document.getElementById("stopMicButton");
+    const randomPresetButton = document.getElementById("randomPresetButton");
+    const nextPresetButton = document.getElementById("nextPresetButton");
+    const cycleSecondsInput = document.getElementById("cycleSeconds");
+    const startRecordingButton = document.getElementById("startRecordingButton");
+    const stopRecordingButton = document.getElementById("stopRecordingButton");
+    const downloadLink = document.getElementById("downloadLink");
+    const meterFill = document.getElementById("meterFill");
+    const logEl = document.getElementById("log");
+    const audioDeviceSelect = document.getElementById("audioDeviceSelect");
+    const fpsSelect = document.getElementById("fpsSelect");
+    const bitrateSelect = document.getElementById("bitrateSelect");
+    const formatSelect = document.getElementById("formatSelect");
+    const resolutionSelect = document.getElementById("resolutionSelect");
+    const refreshDevicesButton = document.getElementById("refreshDevicesButton");
+    const requestMicPermissionButton = document.getElementById("requestMicPermissionButton");
+    const skinGrid = document.getElementById("skinGrid");
+    const studioTabButton = document.getElementById("studioTabButton");
+    const settingsTabButton = document.getElementById("settingsTabButton");
+    const studioPanel = document.getElementById("studioPanel");
+    const settingsPanel = document.getElementById("settingsPanel");
+    const presetSummaryValue = document.getElementById("presetSummaryValue");
+    const formatSummaryValue = document.getElementById("formatSummaryValue");
+    const skinSummaryValue = document.getElementById("skinSummaryValue");
+    const audioSummaryValue = document.getElementById("audioSummaryValue");
+    const stagePresetLabel = document.getElementById("stagePresetLabel");
+    const stageMetaLabel = document.getElementById("stageMetaLabel");
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const recorder = new Recorder();
+
+    let audioContext;
+    let analyser;
+    let visualizer;
+    let micStream;
+    let micSource;
+    let gainNode;
+    let animationId;
+    let cycleTimer;
+    let presets = {};
+    let presetKeys = [];
+    let presetIndex = 0;
+    let activeDownloadUrl = null;
+    let activeSkinId = defaultSkinId;
+    let appSettings;
+
+    function log(message) {
+      const time = new Date().toLocaleTimeString();
+      logEl.textContent = `${time} ${message}\n${logEl.textContent}`.trim();
+    }
+
+    function clearDownloadUrl() {
+      if (activeDownloadUrl) {
+        URL.revokeObjectURL(activeDownloadUrl);
+        activeDownloadUrl = null;
+      }
+    }
+
+    function persistSetting(key, value) {
+      if (!appSettings) {
+        return;
+      }
+
+      appSettings[key] = value;
+      saveSetting(key, value).catch((error) => {
+        log(`Settings save error: ${error.message}`);
+      });
+    }
+
+    function applyStoredSettings(settings) {
+      cycleSecondsInput.value = settings.cycleSeconds;
+      fpsSelect.value = settings.fps;
+      bitrateSelect.value = settings.bitrate;
+      formatSelect.value = settings.format;
+      resolutionSelect.value = settings.resolution;
+    }
+
+    function refreshAudioSummary() {
+      const selectedOption = audioDeviceSelect.selectedOptions[0];
+      audioSummaryValue.textContent = selectedOption ? selectedOption.textContent : "Default";
+    }
+
+    function updateStageMeta() {
+      stageMetaLabel.textContent = `${resolutionSelect.value} • ${fpsSelect.value} FPS • ${formatSelect.value.toUpperCase()}`;
+      formatSummaryValue.textContent = formatSelect.value.toUpperCase();
+    }
+
+    function showPanel(panelId, shouldPersist = true) {
+      const isStudio = panelId === "studio";
+      studioPanel.classList.toggle("active", isStudio);
+      settingsPanel.classList.toggle("active", !isStudio);
+      studioTabButton.classList.toggle("active", isStudio);
+      settingsTabButton.classList.toggle("active", !isStudio);
+
+      if (shouldPersist) {
+        persistSetting("activeTab", panelId);
+      }
+    }
+
+    function renderSkinOptions() {
+      skinGrid.innerHTML = "";
+
+      skinCatalog.forEach((skin) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "skin-option";
+        button.dataset.skinId = skin.id;
+
+        const header = document.createElement("div");
+        header.className = "skin-option-header";
+
+        const name = document.createElement("div");
+        name.className = "skin-option-name";
+        name.textContent = skin.name;
+
+        const swatches = document.createElement("div");
+        swatches.className = "skin-swatches";
+        skin.swatches.forEach((color) => {
+          const swatch = document.createElement("div");
+          swatch.className = "skin-swatch";
+          swatch.style.background = color;
+          swatches.appendChild(swatch);
+        });
+
+        const copy = document.createElement("div");
+        copy.className = "skin-option-copy";
+        copy.textContent = skin.description;
+
+        header.appendChild(name);
+        header.appendChild(swatches);
+        button.appendChild(header);
+        button.appendChild(copy);
+        button.addEventListener("click", () => setSkin(skin.id));
+        skinGrid.appendChild(button);
+      });
+    }
+
+    function refreshSkinSelection() {
+      const activeSkin = getSkinById(activeSkinId);
+      applySkin(root, activeSkin);
+      skinSummaryValue.textContent = activeSkin.name;
+
+      skinGrid.querySelectorAll(".skin-option").forEach((button) => {
+        button.classList.toggle("active", button.dataset.skinId === activeSkinId);
+      });
+    }
+
+    function setSkin(skinId, shouldPersist = true) {
+      activeSkinId = skinId;
+      refreshSkinSelection();
+      log(`Skin: ${getSkinById(skinId).name}`);
+
+      if (shouldPersist) {
+        persistSetting("skinId", skinId);
+      }
+    }
+
+    function populatePresetSelect() {
+      presetSelect.innerHTML = "";
+
+      if (presetKeys.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No presets available";
+        presetSelect.appendChild(option);
+        return;
+      }
+
+      presetKeys.forEach((presetName, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = presetName;
+        presetSelect.appendChild(option);
+      });
+    }
+
+    function loadPresets() {
+      const availablePresets = window.butterchurnPresets?.getPresets?.() || {};
+      presets = availablePresets;
+      presetKeys = Object.keys(presets).sort((a, b) => a.localeCompare(b));
+      populatePresetSelect();
+      presetSummaryValue.textContent = String(presetKeys.length);
+
+      if (presetKeys.length > 0) {
+        const storedPresetIndex = appSettings?.presetName
+          ? presetKeys.findIndex((presetName) => presetName === appSettings.presetName)
+          : -1;
+        presetIndex = storedPresetIndex >= 0
+          ? storedPresetIndex
+          : Math.floor(Math.random() * presetKeys.length);
+        presetSelect.value = String(presetIndex);
+        stagePresetLabel.textContent = presetKeys[presetIndex];
+        log(`Loaded ${presetKeys.length} presets`);
+      } else {
+        stagePresetLabel.textContent = "Preset library unavailable";
+        log("Preset library not available");
+      }
+    }
+
+    function setDefaultAudioOptions(message = "Default microphone") {
+      audioDeviceSelect.innerHTML = "";
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = message;
+      audioDeviceSelect.appendChild(option);
+    }
+
+    async function loadAudioDevices() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices.filter((device) => device.kind === "audioinput");
+        const currentSelection = audioDeviceSelect.value;
+
+        audioDeviceSelect.innerHTML = "";
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Default microphone";
+        audioDeviceSelect.appendChild(defaultOption);
+
+        audioInputs.forEach((device, index) => {
+          const option = document.createElement("option");
+          option.value = device.deviceId;
+          option.textContent = device.label || `Microphone ${index + 1}`;
+          audioDeviceSelect.appendChild(option);
+        });
+
+        const storedDeviceId = appSettings?.audioDeviceId || currentSelection;
+        if (
+          storedDeviceId &&
+          Array.from(audioDeviceSelect.options).some((option) => option.value === storedDeviceId)
+        ) {
+          audioDeviceSelect.value = storedDeviceId;
+        }
+
+        refreshAudioSummary();
+
+        if (audioInputs.length === 0) {
+          log(`No audio inputs visible yet. Use "Allow Mic" first.`);
+        } else {
+          log(`Found ${audioInputs.length} audio input device(s)`);
+        }
+      } catch (error) {
+        setDefaultAudioOptions("Default microphone");
+        refreshAudioSummary();
+        log(`Audio devices error: ${error.message}`);
+      }
+    }
+
+    async function requestMicrophonePermission() {
+      try {
+        const permissionStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        permissionStream.getTracks().forEach((track) => track.stop());
+        await loadAudioDevices();
+        log("Microphone permission granted");
+      } catch (error) {
+        log(`Permission error: ${error.message}`);
+      }
+    }
+
+    async function ensureVisualizer() {
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+      }
+
+      if (!visualizer) {
+        visualizer = butterchurn.createVisualizer(audioContext, canvas, {
+          width: canvas.width,
+          height: canvas.height,
+          pixelRatio: 1,
+          textureRatio: 1,
+        });
+      }
+
+      await audioContext.resume();
+
+      if (presetKeys.length > 0) {
+        await loadCurrentPreset(0);
+      }
+    }
+
+    async function loadCurrentPreset(blendTime = 2.7) {
+      if (!visualizer || presetKeys.length === 0) {
+        return;
+      }
+
+      const presetName = presetKeys[presetIndex];
+      await visualizer.loadPreset(presets[presetName], blendTime);
+      presetSelect.value = String(presetIndex);
+      stagePresetLabel.textContent = presetName;
+      persistSetting("presetName", presetName);
+      log(`Preset: ${presetName}`);
+    }
+
+    async function updateResolution() {
+      const [width, height] = resolutionSelect.value.split("x").map(Number);
+      canvas.width = width;
+      canvas.height = height;
+
+      if (visualizer) {
+        visualizer.setRendererSize(width, height, {
+          pixelRatio: 1,
+          textureRatio: 1,
+        });
+      }
+
+      updateStageMeta();
+      persistSetting("resolution", resolutionSelect.value);
+      log(`Resolution changed to ${width}x${height}`);
+    }
+
+    function updateMeter() {
+      if (!analyser) {
+        meterFill.style.width = "0%";
+        return;
+      }
+
+      const data = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(data);
+
+      let sum = 0;
+      for (const value of data) {
+        const centered = value - 128;
+        sum += centered * centered;
+      }
+
+      const rms = Math.sqrt(sum / data.length);
+      meterFill.style.width = `${Math.min(100, Math.round(rms * 3))}%`;
+    }
+
+    function render() {
+      animationId = requestAnimationFrame(render);
+      visualizer.render();
+      updateMeter();
+    }
+
+    function startRenderLoop() {
+      if (!animationId) {
+        render();
+      }
+    }
+
+    function stopRenderLoop() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+    }
+
+    async function startMicrophone() {
+      try {
+        await ensureVisualizer();
+
+        const constraints = {
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+          },
+        };
+
+        if (audioDeviceSelect.value) {
+          constraints.audio.deviceId = { exact: audioDeviceSelect.value };
+        }
+
+        if (micStream) {
+          stopMicrophone();
+        }
+
+        micStream = await navigator.mediaDevices.getUserMedia(constraints);
+        micSource = audioContext.createMediaStreamSource(micStream);
+        gainNode = audioContext.createGain();
+        gainNode.gain.value = 1.25;
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 1024;
+
+        micSource.connect(gainNode);
+        gainNode.connect(analyser);
+        visualizer.connectAudio(gainNode);
+
+        startRenderLoop();
+        startMicButton.disabled = true;
+        stopMicButton.disabled = false;
+        startRecordingButton.disabled = false;
+
+        await loadAudioDevices();
+        log("Microphone connected");
+      } catch (error) {
+        log(`Microphone error: ${error.message}`);
+      }
+    }
+
+    function stopMicrophone() {
+      if (recorder.isRecording()) {
+        recorder.stopRecording();
+      }
+
+      if (visualizer && gainNode) {
+        visualizer.disconnectAudio(gainNode);
+      }
+
+      if (micSource) {
+        micSource.disconnect();
+      }
+
+      if (gainNode) {
+        gainNode.disconnect();
+      }
+
+      if (analyser) {
+        analyser.disconnect();
+      }
+
+      if (micStream) {
+        micStream.getTracks().forEach((track) => track.stop());
+      }
+
+      micStream = null;
+      micSource = null;
+      gainNode = null;
+      analyser = null;
+      startMicButton.disabled = false;
+      stopMicButton.disabled = true;
+      startRecordingButton.disabled = true;
+      stopRecordingButton.disabled = true;
+      meterFill.style.width = "0%";
+      stopRenderLoop();
+      log("Microphone stopped");
+    }
+
+    async function startRecording() {
+      if (!micStream) {
+        log("Start microphone first");
+        return;
+      }
+
+      try {
+        clearDownloadUrl();
+        downloadLink.style.display = "none";
+
+        const fps = Number(fpsSelect.value);
+        const bitrate = Number(bitrateSelect.value);
+        const mimeType = recorder.startRecording(canvas, micStream, fps, bitrate);
+
+        startRecordingButton.disabled = true;
+        stopRecordingButton.disabled = false;
+        updateStageMeta();
+        log(`Recording started at ${fps} FPS, ${Math.round(bitrate / 1000000)} Mbps${mimeType ? ` (${mimeType})` : ""}`);
+      } catch (error) {
+        log(`Recording error: ${error.message}`);
+      }
+    }
+
+    async function stopRecording() {
+      if (!recorder.isRecording()) {
+        return;
+      }
+
+      try {
+        log("Stopping recording...");
+        const webmBlob = await recorder.stopRecording();
+        const format = formatSelect.value;
+        let finalBlob = webmBlob;
+        let fileName = `butterchurn-recording-${Date.now()}`;
+
+        if (format === "mp4") {
+          log("Converting to MP4...");
+          const { default: VideoConverter } = await import("../src/converter.js");
+          const converter = new VideoConverter();
+          finalBlob = await converter.convertWebMToMP4(webmBlob);
+          fileName += ".mp4";
+        } else {
+          fileName += ".webm";
+        }
+
+        activeDownloadUrl = URL.createObjectURL(finalBlob);
+        downloadLink.href = activeDownloadUrl;
+        downloadLink.download = fileName;
+        downloadLink.style.display = "flex";
+        log(`Recording ready: ${(finalBlob.size / 1024 / 1024).toFixed(2)} MB (${format.toUpperCase()})`);
+      } catch (error) {
+        log(`Stop recording error: ${error.message}`);
+      }
+
+      startRecordingButton.disabled = !micStream;
+      stopRecordingButton.disabled = true;
+    }
+
+    async function selectPreset(index, blendTime = 2.7) {
+      if (presetKeys.length === 0) {
+        return;
+      }
+
+      presetIndex = index;
+      const presetName = presetKeys[presetIndex];
+      presetSelect.value = String(presetIndex);
+      stagePresetLabel.textContent = presetName;
+      persistSetting("presetName", presetName);
+      await loadCurrentPreset(blendTime);
+    }
+
+    async function selectRandomPreset() {
+      if (presetKeys.length === 0) {
+        return;
+      }
+
+      await selectPreset(Math.floor(Math.random() * presetKeys.length));
+    }
+
+    function restartPresetCycle() {
+      if (cycleTimer) {
+        clearInterval(cycleTimer);
+      }
+
+      if (presetKeys.length === 0) {
+        return;
+      }
+
+      const seconds = Math.max(3, Number(cycleSecondsInput.value) || 15);
+      cycleTimer = setInterval(() => {
+        const nextIndex = (presetIndex + 1) % presetKeys.length;
+        selectPreset(nextIndex);
+      }, seconds * 1000);
+    }
+
+    studioTabButton.addEventListener("click", () => showPanel("studio"));
+    settingsTabButton.addEventListener("click", () => showPanel("settings"));
+    startMicButton.addEventListener("click", startMicrophone);
+    stopMicButton.addEventListener("click", stopMicrophone);
+    startRecordingButton.addEventListener("click", startRecording);
+    stopRecordingButton.addEventListener("click", stopRecording);
+    randomPresetButton.addEventListener("click", selectRandomPreset);
+    nextPresetButton.addEventListener("click", () => {
+      if (presetKeys.length > 0) {
+        selectPreset((presetIndex + 1) % presetKeys.length);
+      }
+    });
+    presetSelect.addEventListener("change", () => {
+      if (presetSelect.value !== "") {
+        selectPreset(Number(presetSelect.value));
+      }
+    });
+    cycleSecondsInput.addEventListener("change", () => {
+      persistSetting("cycleSeconds", cycleSecondsInput.value);
+      restartPresetCycle();
+    });
+    resolutionSelect.addEventListener("change", updateResolution);
+    fpsSelect.addEventListener("change", () => {
+      persistSetting("fps", fpsSelect.value);
+      updateStageMeta();
+    });
+    bitrateSelect.addEventListener("change", () => {
+      persistSetting("bitrate", bitrateSelect.value);
+    });
+    formatSelect.addEventListener("change", () => {
+      persistSetting("format", formatSelect.value);
+      updateStageMeta();
+    });
+    audioDeviceSelect.addEventListener("change", () => {
+      persistSetting("audioDeviceId", audioDeviceSelect.value);
+      refreshAudioSummary();
+      log("Audio device selection updated");
+    });
+    refreshDevicesButton.addEventListener("click", loadAudioDevices);
+    requestMicPermissionButton.addEventListener("click", requestMicrophonePermission);
+
+    async function initializeApp() {
+      renderSkinOptions();
+      appSettings = await loadSettings();
+      applyStoredSettings(appSettings);
+      setSkin(appSettings.skinId || defaultSkinId, false);
+      loadPresets();
+      await loadAudioDevices();
+      showPanel(appSettings.activeTab || "studio", false);
+      restartPresetCycle();
+      updateStageMeta();
+      refreshAudioSummary();
+      log("Ready");
+    }
+
+    initializeApp();
+  </script>
+</body>
+</html>

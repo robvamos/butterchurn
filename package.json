@@ -12,13 +12,14 @@
     "dist/isSupported.min.js"
   ],
   "scripts": {
-    "build": "NODE_ENV=production rollup -c",
+    "build": "cross-env NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "dev-build": "rollup -c",
-    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs",
-    "test:visual": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js",
-    "test:visual:update": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --updateSnapshot",
-    "test:visual:watch": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --watch",
+    "demo:audio-recorder": "node scripts/serve-examples.mjs examples/audio-reactive-recorder.html",
+    "test": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs",
+    "test:visual": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js",
+    "test:visual:update": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --updateSnapshot",
+    "test:visual:watch": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest --config jest.config.mjs test/visual/regression.test.js --watch",
     "test:visual:local": "pnpm build && pnpm test:visual",
     "test:visual:docker": "./scripts/test-visual-docker.sh",
     "test:visual:view": "open test/visual/__image_snapshots__/__diff_output__"
@@ -38,6 +39,9 @@
   "homepage": "https://butterchurnviz.com",
   "dependencies": {
     "@assemblyscript/loader": "^0.17.11",
+    "@ffmpeg/core": "^0.12.10",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "0.12.2",
     "ecma-proposal-math-extensions": "0.0.2",
     "eel-wasm": "^0.0.16"
   },
@@ -50,6 +54,7 @@
     "assemblyscript": "^0.17.11",
     "butterchurn-presets": "3.0.0-beta.4",
     "butterchurn-presets-js": "npm:butterchurn-presets@^2.4.7",
+    "cross-env": "^7.0.3",
     "eslint": "^7.9.0",
     "eslint-plugin-prettier": "^3.1.4",
     "jest": "^30.0.4",
