@@ -5,6 +5,7 @@ const DB_VERSION = 1;
 const defaultSettings = {
   activeTab: "studio",
   audioDeviceId: "",
+  autoCycleEnabled: true,
   format: "webm",
   fps: "60",
   presetName: "",

@@ -138,33 +138,38 @@
 
     .summary-card {
       display: grid;
-      gap: 12px;
+      gap: 10px;
     }
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .summary-stat {
       border: 1px solid var(--field-border);
       border-radius: 6px;
       background: var(--panel-3);
-      padding: 10px;
+      padding: 8px 9px;
+      min-width: 0;
     }
 
     .summary-stat-label {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
     .summary-stat-value {
-      margin-top: 6px;
-      font-size: 15px;
+      margin-top: 4px;
+      font-size: 13px;
       font-weight: 700;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .section-title {
@@ -189,11 +194,48 @@
       gap: 8px;
     }
 
+    .compact-group {
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .checkbox-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .checkbox-row input {
+      width: 16px;
+      min-height: 16px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
     .inline-actions {
       display: grid;
       grid-template-columns: minmax(180px, 1fr) auto auto;
       gap: 8px;
       align-items: center;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     label {
@@ -282,6 +324,27 @@
       line-height: 1.5;
     }
 
+    .meter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .meter-status {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .summary-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
     .log {
       min-height: 124px;
       max-height: 220px;
@@ -298,6 +361,48 @@
     .skin-grid {
       display: grid;
       gap: 10px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(5, 8, 12, 0.72);
+      backdrop-filter: blur(6px);
+      z-index: 20;
+    }
+
+    .modal-card {
+      width: min(100%, 420px);
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 22%), var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
+
+    .modal-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .modal-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
     }
 
     .skin-option {
@@ -410,9 +515,12 @@
 
     @media (max-width: 720px) {
       .inline-actions,
-      .summary-grid,
       .stage-header {
         grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .stage-header {
@@ -458,12 +566,12 @@
               <div class="summary-stat-label">Export</div>
               <div id="formatSummaryValue" class="summary-stat-value">WebM</div>
             </div>
+            <div class="summary-stat">
+              <div class="summary-stat-label">Input</div>
+              <div id="audioSummaryValue" class="summary-stat-value">System default</div>
+            </div>
           </div>
-          <div class="summary-stat">
-            <div class="summary-stat-label">Input</div>
-            <div id="audioSummaryValue" class="summary-stat-value">Default</div>
-          </div>
-          <div class="section-copy">Use Studio for capture and playback control. Settings keeps the visual layer and export defaults organized in one place.</div>
+          <div class="summary-note">Selections persist locally and reload with the last session state.</div>
         </div>
 
         <div class="controls">
@@ -473,15 +581,24 @@
           </div>
 
           <div class="control-group">
+            <div class="meter-header">
+              <label>Energy</label>
+              <div id="meterStatusLabel" class="meter-status">Idle</div>
+            </div>
+            <div class="meter"><div id="meterFill" class="meter-fill"></div></div>
+            <div class="hint">Live input preview stays available even when recording is off.</div>
+          </div>
+
+          <div class="control-group compact-group">
             <label for="audioDeviceSelect">Audio Device</label>
             <div class="inline-actions">
               <select id="audioDeviceSelect">
-                <option value="">Default microphone</option>
+                <option value="">System default input</option>
               </select>
               <button id="refreshDevicesButton" type="button">Refresh</button>
-              <button id="requestMicPermissionButton" type="button">Allow Mic</button>
+              <button id="requestMicPermissionButton" class="hidden" type="button">Allow Mic</button>
             </div>
-            <div class="hint">After microphone permission is granted, the browser can reveal full device names and alternate inputs.</div>
+            <div id="audioDeviceHint" class="hint">The app asks for microphone access on load so the browser can reveal real input names as early as possible.</div>
           </div>
 
           <div class="control-group">
@@ -497,13 +614,15 @@
           </div>
 
           <div class="control-group">
-            <label for="cycleSeconds">Auto Cycle Seconds</label>
+            <div class="control-row">
+              <label for="cycleSeconds">Auto Cycle Seconds</label>
+              <label class="checkbox-row" for="autoCycleEnabled">
+                <input id="autoCycleEnabled" type="checkbox" checked>
+                <span>Enabled</span>
+              </label>
+            </div>
             <input id="cycleSeconds" type="number" min="3" step="1" value="15">
-          </div>
-
-          <div class="control-group">
-            <label>Energy</label>
-            <div class="meter"><div id="meterFill" class="meter-fill"></div></div>
+            <div class="hint">Preset cycling runs only while a live audio input is connected.</div>
           </div>
 
           <div class="button-row">
@@ -582,6 +701,24 @@
     </section>
   </main>
 
+  <div id="micPermissionModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="micPermissionModalTitle">
+    <div class="modal-card">
+      <div id="micPermissionModalTitle" class="modal-title">Microphone Access Blocked</div>
+      <div id="micPermissionModalCopy" class="modal-copy">
+        This browser has already blocked microphone access for this page, so it will not show the native permission prompt again until access is re-enabled.
+      </div>
+      <ol class="modal-list">
+        <li>Open the site controls near the address bar.</li>
+        <li>Set Microphone access to Allow for this page.</li>
+        <li>Reload the page or press Refresh in the audio section.</li>
+      </ol>
+      <div class="button-row">
+        <button id="micPermissionModalCloseButton" type="button">Close</button>
+        <button id="micPermissionModalRetryButton" class="primary-action" type="button">Try Again</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import butterchurn from "../dist/butterchurn.js";
     import Recorder from "../src/recorder.js";
@@ -596,12 +733,15 @@
     const randomPresetButton = document.getElementById("randomPresetButton");
     const nextPresetButton = document.getElementById("nextPresetButton");
     const cycleSecondsInput = document.getElementById("cycleSeconds");
+    const autoCycleEnabledInput = document.getElementById("autoCycleEnabled");
     const startRecordingButton = document.getElementById("startRecordingButton");
     const stopRecordingButton = document.getElementById("stopRecordingButton");
     const downloadLink = document.getElementById("downloadLink");
     const meterFill = document.getElementById("meterFill");
+    const meterStatusLabel = document.getElementById("meterStatusLabel");
     const logEl = document.getElementById("log");
     const audioDeviceSelect = document.getElementById("audioDeviceSelect");
+    const audioDeviceHint = document.getElementById("audioDeviceHint");
     const fpsSelect = document.getElementById("fpsSelect");
     const bitrateSelect = document.getElementById("bitrateSelect");
     const formatSelect = document.getElementById("formatSelect");
@@ -619,8 +759,13 @@
     const audioSummaryValue = document.getElementById("audioSummaryValue");
     const stagePresetLabel = document.getElementById("stagePresetLabel");
     const stageMetaLabel = document.getElementById("stageMetaLabel");
+    const micPermissionModal = document.getElementById("micPermissionModal");
+    const micPermissionModalCopy = document.getElementById("micPermissionModalCopy");
+    const micPermissionModalCloseButton = document.getElementById("micPermissionModalCloseButton");
+    const micPermissionModalRetryButton = document.getElementById("micPermissionModalRetryButton");
 
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const PSEUDO_AUDIO_DEVICE_IDS = new Set(["default", "communications"]);
     const recorder = new Recorder();
 
     let audioContext;
@@ -662,6 +807,7 @@
     }
 
     function applyStoredSettings(settings) {
+      autoCycleEnabledInput.checked = settings.autoCycleEnabled !== false;
       cycleSecondsInput.value = settings.cycleSeconds;
       fpsSelect.value = settings.fps;
       bitrateSelect.value = settings.bitrate;
@@ -671,12 +817,74 @@
 
     function refreshAudioSummary() {
       const selectedOption = audioDeviceSelect.selectedOptions[0];
-      audioSummaryValue.textContent = selectedOption ? selectedOption.textContent : "Default";
+      audioSummaryValue.textContent = selectedOption ? selectedOption.textContent : "System default";
+    }
+
+    function getSelectableAudioInputs(devices) {
+      const audioInputs = devices.filter((device) => device.kind === "audioinput");
+      const hardwareInputs = audioInputs.filter((device) => !PSEUDO_AUDIO_DEVICE_IDS.has(device.deviceId));
+
+      return {
+        hardwareInputs,
+        visibleInputs: hardwareInputs.length > 0
+          ? hardwareInputs
+          : audioInputs.filter((device) => device.deviceId !== "communications"),
+      };
+    }
+
+    function formatAudioDeviceLabel(device, index) {
+      if (device.label) {
+        return device.label;
+      }
+
+      return `Input ${index + 1} - allow mic for full name`;
+    }
+
+    function updateAudioDeviceHint({ hardwareCount = 0, visibleCount = 0, labelsVisible = false } = {}) {
+      if (visibleCount === 0) {
+        audioDeviceHint.textContent = "The browser is only exposing the system default route right now. As soon as microphone access is granted, hardware inputs can appear here.";
+        return;
+      }
+
+      const inputWord = hardwareCount === 1 ? "input" : "inputs";
+      if (!labelsVisible) {
+        audioDeviceHint.textContent = `The browser currently sees ${hardwareCount} selectable ${inputWord}, but it is hiding their names until microphone permission is granted.`;
+        return;
+      }
+
+      audioDeviceHint.textContent = `The browser currently sees ${hardwareCount} selectable ${inputWord} plus the system default route. Some Windows devices may stay hidden if the browser or driver does not expose them to web apps.`;
     }
 
     function updateStageMeta() {
       stageMetaLabel.textContent = `${resolutionSelect.value} • ${fpsSelect.value} FPS • ${formatSelect.value.toUpperCase()}`;
       formatSummaryValue.textContent = formatSelect.value.toUpperCase();
+    }
+
+    function updateMeterStatus(text) {
+      meterStatusLabel.textContent = text;
+    }
+
+    function setMicPermissionButtonVisible(visible) {
+      requestMicPermissionButton.classList.toggle("hidden", !visible);
+    }
+
+    function showMicPermissionModal(message) {
+      if (message) {
+        micPermissionModalCopy.textContent = message;
+      }
+
+      micPermissionModal.classList.remove("hidden");
+    }
+
+    function hideMicPermissionModal() {
+      micPermissionModal.classList.add("hidden");
+    }
+
+    function hasLiveAudioInput() {
+      return Boolean(
+        micStream &&
+        micStream.getAudioTracks().some((track) => track.readyState === "live" && track.enabled)
+      );
     }
 
     function showPanel(panelId, shouldPersist = true) {
@@ -791,7 +999,7 @@
       }
     }
 
-    function setDefaultAudioOptions(message = "Default microphone") {
+    function setDefaultAudioOptions(message = "System default input") {
       audioDeviceSelect.innerHTML = "";
       const option = document.createElement("option");
       option.value = "";
@@ -802,20 +1010,22 @@
     async function loadAudioDevices() {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const audioInputs = devices.filter((device) => device.kind === "audioinput");
         const currentSelection = audioDeviceSelect.value;
+        const { hardwareInputs, visibleInputs } = getSelectableAudioInputs(devices);
+        const labelsVisible = visibleInputs.some((device) => device.label);
 
         audioDeviceSelect.innerHTML = "";
 
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
-        defaultOption.textContent = "Default microphone";
+        defaultOption.textContent = "System default input";
         audioDeviceSelect.appendChild(defaultOption);
 
-        audioInputs.forEach((device, index) => {
+        visibleInputs.forEach((device, index) => {
           const option = document.createElement("option");
           option.value = device.deviceId;
-          option.textContent = device.label || `Microphone ${index + 1}`;
+          option.textContent = formatAudioDeviceLabel(device, index);
+          option.title = option.textContent;
           audioDeviceSelect.appendChild(option);
         });
 
@@ -827,15 +1037,21 @@
           audioDeviceSelect.value = storedDeviceId;
         }
 
+        updateAudioDeviceHint({
+          hardwareCount: hardwareInputs.length || visibleInputs.length,
+          visibleCount: visibleInputs.length,
+          labelsVisible,
+        });
         refreshAudioSummary();
 
-        if (audioInputs.length === 0) {
-          log(`No audio inputs visible yet. Use "Allow Mic" first.`);
+        if (visibleInputs.length === 0) {
+          log("No audio inputs visible yet. Waiting for microphone permission.");
         } else {
-          log(`Found ${audioInputs.length} audio input device(s)`);
+          log(`Browser sees ${hardwareInputs.length || visibleInputs.length} selectable audio input device(s)`);
         }
       } catch (error) {
-        setDefaultAudioOptions("Default microphone");
+        setDefaultAudioOptions("System default input");
+        updateAudioDeviceHint();
         refreshAudioSummary();
         log(`Audio devices error: ${error.message}`);
       }
@@ -843,13 +1059,84 @@
 
     async function requestMicrophonePermission() {
       try {
+        setMicPermissionButtonVisible(false);
+        hideMicPermissionModal();
         const permissionStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         permissionStream.getTracks().forEach((track) => track.stop());
         await loadAudioDevices();
         log("Microphone permission granted");
+        return true;
       } catch (error) {
+        setMicPermissionButtonVisible(true);
+        showMicPermissionModal("The browser did not reopen the native microphone prompt because access is currently blocked for this page. Re-enable microphone access in the site permissions, then try again.");
         log(`Permission error: ${error.message}`);
+        return false;
       }
+    }
+
+    async function getMicrophonePermissionState() {
+      if (!navigator.permissions?.query) {
+        return "unknown";
+      }
+
+      try {
+        const permissionStatus = await navigator.permissions.query({ name: "microphone" });
+        return permissionStatus.state;
+      } catch (error) {
+        log(`Permission status check unavailable: ${error.message}`);
+        return "unknown";
+      }
+    }
+
+    async function prepareMicrophoneAccess() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setMicPermissionButtonVisible(false);
+        audioDeviceHint.textContent = "This browser does not support microphone access for the recorder.";
+        log("Microphone access API unavailable");
+        return;
+      }
+
+      try {
+        const permissionState = await getMicrophonePermissionState();
+        if (permissionState === "granted") {
+          setMicPermissionButtonVisible(false);
+          hideMicPermissionModal();
+          await loadAudioDevices();
+          audioDeviceHint.textContent = "Microphone access is already granted. Choose any exposed input or keep the system default route.";
+          return;
+        }
+
+        if (permissionState === "denied") {
+          setMicPermissionButtonVisible(true);
+          await loadAudioDevices();
+          audioDeviceHint.textContent = "Microphone access is blocked in the browser, so the list may stay limited until permission is re-enabled.";
+          showMicPermissionModal("Microphone access is blocked for this page. The browser will not show the native permission popup again until you re-enable access in the site settings.");
+          log("Microphone permission is currently blocked");
+          return;
+        }
+
+        if (permissionState === "prompt" || permissionState === "unknown") {
+          setMicPermissionButtonVisible(true);
+        }
+      } catch (error) {
+        log(`Microphone preparation error: ${error.message}`);
+      }
+
+      await requestMicrophonePermission();
+    }
+
+    async function activatePreviewForSelectedInput() {
+      if (micStream) {
+        return;
+      }
+
+      const permissionState = await getMicrophonePermissionState();
+      if (permissionState !== "granted") {
+        updateMeterStatus("Ready");
+        return;
+      }
+
+      await startMicrophone();
     }
 
     async function ensureVisualizer() {
@@ -906,6 +1193,7 @@
     function updateMeter() {
       if (!analyser) {
         meterFill.style.width = "0%";
+        updateMeterStatus(micStream ? "Listening" : "Idle");
         return;
       }
 
@@ -919,7 +1207,9 @@
       }
 
       const rms = Math.sqrt(sum / data.length);
-      meterFill.style.width = `${Math.min(100, Math.round(rms * 3))}%`;
+      const level = Math.min(100, Math.round(rms * 3));
+      meterFill.style.width = `${level}%`;
+      updateMeterStatus(level > 3 ? "Live" : "Listening");
     }
 
     function render() {
@@ -976,8 +1266,10 @@
         startMicButton.disabled = true;
         stopMicButton.disabled = false;
         startRecordingButton.disabled = false;
+        updateMeterStatus("Listening");
 
         await loadAudioDevices();
+        restartPresetCycle();
         log("Microphone connected");
       } catch (error) {
         log(`Microphone error: ${error.message}`);
@@ -1018,6 +1310,8 @@
       startRecordingButton.disabled = true;
       stopRecordingButton.disabled = true;
       meterFill.style.width = "0%";
+      updateMeterStatus("Idle");
+      restartPresetCycle();
       stopRenderLoop();
       log("Microphone stopped");
     }
@@ -1104,14 +1398,30 @@
     function restartPresetCycle() {
       if (cycleTimer) {
         clearInterval(cycleTimer);
+        cycleTimer = null;
       }
 
       if (presetKeys.length === 0) {
         return;
       }
 
+      if (!autoCycleEnabledInput.checked) {
+        log("Auto cycle disabled");
+        return;
+      }
+
+      if (!hasLiveAudioInput()) {
+        log("Auto cycle idle until an audio input is live");
+        return;
+      }
+
       const seconds = Math.max(3, Number(cycleSecondsInput.value) || 15);
       cycleTimer = setInterval(() => {
+        if (!hasLiveAudioInput()) {
+          restartPresetCycle();
+          return;
+        }
+
         const nextIndex = (presetIndex + 1) % presetKeys.length;
         selectPreset(nextIndex);
       }, seconds * 1000);
@@ -1138,6 +1448,10 @@
       persistSetting("cycleSeconds", cycleSecondsInput.value);
       restartPresetCycle();
     });
+    autoCycleEnabledInput.addEventListener("change", () => {
+      persistSetting("autoCycleEnabled", autoCycleEnabledInput.checked);
+      restartPresetCycle();
+    });
     resolutionSelect.addEventListener("change", updateResolution);
     fpsSelect.addEventListener("change", () => {
       persistSetting("fps", fpsSelect.value);
@@ -1154,9 +1468,14 @@
       persistSetting("audioDeviceId", audioDeviceSelect.value);
       refreshAudioSummary();
       log("Audio device selection updated");
+      activatePreviewForSelectedInput().catch((error) => {
+        log(`Audio preview error: ${error.message}`);
+      });
     });
     refreshDevicesButton.addEventListener("click", loadAudioDevices);
     requestMicPermissionButton.addEventListener("click", requestMicrophonePermission);
+    micPermissionModalCloseButton.addEventListener("click", hideMicPermissionModal);
+    micPermissionModalRetryButton.addEventListener("click", requestMicrophonePermission);
 
     async function initializeApp() {
       renderSkinOptions();
@@ -1164,11 +1483,12 @@
       applyStoredSettings(appSettings);
       setSkin(appSettings.skinId || defaultSkinId, false);
       loadPresets();
-      await loadAudioDevices();
+      await prepareMicrophoneAccess();
       showPanel(appSettings.activeTab || "studio", false);
       restartPresetCycle();
       updateStageMeta();
       refreshAudioSummary();
+      updateMeterStatus(appSettings.audioDeviceId ? "Ready" : "Idle");
       log("Ready");
     }
 

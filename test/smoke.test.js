@@ -49,6 +49,9 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
     const refreshDevicesButton = await page.$('#refreshDevicesButton');
     expect(refreshDevicesButton).toBeTruthy();
 
+    const allowMicButton = await page.$('#requestMicPermissionButton');
+    expect(allowMicButton).toBeTruthy();
+
     const fpsSelect = await page.$('#fpsSelect');
     expect(fpsSelect).toBeTruthy();
 
