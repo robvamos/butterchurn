@@ -362,6 +362,8 @@ class ToneDrumBus {
       perc: 0,
     };
     this.lastReactiveRealignAt = 0;
+    this.pendingReactiveConfig = null;
+    this.completedPatternCycles = 0;
   }
 
   getVersion() {
@@ -746,14 +748,20 @@ class ToneDrumBus {
 
   getStepPattern(config) {
     const density = Number(config.density || 48);
+    const bars = Math.max(1, Math.min(8, Number(config.bars || 4)));
+    const totalSteps = bars * 16;
+    const entryLevel = Math.max(0, Math.min(4, Number(config.entryLevel ?? 4)));
+    const mutation = config.loopMutation || "none";
     const steps = [];
 
-    for (let step = 0; step < 16; step += 1) {
+    for (let step = 0; step < totalSteps; step += 1) {
+      const stepInBar = step % 16;
+      const barIndex = Math.floor(step / 16);
       const events = [];
-      if (step === 0 || step === 8) {
+      if (stepInBar === 0 || stepInBar === 8) {
         events.push("kick");
       }
-      if (step === 4 || step === 12) {
+      if (stepInBar === 4 || stepInBar === 12) {
         events.push("snare");
       }
 
@@ -763,16 +771,22 @@ class ToneDrumBus {
 
       if (
         hatEveryStep ||
-        (hatEveryTwo && step % 2 === 0) ||
-        (hatEveryFour && step % 4 === 0)
+        (hatEveryTwo && stepInBar % 2 === 0) ||
+        (hatEveryFour && stepInBar % 4 === 0)
       ) {
         events.push("hat");
       }
 
-      if (density >= 78 && (step === 6 || step === 14)) {
+      if (mutation === "kick-pickup" && barIndex === Math.min(1, bars - 1) && stepInBar === 10) {
+        events.push("kick");
+      }
+      if (mutation === "hat-lift" && barIndex === bars - 1 && stepInBar === 14) {
+        events.push("hat");
+      }
+      if (mutation === "snare-ghost" && entryLevel >= 3 && barIndex === bars - 1 && stepInBar === 14) {
         events.push("ghost-snare");
       }
-      if (density >= 70 && (step === 2 || step === 10)) {
+      if (mutation === "perc-tag" && entryLevel >= 4 && barIndex === bars - 1 && stepInBar === 15) {
         events.push("perc");
       }
 
@@ -964,10 +978,22 @@ class ToneDrumBus {
 
     if (resetIndex) {
       this.currentPatternIndex = 0;
+      this.completedPatternCycles = 0;
     }
     this.patternTimer = globalThis.setInterval(() => {
       const safeTotal = Math.max(1, this.activeSteps.length);
       const stepIndex = this.currentPatternIndex % safeTotal;
+      if (stepIndex === 0 && this.currentPatternIndex > 0) {
+        this.completedPatternCycles += 1;
+        if (this.pendingReactiveConfig) {
+          this.lastConfig = {
+            ...this.lastConfig,
+            ...this.pendingReactiveConfig,
+          };
+          this.activeSteps = this.getStepPattern(this.lastConfig);
+          this.pendingReactiveConfig = null;
+        }
+      }
       const events = this.activeSteps[stepIndex] || [];
       this.absoluteStepCount += 1;
       const activeConfig = this.lastConfig || config;
@@ -1074,10 +1100,15 @@ class ToneDrumBus {
       humanize: Number(config.humanize || 18),
       swing: Number(config.swing || 8),
       tempo: Number(config.tempo || 104),
+      entryLevel: Number(config.entryLevel || 4),
+      confidence: Number(config.confidence || 0),
+      bars: Number(config.bars || 4),
+      loopMutation: config.loopMutation || "none",
     };
 
     this.lastConfig = nextConfig;
     this.activePattern = "reactive-kit";
+    this.pendingReactiveConfig = null;
 
     const steps = this.getStepPattern(nextConfig);
     const totalSteps = steps.length;
@@ -1107,6 +1138,10 @@ class ToneDrumBus {
       humanize: Number(config.humanize ?? this.lastConfig.humanize ?? 18),
       swing: Number(config.swing ?? this.lastConfig.swing ?? 8),
       tempo: Number(config.tempo ?? this.lastConfig.tempo ?? 104),
+      entryLevel: Number(config.entryLevel ?? this.lastConfig.entryLevel ?? 4),
+      confidence: Number(config.confidence ?? this.lastConfig.confidence ?? 0),
+      bars: Number(config.bars ?? this.lastConfig.bars ?? 4),
+      loopMutation: config.loopMutation ?? this.lastConfig.loopMutation ?? "none",
     };
 
     const transport = this.tone.getTransport();
@@ -1114,10 +1149,11 @@ class ToneDrumBus {
     transport.swing = Math.max(0, Math.min(0.45, Number(nextConfig.swing || 8) / 100 * 0.45));
     transport.swingSubdivision = "16n";
 
-    this.lastConfig = nextConfig;
-    this.activeSteps = this.getStepPattern(nextConfig);
+    this.pendingReactiveConfig = nextConfig;
 
-    if (this.patternTimer) {
+    if (!this.patternTimer) {
+      this.lastConfig = nextConfig;
+      this.activeSteps = this.getStepPattern(nextConfig);
       this.startPatternScheduler(this.activeSteps, nextConfig, "reactive-kit", { resetIndex: false });
     }
 
@@ -1134,10 +1170,12 @@ class ToneDrumBus {
       return this.getSummary();
     }
     this.lastReactiveRealignAt = now;
-    this.currentPatternIndex = 0;
-    this.absoluteStepCount = 0;
-    const previewEvents = this.evolveEvents(this.activeSteps[0] || ["kick"], this.lastConfig, 0, this.activeSteps.length);
-    this.updateLoopState(0, this.activeSteps.length, previewEvents, "reactive-kit", []);
+    if (this.currentPatternIndex % Math.max(1, this.activeSteps.length) < 4) {
+      this.currentPatternIndex = 0;
+      this.absoluteStepCount = 0;
+      const previewEvents = this.evolveEvents(this.activeSteps[0] || ["kick"], this.lastConfig, 0, this.activeSteps.length);
+      this.updateLoopState(0, this.activeSteps.length, previewEvents, "reactive-kit", []);
+    }
     return this.getSummary();
   }
 

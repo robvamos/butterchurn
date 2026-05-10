@@ -3878,6 +3878,57 @@
             : clampPercent(baseDensity + densityBoost))
         : clampPercent(baseDensity + densityBoost);
 
+      let sectionState = "steady";
+      if (!phaseMetrics.liveFollow) {
+        sectionState = "standby";
+      } else if (phase === "listening" || phase === "entering") {
+        sectionState = "intro";
+      } else if (energy < 0.12 && onset < 0.08) {
+        sectionState = "pause";
+      } else if (energy < 0.24 && fillProbability < 24) {
+        sectionState = "break";
+      } else if (onset > 0.36 && energy > 0.5) {
+        sectionState = "build";
+      } else if (fillProbability >= 62 && energy > 0.42) {
+        sectionState = "lift";
+      }
+
+      const variationEveryLoops = (() => {
+        switch (sectionState) {
+          case "intro":
+          case "pause":
+          case "break":
+            return 8;
+          case "build":
+          case "lift":
+            return 4;
+          default:
+            return 6;
+        }
+      })();
+
+      const loopMutation = (() => {
+        if (entryLevel <= 1 || sectionState === "pause" || sectionState === "break") {
+          return "none";
+        }
+        if (sectionState === "build") {
+          return "hat-lift";
+        }
+        if (sectionState === "lift" && entryLevel >= 4) {
+          return "perc-tag";
+        }
+        if (sectionState === "lift" && entryLevel >= 3) {
+          return "snare-ghost";
+        }
+        if (entryLevel >= 3 && fillProbability >= 52) {
+          return "snare-ghost";
+        }
+        if (entryLevel >= 2 && densityTarget >= 56) {
+          return "hat-lift";
+        }
+        return "kick-pickup";
+      })();
+
       return {
         tempo: tempoTarget,
         intensity: clampPercent(baseIntensity + intensityBoost),
@@ -3895,6 +3946,10 @@
         detectedTempo: Number(essentiaSummary.tempo || 0),
         sourceMode,
         downbeatPulse: phaseMetrics.liveFollow && confidence >= tempoConfidenceThreshold && onset >= (isMicrophoneRoute ? 0.56 : 0.48),
+        bars: 4,
+        variationEveryLoops,
+        sectionState,
+        loopMutation,
       };
     }
 
