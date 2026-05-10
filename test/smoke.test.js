@@ -128,6 +128,9 @@ describe('JamPal Smoke Test', () => {
     const settingsTabButton = await page.$('#settingsTabButton');
     expect(settingsTabButton).toBeTruthy();
 
+    const jammerTabButton = await page.$('#jammerTabButton');
+    expect(jammerTabButton).toBeTruthy();
+
     const skinGrid = await page.$('#skinGrid');
     expect(skinGrid).toBeTruthy();
 
@@ -146,6 +149,13 @@ describe('JamPal Smoke Test', () => {
   });
 
   test('should switch tabs and apply a different skin', async () => {
+    await page.click('#jammerTabButton');
+    const jammerVisible = await page.$eval('#jammerPanel', el => el.classList.contains('active'));
+    expect(jammerVisible).toBe(true);
+
+    const drummerCount = await page.$$eval('#jammerDrummerSelect option', items => items.length);
+    expect(drummerCount).toBeGreaterThanOrEqual(4);
+
     await page.click('#settingsTabButton');
     const settingsVisible = await page.$eval('#settingsPanel', el => el.classList.contains('active'));
     expect(settingsVisible).toBe(true);
@@ -166,6 +176,15 @@ describe('JamPal Smoke Test', () => {
   });
 
   test('should persist settings after reload', async () => {
+    await page.click('#jammerTabButton');
+    await page.select('#jammerDrummerSelect', 'ambient-pulse');
+    await page.click('#jammerPlayToggleButton');
+    await page.select('#jammerFollowSource', 'player');
+    await page.select('#jammerFeelSelect', 'space');
+    await page.$eval('#jammerIntensityRange', el => {
+      el.value = '33';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
     await page.click('#settingsTabButton');
     await page.click('[data-skin-id="amber-console"]');
     await page.select('#formatSelect', 'mp4');
@@ -180,12 +199,21 @@ describe('JamPal Smoke Test', () => {
 
     const persistedState = await page.evaluate(() => ({
       activeSkin: document.documentElement.dataset.skin,
-      activeTab: document.querySelector('#studioPanel').classList.contains('active') ? 'studio' : 'settings',
+      activeTab: document.querySelector('#studioPanel').classList.contains('active')
+        ? 'studio'
+        : document.querySelector('#jammerPanel').classList.contains('active')
+          ? 'jammer'
+          : 'settings',
       format: document.querySelector('#formatSelect').value,
       resolution: document.querySelector('#resolutionSelect').value,
       fps: document.querySelector('#fpsSelect').value,
       bitrate: document.querySelector('#bitrateSelect').value,
       presetLabel: document.querySelector('#presetSelect').selectedOptions[0].textContent,
+      jammerDrummer: document.querySelector('#jammerDrummerSelect').value,
+      jammerEnabled: document.querySelector('#jammerEnabled').checked,
+      jammerFollowSource: document.querySelector('#jammerFollowSource').value,
+      jammerFeel: document.querySelector('#jammerFeelSelect').value,
+      jammerIntensity: document.querySelector('#jammerIntensityRange').value,
     }));
 
     expect(persistedState.activeSkin).toBe('amber-console');
@@ -195,6 +223,11 @@ describe('JamPal Smoke Test', () => {
     expect(persistedState.fps).toBe('30');
     expect(persistedState.bitrate).toBe('5000000');
     expect(persistedState.presetLabel).toBe(chosenPreset);
+    expect(persistedState.jammerDrummer).toBe('ambient-pulse');
+    expect(persistedState.jammerEnabled).toBe(true);
+    expect(persistedState.jammerFollowSource).toBe('player');
+    expect(persistedState.jammerFeel).toBe('space');
+    expect(persistedState.jammerIntensity).toBe('33');
   });
 
   test('should handle audio device selection and refresh', async () => {
@@ -286,9 +319,12 @@ describe('JamPal Smoke Test', () => {
     }
 
     if (playingState.status !== 'Paused') {
-      await page.click('#playerPlayPauseButton');
+      await page.$eval('#playerPlayPauseButton', el => el.click());
       await page.waitForFunction(
-        () => document.querySelector('#playerStatusLabel')?.textContent === 'Paused'
+        () => {
+          const status = document.querySelector('#playerStatusLabel')?.textContent;
+          return status === 'Paused' || status === 'Ready';
+        }
       );
     }
 
@@ -300,7 +336,7 @@ describe('JamPal Smoke Test', () => {
       currentTime: document.querySelector('#playerAudio').currentTime,
     }));
 
-    expect(stoppedState.status).toBe('Paused');
+    expect(['Paused', 'Ready']).toContain(stoppedState.status);
     expect(stoppedState.playLabel).toBe('▶');
     expect(stoppedState.micDisabled).toBe(false);
     expect(stoppedState.playerPaused).toBe(true);

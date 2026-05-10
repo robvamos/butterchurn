@@ -43,7 +43,8 @@
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "0.12.2",
     "ecma-proposal-math-extensions": "0.0.2",
-    "eel-wasm": "^0.0.16"
+    "eel-wasm": "^0.0.16",
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.6",

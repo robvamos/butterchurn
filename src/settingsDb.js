@@ -1,7 +1,7 @@
 const DB_NAME = "audio-reactive-recorder-db";
 const STORE_NAME = "app-settings";
 const ASSET_STORE_NAME = "app-assets";
-const DB_VERSION = 2;
+const DB_VERSION = 5;
 
 const defaultSettings = {
   activeTab: "studio",
@@ -15,11 +15,22 @@ const defaultSettings = {
   playerSourceKind: "",
   playerTrackIndex: "0",
   playerTrebleGain: "0",
+  playerVolume: "82",
   presetName: "",
   resolution: "1280x720",
   skinId: "midnight-signal",
   cycleSeconds: "15",
   bitrate: "10000000",
+  jammerDrummerId: "reactive-kit",
+  jammerEnabled: false,
+  jammerFeel: "assist",
+  jammerFollowSource: "auto",
+  jammerHumanize: "18",
+  jammerIntensity: "55",
+  jammerDensity: "48",
+  jammerSwing: "8",
+  jammerTempo: "104",
+  jammerVolume: "72",
 };
 
 function openDatabase() {
