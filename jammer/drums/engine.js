@@ -161,7 +161,7 @@ export class JammerEngine {
     let summary = "Waiting for an input route before the drummer can lock onto a groove.";
 
     if (!this.state.enabled) {
-      summary = `${profile.name} is staged but not armed yet. Enable Jammer to let the groove brain prepare.`;
+      summary = `${profile.name} is ready when you press Play Drummer.`;
     } else if (resolvedSource === "player") {
       routeLabel = "Player";
       statusLabel = "Ready";

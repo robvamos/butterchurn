@@ -39,3 +39,81 @@ Target signal chain:
 The current scaffold is intentionally light: it exposes drummer metadata, defaults,
 parameter shaping and source readiness so the UI and persistence can settle before
 the audio engine work begins.
+
+## Future plan
+
+### Tone.js role
+
+For a "real" drum engine, Tone.js should evolve from placeholder synth voices into
+the execution layer of the drummer.
+
+Preferred playback model:
+
+- `Tone.Sampler`
+- sample-backed kits such as:
+  - `kick.wav`
+  - `snare.wav`
+  - `hihat.wav`
+  - `ride.wav`
+  - `tom.wav`
+  - `crash.wav`
+
+That makes it possible to swap entire drum identities just by changing sample packs:
+
+- acoustic jazz
+- rock
+- techno
+- industrial
+- lo-fi
+- trap
+- cinematic
+- glitch
+
+### Dynamic FX layer
+
+Tone.js should also host the real-time drum effects layer. Important effect families:
+
+- `Reverb`
+- `Delay`
+- `PingPongDelay`
+- `Chorus`
+- `Phaser`
+- `Distortion`
+- `Compressor`
+- `EQ3`
+- `Limiter`
+- `Filter`
+- `AutoWah`
+- `BitCrusher`
+
+This is especially important for the AI drummer direction, because the kit should
+"breathe" with the incoming audio:
+
+- more energy -> more compression and crash activity
+- softer music -> brushes or jazz hats
+- aggressive transients -> denser fills
+
+### Division of responsibilities
+
+Tone.js should not be treated as the whole solution. Its ideal role in JamPal is:
+
+- `Tone.js` = drummer / performer
+- `Essentia.js` = ear
+- `Magenta.js` = creative brain
+- `Butterchurn` = visual layer
+
+### Known limits of Tone.js alone
+
+Tone.js is not enough by itself for:
+
+- advanced beat detection
+- musical AI
+- source separation
+- serious transcription
+
+So the intended companion stack remains:
+
+- `Essentia.js`
+- `Magenta.js`
+- `Meyda`
+- optional `ONNX` / `TensorFlow.js` models

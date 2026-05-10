@@ -181,6 +181,140 @@ const TONE_INSTRUMENT_CATALOG = [
       node.triggerAttackRelease("G5", "32n", time, velocity);
     },
   },
+  {
+    id: "metal-cymbal",
+    name: "Metal Cymbal",
+    group: "Hat",
+    role: "hat",
+    engine: "MetalSynth",
+    create: (tone, output) =>
+      new tone.MetalSynth({
+        frequency: 280,
+        envelope: { attack: 0.001, decay: 0.18, release: 0.04 },
+        harmonicity: 7,
+        modulationIndex: 36,
+        resonance: 4200,
+        octaves: 2,
+        volume: -6,
+      }).connect(output),
+    applyConfig: (node, config) => {
+      node.frequency = 180 + (Number(config.hatBrightness || 52) / 100) * 260;
+      node.resonance = 2600 + (Number(config.hatBrightness || 52) / 100) * 4200;
+    },
+    trigger: (_tone, node, _config, time, velocity, duration = "32n") => {
+      node.triggerAttackRelease(duration, time, velocity);
+    },
+  },
+  {
+    id: "mono-thump",
+    name: "Mono Thump",
+    group: "Synth",
+    role: "perc",
+    engine: "MonoSynth",
+    create: (tone, output) =>
+      new tone.MonoSynth({
+        oscillator: { type: "square" },
+        filter: { Q: 1.2, type: "lowpass", rolloff: -24 },
+        envelope: { attack: 0.001, decay: 0.09, sustain: 0, release: 0.06 },
+        volume: -8,
+      }).connect(output),
+    applyConfig: () => {},
+    trigger: (_tone, node, _config, time, velocity) => {
+      node.triggerAttackRelease("C3", "32n", time, velocity);
+    },
+  },
+  {
+    id: "fm-clang",
+    name: "FM Clang",
+    group: "Synth",
+    role: "perc",
+    engine: "FMSynth",
+    create: (tone, output) =>
+      new tone.FMSynth({
+        harmonicity: 3,
+        modulationIndex: 12,
+        envelope: { attack: 0.001, decay: 0.12, sustain: 0, release: 0.08 },
+        modulation: { type: "square" },
+        modulationEnvelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.03 },
+        volume: -10,
+      }).connect(output),
+    applyConfig: () => {},
+    trigger: (_tone, node, _config, time, velocity) => {
+      node.triggerAttackRelease("E5", "32n", time, velocity);
+    },
+  },
+  {
+    id: "am-chime",
+    name: "AM Chime",
+    group: "Synth",
+    role: "perc",
+    engine: "AMSynth",
+    create: (tone, output) =>
+      new tone.AMSynth({
+        harmonicity: 2,
+        envelope: { attack: 0.001, decay: 0.14, sustain: 0, release: 0.08 },
+        modulation: { type: "triangle" },
+        modulationEnvelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.03 },
+        volume: -10,
+      }).connect(output),
+    applyConfig: () => {},
+    trigger: (_tone, node, _config, time, velocity) => {
+      node.triggerAttackRelease("A5", "32n", time, velocity);
+    },
+  },
+  {
+    id: "pluck-pop",
+    name: "Pluck Pop",
+    group: "Synth",
+    role: "perc",
+    engine: "PluckSynth",
+    create: (tone, output) =>
+      new tone.PluckSynth({
+        attackNoise: 1,
+        dampening: 2800,
+        resonance: 0.78,
+        volume: -8,
+      }).connect(output),
+    applyConfig: () => {},
+    trigger: (_tone, node, _config, time, velocity) => {
+      node.triggerAttackRelease("D5", time, velocity);
+    },
+  },
+  {
+    id: "duo-glide",
+    name: "Duo Glide",
+    group: "Synth",
+    role: "perc",
+    engine: "DuoSynth",
+    create: (tone, output) =>
+      new tone.DuoSynth({
+        harmonicity: 1.5,
+        voice0: { oscillator: { type: "sawtooth" } },
+        voice1: { oscillator: { type: "triangle" } },
+        volume: -12,
+      }).connect(output),
+    applyConfig: () => {},
+    trigger: (_tone, node, _config, time, velocity) => {
+      node.triggerAttackRelease("G4", "32n", time, velocity);
+    },
+  },
+  {
+    id: "basic-synth",
+    name: "Basic Synth",
+    group: "Synth",
+    role: "perc",
+    engine: "Synth",
+    create: (tone, output) =>
+      new tone.Synth({
+        oscillator: { type: "triangle" },
+        envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.05 },
+        volume: -10,
+      }).connect(output),
+    applyConfig: () => {},
+    trigger: (_tone, node, _config, time, velocity) => {
+      node.triggerAttackRelease("C5", "32n", time, velocity);
+    },
+  },
 ];
 
 class ToneDrumBus {
@@ -523,6 +657,9 @@ class ToneDrumBus {
       if (density >= 78 && (step === 6 || step === 14)) {
         events.push("ghost-snare");
       }
+      if (density >= 70 && (step === 2 || step === 10)) {
+        events.push("perc");
+      }
 
       steps.push(events);
     }
@@ -566,6 +703,9 @@ class ToneDrumBus {
         if (barIndex % 2 === 1 && stepInBar === 14) {
           events.push("ghost-snare");
         }
+        if (density >= 68 && (stepInBar === 6 || stepInBar === 15)) {
+          events.push("perc");
+        }
       } else if (style === "disco") {
         if (stepInBar % 4 === 0) {
           events.push("kick");
@@ -577,6 +717,9 @@ class ToneDrumBus {
         if (barIndex === bars - 1 && stepInBar === 15) {
           events.push("ghost-snare");
         }
+        if (density >= 64 && stepInBar === 7) {
+          events.push("perc");
+        }
       } else if (style === "ambient") {
         if (stepInBar === 0 || stepInBar === 10) {
           events.push("kick");
@@ -586,6 +729,9 @@ class ToneDrumBus {
         }
         if (stepInBar % 4 === 0 || (density >= 70 && stepInBar % 2 === 0)) {
           events.push("hat");
+        }
+        if (density >= 58 && (stepInBar === 6 || stepInBar === 14)) {
+          events.push("perc");
         }
       } else {
         if (stepInBar === 0 || stepInBar === 8) {
@@ -599,6 +745,9 @@ class ToneDrumBus {
         }
         if (barIndex === bars - 1 && stepInBar === 14 && density >= 55) {
           events.push("ghost-snare");
+        }
+        if (density >= 66 && (stepInBar === 3 || stepInBar === 11)) {
+          events.push("perc");
         }
       }
 
@@ -875,7 +1024,9 @@ class ToneDrumBus {
 
   async previewVoice(voice) {
     await this.warmup();
-    const deckEntry = this.deck.find((entry) => entry.id === voice) || this.pickDeckEntry(voice);
+    const deckEntry = typeof voice === "object" && voice !== null
+      ? voice
+      : this.deck.find((entry) => entry.id === voice) || this.pickDeckEntry(voice);
     if (!deckEntry) {
       return;
     }

@@ -574,6 +574,13 @@
       align-items: center;
     }
 
+    .jammer-library-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: start;
+    }
+
     .jammer-deck-grid {
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     }
@@ -586,6 +593,12 @@
       border: 1px solid var(--field-border);
       border-radius: 8px;
       background: var(--panel-2);
+    }
+
+    .jammer-library-card {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 8px;
     }
 
     .jammer-deck-card.is-muted {
@@ -606,6 +619,13 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
+    }
+
+    .jammer-library-actions {
+      display: grid;
+      grid-template-columns: repeat(2, auto);
+      gap: 6px;
+      justify-content: end;
     }
 
     .jammer-deck-controls button,
@@ -634,7 +654,43 @@
     }
 
     .jammer-library-grid {
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .jammer-library-close {
+      width: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .jammer-library-close svg,
+    .jammer-preview-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .jammer-preview-icon {
+      width: 40px;
+      min-width: 40px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 920px) {
+      .jammer-library-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .jammer-favorite-list {
@@ -1626,9 +1682,17 @@
             <div id="jammerDeckGrid" class="jammer-deck-grid"></div>
 
             <div id="jammerLibraryPanel" class="jammer-library-panel">
-              <div class="jammer-group-heading">
-                <strong id="jammerLibraryTitle">Tone Instrument Library</strong>
-                <span id="jammerLibraryHint">Choose one or more instruments to add to the deck.</span>
+              <div class="jammer-library-header">
+                <div class="jammer-group-heading">
+                  <strong id="jammerLibraryTitle">Tone Instrument Library</strong>
+                  <span id="jammerLibraryHint">Choose one or more instruments to add to the deck.</span>
+                </div>
+                <button id="jammerCloseLibraryButton" class="jammer-library-close" type="button" aria-label="Close instrument library" title="Close">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6 18 18"></path>
+                    <path d="M18 6 6 18"></path>
+                  </svg>
+                </button>
               </div>
               <div id="jammerLibraryGroups" class="jammer-library-groups"></div>
             </div>
@@ -1829,6 +1893,7 @@
     const jammerLibraryPanel = document.getElementById("jammerLibraryPanel");
     const jammerLibraryTitle = document.getElementById("jammerLibraryTitle");
     const jammerLibraryHint = document.getElementById("jammerLibraryHint");
+    const jammerCloseLibraryButton = document.getElementById("jammerCloseLibraryButton");
     const jammerLibraryGroups = document.getElementById("jammerLibraryGroups");
     const jammerLabJamToggleButton = document.getElementById("jammerLabJamToggleButton");
     const jammerLabJamStopButton = document.getElementById("jammerLabJamStopButton");
@@ -2354,11 +2419,38 @@
         instruments.forEach((instrument) => {
           const card = document.createElement("div");
           card.className = "jammer-library-card";
+          const info = document.createElement("div");
           const heading = document.createElement("strong");
           heading.textContent = instrument.name;
           const meta = document.createElement("div");
           meta.className = "jammer-deck-meta";
           meta.textContent = `${instrument.engine} • ${instrument.role}`;
+          const actions = document.createElement("div");
+          actions.className = "jammer-library-actions";
+          const previewButton = document.createElement("button");
+          previewButton.type = "button";
+          previewButton.className = "jammer-preview-icon";
+          previewButton.setAttribute("aria-label", `Preview ${instrument.name}`);
+          previewButton.title = `Preview ${instrument.name}`;
+          previewButton.innerHTML = `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 9v6"></path>
+              <path d="M9 7v10"></path>
+              <path d="M9 8 14 12 9 16"></path>
+              <path d="M17 9.5a3.5 3.5 0 0 1 0 5"></path>
+              <path d="M19 7a7 7 0 0 1 0 10"></path>
+            </svg>
+          `;
+          previewButton.addEventListener("click", () => {
+            const temporaryEntry = {
+              id: `library-preview-${instrument.id}`,
+              catalogId: instrument.id,
+              enabled: true,
+            };
+            toneDrumBus.previewVoice(temporaryEntry).catch((error) => {
+              log(`Instrument preview error: ${error.message}`);
+            });
+          });
           const addButton = document.createElement("button");
           addButton.type = "button";
           addButton.textContent = jammerDeckReplaceTargetId ? "Use Here" : "Add To Deck";
@@ -2372,9 +2464,12 @@
             renderInstrumentDeck();
             persistJammerLabSettings().catch((error) => log(`Drummer lab save error: ${error.message}`));
           });
-          card.appendChild(heading);
-          card.appendChild(meta);
-          card.appendChild(addButton);
+          info.appendChild(heading);
+          info.appendChild(meta);
+          card.appendChild(info);
+          actions.appendChild(previewButton);
+          actions.appendChild(addButton);
+          card.appendChild(actions);
           grid.appendChild(card);
         });
         group.appendChild(grid);
@@ -2646,7 +2741,7 @@
       jammerRouteValue.textContent = snapshot.routeLabel;
       jammerPatternValue.textContent = snapshot.patternLabel;
       jammerLaneValue.textContent = snapshot.laneLabel;
-      jammerToneValue.textContent = `v${toneDrumBusSummary.version} • ${toneDrumBusSummary.started ? "armed" : "installed"}`;
+      jammerToneValue.textContent = `v${toneDrumBusSummary.version} • ${toneDrumBusSummary.started ? "ready" : "installed"}`;
       jammerMaskValue.textContent = toneDrumBusSummary.analysisReferenceReady ? "Bus ready" : "Pending";
       jammerArchitectureList.innerHTML = "";
 
@@ -4004,6 +4099,9 @@
     jammerOpenLibraryButton.addEventListener("click", () => {
       toggleJammerLibrary(!jammerDeckLibraryOpen, null);
       renderInstrumentLibrary();
+    });
+    jammerCloseLibraryButton.addEventListener("click", () => {
+      toggleJammerLibrary(false, null);
     });
     jammerLabJamToggleButton.addEventListener("click", () => {
       startLabJam().catch((error) => {

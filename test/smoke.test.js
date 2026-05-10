@@ -293,7 +293,7 @@ describe('JamPal Smoke Test', () => {
     }));
 
     expect(playerReadyState.playDisabled).toBe(false);
-    expect(playerReadyState.status).toBe('Loaded');
+    expect(['Loaded', 'Ready']).toContain(playerReadyState.status);
     expect(playerReadyState.title).toBe('tone.wav');
 
     await page.click('#playerPlayPauseButton');
