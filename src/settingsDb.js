@@ -1,6 +1,7 @@
 const DB_NAME = "audio-reactive-recorder-db";
 const STORE_NAME = "app-settings";
-const DB_VERSION = 1;
+const ASSET_STORE_NAME = "app-assets";
+const DB_VERSION = 2;
 
 const defaultSettings = {
   activeTab: "studio",
@@ -8,6 +9,12 @@ const defaultSettings = {
   autoCycleEnabled: true,
   format: "webm",
   fps: "60",
+  playerBassGain: "0",
+  playerCurrentTime: "0",
+  playerMidGain: "0",
+  playerSourceKind: "",
+  playerTrackIndex: "0",
+  playerTrebleGain: "0",
   presetName: "",
   resolution: "1280x720",
   skinId: "midnight-signal",
@@ -24,6 +31,9 @@ function openDatabase() {
       if (!database.objectStoreNames.contains(STORE_NAME)) {
         database.createObjectStore(STORE_NAME);
       }
+      if (!database.objectStoreNames.contains(ASSET_STORE_NAME)) {
+        database.createObjectStore(ASSET_STORE_NAME);
+      }
     });
 
     request.addEventListener("success", () => resolve(request.result));
@@ -31,12 +41,12 @@ function openDatabase() {
   });
 }
 
-async function withStore(mode, callback) {
+async function withStore(storeName, mode, callback) {
   const database = await openDatabase();
 
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction(STORE_NAME, mode);
-    const store = transaction.objectStore(STORE_NAME);
+    const transaction = database.transaction(storeName, mode);
+    const store = transaction.objectStore(storeName);
 
     let callbackResult;
     try {
@@ -65,7 +75,7 @@ async function withStore(mode, callback) {
 export async function loadSettings() {
   const settings = { ...defaultSettings };
 
-  await withStore("readonly", (store) => {
+  await withStore(STORE_NAME, "readonly", (store) => {
     Object.keys(defaultSettings).forEach((key) => {
       const request = store.get(key);
       request.addEventListener("success", () => {
@@ -80,8 +90,33 @@ export async function loadSettings() {
 }
 
 export async function saveSetting(key, value) {
-  return withStore("readwrite", (store) => {
+  return withStore(STORE_NAME, "readwrite", (store) => {
     store.put(value, key);
+  });
+}
+
+export async function loadAsset(key) {
+  let result;
+
+  await withStore(ASSET_STORE_NAME, "readonly", (store) => {
+    const request = store.get(key);
+    request.addEventListener("success", () => {
+      result = request.result;
+    });
+  });
+
+  return result;
+}
+
+export async function saveAsset(key, value) {
+  return withStore(ASSET_STORE_NAME, "readwrite", (store) => {
+    store.put(value, key);
+  });
+}
+
+export async function deleteAsset(key) {
+  return withStore(ASSET_STORE_NAME, "readwrite", (store) => {
+    store.delete(key);
   });
 }
 

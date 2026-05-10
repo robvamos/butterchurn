@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
-  <title>Butterchurn Audio Reactive Recorder</title>
+  <title>JamPal</title>
   <script src="/node_modules/butterchurn-presets-js/lib/butterchurnPresets.min.js"></script>
   <style>
     :root {
@@ -63,16 +63,33 @@
 
     .sidebar-header {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 18px;
+      cursor: pointer;
+    }
+
+    .sidebar-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-line {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
+      flex-wrap: wrap;
     }
 
     .eyebrow {
       color: var(--accent);
-      font-size: 12px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0;
       text-transform: uppercase;
+      font-family: var(--font-display);
     }
 
     h1 {
@@ -87,13 +104,6 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
-    }
-
-    .tab-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
     }
 
     .tab-button {
@@ -112,6 +122,24 @@
       color: var(--text);
       border-color: var(--accent);
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    .settings-icon-button {
+      width: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      align-self: start;
+    }
+
+    .settings-icon-button svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
     }
 
     .panel-section {
@@ -200,6 +228,156 @@
       border: 1px solid var(--field-border);
       border-radius: 8px;
       background: var(--panel-2);
+    }
+
+    .player-panel {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 24%), var(--panel-2);
+    }
+
+    .player-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .player-source-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .player-now {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .player-title {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .player-play-button {
+      min-height: 44px;
+      border-color: var(--accent);
+    }
+
+    .player-play-button.active {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .player-progress {
+      display: grid;
+      gap: 6px;
+    }
+
+    .player-progress input[type="range"] {
+      padding: 0;
+    }
+
+    .player-time {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .player-meta-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .player-mini-status {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .eq-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .eq-band {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .eq-band label {
+      font-size: 11px;
+    }
+
+    .eq-value {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .preset-panel {
+      display: grid;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+
+    .preset-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .preset-row.actions {
+      grid-template-columns: auto auto auto auto minmax(64px, 84px);
+    }
+
+    .preset-panel label {
+      font-size: 12px;
+    }
+
+    .preset-panel .checkbox-row {
+      justify-self: start;
+    }
+
+    .preset-panel .hint {
+      font-size: 11px;
+      line-height: 1.35;
     }
 
     .control-row {
@@ -331,6 +509,14 @@
       gap: 10px;
     }
 
+    .meter-route {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
     .meter-status {
       color: var(--muted);
       font-size: 11px;
@@ -361,48 +547,6 @@
     .skin-grid {
       display: grid;
       gap: 10px;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background: rgba(5, 8, 12, 0.72);
-      backdrop-filter: blur(6px);
-      z-index: 20;
-    }
-
-    .modal-card {
-      width: min(100%, 420px);
-      display: grid;
-      gap: 12px;
-      padding: 18px;
-      border: 1px solid var(--field-border);
-      border-radius: 8px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 22%), var(--panel);
-      box-shadow: var(--shadow);
-    }
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-      font-family: var(--font-display);
-    }
-
-    .modal-copy {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .modal-list {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
     }
 
     .skin-option {
@@ -458,16 +602,19 @@
 
     .stage {
       display: grid;
-      place-items: center;
+      align-content: start;
       min-width: 0;
-      padding: 20px;
+      padding: 0;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 20%);
     }
 
     .stage-shell {
-      width: min(100%, 1320px);
+      width: min(100%, 50vw, 720px);
       display: grid;
-      gap: 14px;
+      gap: 0;
+      position: relative;
+      min-width: 320px;
+      max-width: min(100%, 1200px);
     }
 
     .stage-header {
@@ -479,6 +626,16 @@
       font-size: 13px;
     }
 
+    .stage-header-side {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+    }
+
+    .stage-capture-actions {
+      width: min(240px, 100%);
+    }
+
     .stage-title {
       color: var(--text);
       font-size: 18px;
@@ -487,22 +644,159 @@
     }
 
     .canvas-frame {
-      border: 1px solid var(--field-border);
-      border-radius: 12px;
-      padding: 16px;
+      position: relative;
+      border-left: 0;
+      border-top: 0;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 0;
+      padding: 0;
       background: var(--canvas-frame);
-      box-shadow: var(--shadow);
+      box-shadow: none;
+      user-select: none;
     }
 
     canvas {
-      width: min(100%, 1280px);
+      width: 100%;
       aspect-ratio: 16 / 9;
       display: block;
       background: #000;
-      border-radius: 8px;
+      border-radius: 0;
+    }
+
+    .canvas-frame::after {
+      content: "Double click to expand";
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(10, 14, 20, 0.72);
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      opacity: 0;
+      transition: opacity 120ms ease;
+      pointer-events: none;
+    }
+
+    .canvas-frame:hover::after {
+      opacity: 1;
+    }
+
+    .canvas-frame.expanded::after {
+      content: "Double click for fullscreen";
+      opacity: 1;
+    }
+
+    .canvas-frame.fullscreen-active::after {
+      content: "Double click or ESC to restore";
+      opacity: 1;
+    }
+
+    .resize-handle {
+      position: absolute;
+      z-index: 3;
+    }
+
+    .resize-handle.edge-n,
+    .resize-handle.edge-s {
+      left: 12px;
+      right: 12px;
+      height: 10px;
+      cursor: ns-resize;
+    }
+
+    .resize-handle.edge-n {
+      top: -5px;
+    }
+
+    .resize-handle.edge-s {
+      bottom: -5px;
+    }
+
+    .resize-handle.edge-e,
+    .resize-handle.edge-w {
+      top: 12px;
+      bottom: 12px;
+      width: 10px;
+    }
+
+    .resize-handle.edge-e {
+      right: -5px;
+      cursor: ew-resize;
+    }
+
+    .resize-handle.edge-w {
+      left: -5px;
+      cursor: ew-resize;
+    }
+
+    .resize-handle.corner-nw,
+    .resize-handle.corner-ne,
+    .resize-handle.corner-sw,
+    .resize-handle.corner-se {
+      width: 16px;
+      height: 16px;
+    }
+
+    .resize-handle.corner-nw {
+      top: -8px;
+      left: -8px;
+      cursor: nwse-resize;
+    }
+
+    .resize-handle.corner-ne {
+      top: -8px;
+      right: -8px;
+      cursor: nesw-resize;
+    }
+
+    .resize-handle.corner-sw {
+      bottom: -8px;
+      left: -8px;
+      cursor: nesw-resize;
+    }
+
+    .resize-handle.corner-se {
+      right: -8px;
+      bottom: -8px;
+      cursor: nwse-resize;
+    }
+
+    .stage-shell.expanded {
+      position: fixed;
+      inset: 12px;
+      width: auto !important;
+      max-width: none;
+      z-index: 30;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(7, 10, 14, 0.98);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+    }
+
+    .stage-shell.expanded .canvas-frame {
+      border: 1px solid var(--field-border);
+    }
+
+    .stage-shell.expanded canvas {
+      height: calc(100vh - 110px);
+      max-height: calc(100vh - 110px);
+      width: auto;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .stage-shell.expanded .resize-handle {
+      display: none;
     }
 
     @media (max-width: 960px) {
+      .stage-shell {
+        width: 100%;
+      }
+
       main {
         grid-template-columns: 1fr;
       }
@@ -515,6 +809,8 @@
 
     @media (max-width: 720px) {
       .inline-actions,
+      .preset-row,
+      .preset-row.actions,
       .stage-header {
         grid-template-columns: 1fr;
       }
@@ -525,6 +821,14 @@
 
       .stage-header {
         display: grid;
+      }
+
+      .stage-header-side {
+        justify-items: stretch;
+      }
+
+      .stage-capture-actions {
+        width: 100%;
       }
     }
 
@@ -539,41 +843,23 @@
 <body>
   <main>
     <aside>
-      <div class="sidebar-header">
-        <div class="eyebrow">Audio2VideoPal Lab</div>
-        <h1>Butterchurn Recorder</h1>
-        <div class="subtitle">Microphone-reactive visuals, preset steering, and quick export from one live control room.</div>
-      </div>
-
-      <div class="tab-row">
-        <button id="studioTabButton" class="tab-button active" type="button" data-tab="studio">Studio</button>
-        <button id="settingsTabButton" class="tab-button" type="button" data-tab="settings">Settings</button>
+      <div id="studioHomeButton" class="sidebar-header" role="button" tabindex="0" aria-label="Open studio">
+        <div class="sidebar-header-top">
+          <div class="brand-line">
+            <div class="eyebrow">JamPal</div>
+            <h1>Listen&React</h1>
+          </div>
+          <button id="settingsTabButton" class="tab-button settings-icon-button" type="button" data-tab="settings" aria-label="Open settings" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10.2 3.6h3.6l.42 2.1a6.9 6.9 0 0 1 1.45.6l1.82-1.14 2.54 2.54-1.14 1.82c.24.46.44.95.6 1.45l2.1.42v3.6l-2.1.42a6.9 6.9 0 0 1-.6 1.45l1.14 1.82-2.54 2.54-1.82-1.14c-.46.24-.95.44-1.45.6l-.42 2.1h-3.6l-.42-2.1a6.9 6.9 0 0 1-1.45-.6l-1.82 1.14-2.54-2.54 1.14-1.82a6.9 6.9 0 0 1-.6-1.45l-2.1-.42v-3.6l2.1-.42c.16-.5.36-.99.6-1.45L3.67 7.7 6.2 5.16l1.82 1.14c.46-.24.95-.44 1.45-.6l.73-2.1Z" stroke-width="1.35" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="3.1" stroke-width="1.5"/>
+            </svg>
+          </button>
+        </div>
+        <div class="subtitle">Live audio and video reactions</div>
       </div>
 
       <section id="studioPanel" class="panel-section active" data-panel="studio">
-        <div class="summary-card">
-          <div class="section-title">Session Snapshot</div>
-          <div class="summary-grid">
-            <div class="summary-stat">
-              <div class="summary-stat-label">Skin</div>
-              <div id="skinSummaryValue" class="summary-stat-value">Midnight Signal</div>
-            </div>
-            <div class="summary-stat">
-              <div class="summary-stat-label">Presets</div>
-              <div id="presetSummaryValue" class="summary-stat-value">0</div>
-            </div>
-            <div class="summary-stat">
-              <div class="summary-stat-label">Export</div>
-              <div id="formatSummaryValue" class="summary-stat-value">WebM</div>
-            </div>
-            <div class="summary-stat">
-              <div class="summary-stat-label">Input</div>
-              <div id="audioSummaryValue" class="summary-stat-value">System default</div>
-            </div>
-          </div>
-          <div class="summary-note">Selections persist locally and reload with the last session state.</div>
-        </div>
-
         <div class="controls">
           <div class="button-row">
             <button id="startMicButton" class="primary-action" type="button">Start Mic</button>
@@ -583,14 +869,135 @@
           <div class="control-group">
             <div class="meter-header">
               <label>Energy</label>
-              <div id="meterStatusLabel" class="meter-status">Idle</div>
+              <div class="meter-route">
+                <span id="meterSourceLabel">No input</span>
+                <span> • </span>
+                <span id="meterStatusLabel" class="meter-status">Idle</span>
+              </div>
             </div>
             <div class="meter"><div id="meterFill" class="meter-fill"></div></div>
-            <div class="hint">Live input preview stays available even when recording is off.</div>
+            <div class="hint">Only one input route is active at a time. Player play takes over and stops the microphone route.</div>
           </div>
 
+          <div class="player-panel">
+            <div class="player-topbar">
+              <label for="playerTrackSelect">Player</label>
+              <div id="playerStatusLabel" class="player-mini-status">No track</div>
+            </div>
+
+            <div class="player-now">
+              <div id="playerTrackTitle" class="player-title">No track loaded</div>
+              <div id="playerPlaylistLabel" class="player-subtitle">Choose a folder playlist or a single audio file.</div>
+            </div>
+
+            <div class="player-meta-row">
+              <select id="playerTrackSelect">
+                <option value="">No tracks loaded</option>
+              </select>
+              <button id="clearPlaylistButton" type="button">Clear</button>
+            </div>
+
+            <div class="player-controls">
+              <button id="playerPrevButton" type="button" disabled title="Previous track" aria-label="Previous track">◀◀</button>
+              <button id="playerPlayPauseButton" class="player-play-button" type="button" disabled title="Play" aria-label="Play">▶</button>
+              <button id="playerNextButton" type="button" disabled title="Next track" aria-label="Next track">▶▶</button>
+            </div>
+
+            <div class="player-progress">
+              <input id="playerProgress" type="range" min="0" max="1000" step="1" value="0" disabled>
+              <div class="player-time">
+                <span id="playerCurrentTimeLabel">00:00</span>
+                <span id="playerDurationLabel">00:00</span>
+              </div>
+            </div>
+
+            <div class="eq-grid">
+              <div class="eq-band">
+                <div class="player-meta-row">
+                  <label for="playerBassSlider">Bass</label>
+                  <span id="playerBassValue" class="eq-value">0 dB</span>
+                </div>
+                <input id="playerBassSlider" type="range" min="-12" max="12" step="1" value="0">
+              </div>
+              <div class="eq-band">
+                <div class="player-meta-row">
+                  <label for="playerMidSlider">Mid</label>
+                  <span id="playerMidValue" class="eq-value">0 dB</span>
+                </div>
+                <input id="playerMidSlider" type="range" min="-12" max="12" step="1" value="0">
+              </div>
+              <div class="eq-band">
+                <div class="player-meta-row">
+                  <label for="playerTrebleSlider">Treble</label>
+                  <span id="playerTrebleValue" class="eq-value">0 dB</span>
+                </div>
+                <input id="playerTrebleSlider" type="range" min="-12" max="12" step="1" value="0">
+              </div>
+            </div>
+
+            <div class="player-source-actions">
+              <button id="loadFolderButton" type="button">Load Folder</button>
+              <button id="openTrackButton" type="button">Open Track</button>
+            </div>
+          </div>
+
+          <div class="preset-panel">
+            <div class="preset-row">
+              <label for="presetSelect">Visualizer</label>
+            </div>
+            <select id="presetSelect">
+              <option value="">Loading presets...</option>
+            </select>
+            <div class="preset-row actions">
+              <label class="checkbox-row" for="autoCycleEnabled">
+                <input id="autoCycleEnabled" type="checkbox" checked>
+                <span>Cycle</span>
+              </label>
+              <button id="randomPresetButton" type="button">Random</button>
+              <button id="nextPresetButton" type="button">Next</button>
+              <label for="cycleSeconds">Sec</label>
+              <input id="cycleSeconds" type="number" min="3" step="1" value="15">
+            </div>
+            <div class="button-row">
+              <button id="startRecordingButton" class="primary-action" type="button" disabled>Record</button>
+              <button id="stopRecordingButton" type="button" disabled>Finish</button>
+            </div>
+            <div class="hint">Preset cycling runs only while a live audio input is connected.</div>
+          </div>
+
+          <a id="downloadLink" class="download-link" download="butterchurn-recording.webm">Download Video</a>
+
+          <div id="log" class="log"></div>
+
+          <div class="summary-card">
+            <div class="section-title">Session Snapshot</div>
+            <div class="summary-grid">
+              <div class="summary-stat">
+                <div class="summary-stat-label">Skin</div>
+                <div id="skinSummaryValue" class="summary-stat-value">Midnight Signal</div>
+              </div>
+              <div class="summary-stat">
+                <div class="summary-stat-label">Presets</div>
+                <div id="presetSummaryValue" class="summary-stat-value">0</div>
+              </div>
+              <div class="summary-stat">
+                <div class="summary-stat-label">Export</div>
+                <div id="formatSummaryValue" class="summary-stat-value">WebM</div>
+              </div>
+              <div class="summary-stat">
+                <div class="summary-stat-label">Input</div>
+                <div id="audioSummaryValue" class="summary-stat-value">System default</div>
+              </div>
+            </div>
+            <div class="summary-note">Selections persist locally and reload with the last session state.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settingsPanel" class="panel-section" data-panel="settings">
+        <div class="settings-card">
+          <div class="section-title">Audio Device</div>
           <div class="control-group compact-group">
-            <label for="audioDeviceSelect">Audio Device</label>
             <div class="inline-actions">
               <select id="audioDeviceSelect">
                 <option value="">System default input</option>
@@ -600,43 +1007,8 @@
             </div>
             <div id="audioDeviceHint" class="hint">The app asks for microphone access on load so the browser can reveal real input names as early as possible.</div>
           </div>
-
-          <div class="control-group">
-            <label for="presetSelect">Preset</label>
-            <select id="presetSelect">
-              <option value="">Loading presets...</option>
-            </select>
-          </div>
-
-          <div class="button-row">
-            <button id="randomPresetButton" type="button">Random</button>
-            <button id="nextPresetButton" type="button">Next</button>
-          </div>
-
-          <div class="control-group">
-            <div class="control-row">
-              <label for="cycleSeconds">Auto Cycle Seconds</label>
-              <label class="checkbox-row" for="autoCycleEnabled">
-                <input id="autoCycleEnabled" type="checkbox" checked>
-                <span>Enabled</span>
-              </label>
-            </div>
-            <input id="cycleSeconds" type="number" min="3" step="1" value="15">
-            <div class="hint">Preset cycling runs only while a live audio input is connected.</div>
-          </div>
-
-          <div class="button-row">
-            <button id="startRecordingButton" class="primary-action" type="button" disabled>Record</button>
-            <button id="stopRecordingButton" type="button" disabled>Finish</button>
-          </div>
-
-          <a id="downloadLink" class="download-link" download="butterchurn-recording.webm">Download Video</a>
-
-          <div id="log" class="log"></div>
         </div>
-      </section>
 
-      <section id="settingsPanel" class="panel-section" data-panel="settings">
         <div class="settings-card">
           <div class="section-title">Visual Skin Library</div>
           <div class="section-copy">All palette, typography, button, stage, and meter variables are driven from the application theme catalog.</div>
@@ -691,42 +1063,41 @@
             <div class="stage-title">Live Visual Stage</div>
             <div id="stagePresetLabel">Waiting for a preset...</div>
           </div>
-          <div id="stageMetaLabel">720p • 60 FPS • WebM</div>
+          <div class="stage-header-side">
+            <div id="stageMetaLabel">720p • 60 FPS • WebM</div>
+          </div>
         </div>
 
         <div class="canvas-frame">
           <canvas id="canvas" width="1280" height="720"></canvas>
+          <div class="resize-handle edge-n" data-resize="n"></div>
+          <div class="resize-handle edge-e" data-resize="e"></div>
+          <div class="resize-handle edge-s" data-resize="s"></div>
+          <div class="resize-handle edge-w" data-resize="w"></div>
+          <div class="resize-handle corner-nw" data-resize="nw"></div>
+          <div class="resize-handle corner-ne" data-resize="ne"></div>
+          <div class="resize-handle corner-sw" data-resize="sw"></div>
+          <div class="resize-handle corner-se" data-resize="se"></div>
         </div>
       </div>
     </section>
   </main>
 
-  <div id="micPermissionModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="micPermissionModalTitle">
-    <div class="modal-card">
-      <div id="micPermissionModalTitle" class="modal-title">Microphone Access Blocked</div>
-      <div id="micPermissionModalCopy" class="modal-copy">
-        This browser has already blocked microphone access for this page, so it will not show the native permission prompt again until access is re-enabled.
-      </div>
-      <ol class="modal-list">
-        <li>Open the site controls near the address bar.</li>
-        <li>Set Microphone access to Allow for this page.</li>
-        <li>Reload the page or press Refresh in the audio section.</li>
-      </ol>
-      <div class="button-row">
-        <button id="micPermissionModalCloseButton" type="button">Close</button>
-        <button id="micPermissionModalRetryButton" class="primary-action" type="button">Try Again</button>
-      </div>
-    </div>
-  </div>
+  <input id="singleTrackInput" class="hidden" type="file" accept="audio/*">
+  <input id="folderTrackInput" class="hidden" type="file" accept="audio/*" webkitdirectory multiple>
+  <audio id="playerAudio" preload="metadata" class="hidden"></audio>
 
   <script type="module">
     import butterchurn from "../dist/butterchurn.js";
     import Recorder from "../src/recorder.js";
     import { applySkin, defaultSkinId, getSkinById, skinCatalog } from "../src/skins.js";
-    import { loadSettings, saveSetting } from "../src/settingsDb.js";
+    import { deleteAsset, loadAsset, loadSettings, saveAsset, saveSetting } from "../src/settingsDb.js";
 
     const root = document.documentElement;
     const canvas = document.getElementById("canvas");
+    const stageShell = document.querySelector(".stage-shell");
+    const canvasFrame = document.querySelector(".canvas-frame");
+    const studioHomeButton = document.getElementById("studioHomeButton");
     const presetSelect = document.getElementById("presetSelect");
     const startMicButton = document.getElementById("startMicButton");
     const stopMicButton = document.getElementById("stopMicButton");
@@ -738,8 +1109,31 @@
     const stopRecordingButton = document.getElementById("stopRecordingButton");
     const downloadLink = document.getElementById("downloadLink");
     const meterFill = document.getElementById("meterFill");
+    const meterSourceLabel = document.getElementById("meterSourceLabel");
     const meterStatusLabel = document.getElementById("meterStatusLabel");
     const logEl = document.getElementById("log");
+    const loadFolderButton = document.getElementById("loadFolderButton");
+    const openTrackButton = document.getElementById("openTrackButton");
+    const clearPlaylistButton = document.getElementById("clearPlaylistButton");
+    const playerTrackSelect = document.getElementById("playerTrackSelect");
+    const playerPrevButton = document.getElementById("playerPrevButton");
+    const playerPlayPauseButton = document.getElementById("playerPlayPauseButton");
+    const playerNextButton = document.getElementById("playerNextButton");
+    const playerProgress = document.getElementById("playerProgress");
+    const playerCurrentTimeLabel = document.getElementById("playerCurrentTimeLabel");
+    const playerDurationLabel = document.getElementById("playerDurationLabel");
+    const playerTrackTitle = document.getElementById("playerTrackTitle");
+    const playerPlaylistLabel = document.getElementById("playerPlaylistLabel");
+    const playerStatusLabel = document.getElementById("playerStatusLabel");
+    const playerBassSlider = document.getElementById("playerBassSlider");
+    const playerMidSlider = document.getElementById("playerMidSlider");
+    const playerTrebleSlider = document.getElementById("playerTrebleSlider");
+    const playerBassValue = document.getElementById("playerBassValue");
+    const playerMidValue = document.getElementById("playerMidValue");
+    const playerTrebleValue = document.getElementById("playerTrebleValue");
+    const singleTrackInput = document.getElementById("singleTrackInput");
+    const folderTrackInput = document.getElementById("folderTrackInput");
+    const playerAudio = document.getElementById("playerAudio");
     const audioDeviceSelect = document.getElementById("audioDeviceSelect");
     const audioDeviceHint = document.getElementById("audioDeviceHint");
     const fpsSelect = document.getElementById("fpsSelect");
@@ -749,7 +1143,6 @@
     const refreshDevicesButton = document.getElementById("refreshDevicesButton");
     const requestMicPermissionButton = document.getElementById("requestMicPermissionButton");
     const skinGrid = document.getElementById("skinGrid");
-    const studioTabButton = document.getElementById("studioTabButton");
     const settingsTabButton = document.getElementById("settingsTabButton");
     const studioPanel = document.getElementById("studioPanel");
     const settingsPanel = document.getElementById("settingsPanel");
@@ -759,10 +1152,6 @@
     const audioSummaryValue = document.getElementById("audioSummaryValue");
     const stagePresetLabel = document.getElementById("stagePresetLabel");
     const stageMetaLabel = document.getElementById("stageMetaLabel");
-    const micPermissionModal = document.getElementById("micPermissionModal");
-    const micPermissionModalCopy = document.getElementById("micPermissionModalCopy");
-    const micPermissionModalCloseButton = document.getElementById("micPermissionModalCloseButton");
-    const micPermissionModalRetryButton = document.getElementById("micPermissionModalRetryButton");
 
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     const PSEUDO_AUDIO_DEVICE_IDS = new Set(["default", "communications"]);
@@ -771,9 +1160,24 @@
     let audioContext;
     let analyser;
     let visualizer;
+    let activeAudioNode = null;
+    let activeInputMode = "none";
     let micStream;
     let micSource;
     let gainNode;
+    let playerSourceNode;
+    let playerAnalyser;
+    let playerOutputNode;
+    let playerVisualizerNode;
+    let bassFilter;
+    let midFilter;
+    let trebleFilter;
+    let playerPlaylist = [];
+    let playerTrackIndex = 0;
+    let playerObjectUrl = null;
+    let suppressPlayerTrackChange = false;
+    let lastPlayerPersistedSecond = -1;
+    let playerProgressWatchTimer = null;
     let animationId;
     let cycleTimer;
     let presets = {};
@@ -782,6 +1186,14 @@
     let activeDownloadUrl = null;
     let activeSkinId = defaultSkinId;
     let appSettings;
+    let stageResizeState = null;
+    let stageExpanded = false;
+    let stageInlineWidth = "";
+    let stageFullscreenActive = false;
+
+    const STAGE_MIN_WIDTH = 320;
+    const STAGE_MAX_WIDTH = 1400;
+    const STAGE_ASPECT_RATIO = 16 / 9;
 
     function log(message) {
       const time = new Date().toLocaleTimeString();
@@ -793,6 +1205,179 @@
         URL.revokeObjectURL(activeDownloadUrl);
         activeDownloadUrl = null;
       }
+    }
+
+    function clampStageWidth(width) {
+      const viewportLimit = Math.max(STAGE_MIN_WIDTH, window.innerWidth - 32);
+      return Math.min(Math.max(width, STAGE_MIN_WIDTH), Math.min(STAGE_MAX_WIDTH, viewportLimit));
+    }
+
+    function setStageWidth(width) {
+      if (stageExpanded) {
+        return;
+      }
+
+      stageInlineWidth = `${Math.round(clampStageWidth(width))}px`;
+      stageShell.style.width = stageInlineWidth;
+    }
+
+    function toggleStageExpanded(forceExpanded) {
+      const nextExpanded = typeof forceExpanded === "boolean" ? forceExpanded : !stageExpanded;
+      if (nextExpanded === stageExpanded) {
+        return;
+      }
+
+      if (nextExpanded) {
+        stageInlineWidth = stageShell.style.width || stageInlineWidth;
+      }
+
+      stageExpanded = nextExpanded;
+      stageShell.classList.toggle("expanded", stageExpanded);
+      canvasFrame.classList.toggle("expanded", stageExpanded);
+
+      if (!stageExpanded && stageInlineWidth) {
+        stageShell.style.width = stageInlineWidth;
+      }
+    }
+
+    async function requestStageFullscreen() {
+      if (document.fullscreenElement === stageShell) {
+        return;
+      }
+
+      if (!stageExpanded) {
+        toggleStageExpanded(true);
+      }
+
+      if (stageShell.requestFullscreen) {
+        await stageShell.requestFullscreen();
+      }
+    }
+
+    async function exitStageFullscreen({ collapse = false } = {}) {
+      if (document.fullscreenElement === stageShell && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+
+      if (collapse) {
+        toggleStageExpanded(false);
+      }
+    }
+
+    function getResizeWidthFromPointer(mode, event) {
+      const bounds = stageShell.getBoundingClientRect();
+      const fromRight = event.clientX - bounds.left;
+      const fromBottom = (event.clientY - bounds.top) * STAGE_ASPECT_RATIO;
+
+      if (mode.includes("e")) {
+        return fromRight;
+      }
+      if (mode.includes("w")) {
+        return bounds.width + (bounds.left - event.clientX);
+      }
+      if (mode.includes("s")) {
+        return fromBottom;
+      }
+      if (mode.includes("n")) {
+        return bounds.width + ((bounds.top - event.clientY) * STAGE_ASPECT_RATIO);
+      }
+
+      return bounds.width;
+    }
+
+    function stopStageResize() {
+      if (!stageResizeState) {
+        return;
+      }
+
+      window.removeEventListener("pointermove", stageResizeState.onMove);
+      window.removeEventListener("pointerup", stageResizeState.onUp);
+      stageResizeState = null;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    }
+
+    function startStageResize(event, mode) {
+      if (stageExpanded) {
+        return;
+      }
+
+      event.preventDefault();
+      const onMove = (moveEvent) => {
+        const nextWidth = getResizeWidthFromPointer(mode, moveEvent);
+        setStageWidth(nextWidth);
+      };
+      const onUp = () => stopStageResize();
+
+      stopStageResize();
+      stageResizeState = { onMove, onUp };
+      document.body.style.cursor = window.getComputedStyle(event.currentTarget).cursor;
+      document.body.style.userSelect = "none";
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp, { once: true });
+    }
+
+    function clearPlayerObjectUrl() {
+      if (playerObjectUrl) {
+        URL.revokeObjectURL(playerObjectUrl);
+        playerObjectUrl = null;
+      }
+    }
+
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds) || seconds < 0) {
+        return "00:00";
+      }
+
+      const totalSeconds = Math.floor(seconds);
+      const minutes = Math.floor(totalSeconds / 60);
+      const remainder = totalSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+    }
+
+    function inferAudioMimeType(fileName) {
+      const lowerName = fileName.toLowerCase();
+      if (lowerName.endsWith(".mp3")) {
+        return "audio/mpeg";
+      }
+      if (lowerName.endsWith(".ogg")) {
+        return "audio/ogg";
+      }
+      if (lowerName.endsWith(".opus")) {
+        return "audio/ogg; codecs=opus";
+      }
+      if (lowerName.endsWith(".wav")) {
+        return "audio/wav";
+      }
+      if (lowerName.endsWith(".m4a") || lowerName.endsWith(".aac")) {
+        return "audio/mp4";
+      }
+      if (lowerName.endsWith(".flac")) {
+        return "audio/flac";
+      }
+
+      return "audio/*";
+    }
+
+    async function normalizePlayableFile(file) {
+      const type = file.type && file.type !== "application/octet-stream"
+        ? file.type
+        : inferAudioMimeType(file.name);
+
+      if (file.type === type) {
+        return file;
+      }
+
+      const bytes = await file.arrayBuffer();
+      return new File([bytes], file.name, {
+        type,
+        lastModified: file.lastModified,
+      });
+    }
+
+    function updateEqValueLabel(element, value) {
+      const amount = Number(value);
+      element.textContent = `${amount > 0 ? "+" : ""}${amount} dB`;
     }
 
     function persistSetting(key, value) {
@@ -813,11 +1398,18 @@
       bitrateSelect.value = settings.bitrate;
       formatSelect.value = settings.format;
       resolutionSelect.value = settings.resolution;
+      playerBassSlider.value = settings.playerBassGain;
+      playerMidSlider.value = settings.playerMidGain;
+      playerTrebleSlider.value = settings.playerTrebleGain;
+      updateEqValueLabel(playerBassValue, settings.playerBassGain);
+      updateEqValueLabel(playerMidValue, settings.playerMidGain);
+      updateEqValueLabel(playerTrebleValue, settings.playerTrebleGain);
     }
 
     function refreshAudioSummary() {
       const selectedOption = audioDeviceSelect.selectedOptions[0];
       audioSummaryValue.textContent = selectedOption ? selectedOption.textContent : "System default";
+      refreshMeterRoute();
     }
 
     function getSelectableAudioInputs(devices) {
@@ -864,34 +1456,596 @@
       meterStatusLabel.textContent = text;
     }
 
+    function hasSelectedMicRoute() {
+      return Boolean(audioDeviceSelect.value || appSettings?.audioDeviceId);
+    }
+
+    function applyStandbyMeterState() {
+      if (!isPlayerPlaying() && hasSelectedMicRoute()) {
+        meterFill.style.width = "14%";
+        updateMeterStatus("Armed");
+      } else {
+        meterFill.style.width = "0%";
+        updateMeterStatus(isPlayerPlaying() ? "Player" : "Idle");
+      }
+      refreshMeterRoute();
+    }
+
+    function getMeterRouteLabel() {
+      if (isPlayerPlaying() || activeInputMode === "player") {
+        return "Player";
+      }
+
+      if (isMicrophoneActive() || audioDeviceSelect.value || appSettings?.audioDeviceId) {
+        return "Mic";
+      }
+
+      return "No input";
+    }
+
+    function refreshMeterRoute() {
+      meterSourceLabel.textContent = getMeterRouteLabel();
+    }
+
+    function updatePlayerStatus(text) {
+      playerStatusLabel.textContent = text;
+    }
+
+    function updatePlayerTimes() {
+      playerCurrentTimeLabel.textContent = formatTime(playerAudio.currentTime || 0);
+      playerDurationLabel.textContent = formatTime(playerAudio.duration || 0);
+      const duration = Number.isFinite(playerAudio.duration) && playerAudio.duration > 0 ? playerAudio.duration : 0;
+      const progress = duration > 0 ? Math.round((playerAudio.currentTime / duration) * 1000) : 0;
+      playerProgress.value = String(progress);
+    }
+
+    function updatePlayerTrackSummary() {
+      const track = playerPlaylist[playerTrackIndex];
+      playerTrackTitle.textContent = track ? track.name : "No track loaded";
+      const descriptor = track
+        ? `${playerTrackIndex + 1} of ${playerPlaylist.length} • ${track.sourceLabel}`
+        : "Choose a folder playlist or a single audio file.";
+      playerPlaylistLabel.textContent = descriptor;
+    }
+
+    function updatePlayerButtons() {
+      const hasTracks = playerPlaylist.length > 0;
+      const isPlaying = !playerAudio.paused && !playerAudio.ended && !!playerAudio.src;
+      const isPaused = hasTracks && !isPlaying && !!playerAudio.src && (playerAudio.currentTime || 0) > 0;
+      playerPlayPauseButton.disabled = !hasTracks;
+      playerPrevButton.disabled = !hasTracks || playerPlaylist.length < 2;
+      playerNextButton.disabled = !hasTracks || playerPlaylist.length < 2;
+      playerProgress.disabled = !hasTracks;
+      clearPlaylistButton.disabled = !hasTracks;
+      playerPlayPauseButton.textContent = isPlaying ? "■" : "▶";
+      playerPlayPauseButton.title = isPlaying ? "Stop" : "Play";
+      playerPlayPauseButton.setAttribute("aria-label", isPlaying ? "Stop" : "Play");
+      playerPrevButton.title = "Previous track";
+      playerPrevButton.setAttribute("aria-label", "Previous track");
+      playerNextButton.title = "Next track";
+      playerNextButton.setAttribute("aria-label", "Next track");
+      playerPlayPauseButton.classList.toggle("active", isPlaying);
+      updatePlayerStatus(
+        !hasTracks ? "No track" : isPlaying ? "Playing" : isPaused ? "Paused" : "Ready"
+      );
+    }
+
+    function refreshPlayerUI() {
+      updatePlayerTrackSummary();
+      updatePlayerTimes();
+      updatePlayerButtons();
+    }
+
+    function persistPlayerState() {
+      persistSetting("playerTrackIndex", String(playerTrackIndex));
+      persistSetting("playerCurrentTime", String(playerAudio.currentTime || 0));
+    }
+
+    function clearPlayerProgressWatch() {
+      if (playerProgressWatchTimer) {
+        clearTimeout(playerProgressWatchTimer);
+        playerProgressWatchTimer = null;
+      }
+    }
+
     function setMicPermissionButtonVisible(visible) {
       requestMicPermissionButton.classList.toggle("hidden", !visible);
     }
 
-    function showMicPermissionModal(message) {
-      if (message) {
-        micPermissionModalCopy.textContent = message;
-      }
-
-      micPermissionModal.classList.remove("hidden");
-    }
-
-    function hideMicPermissionModal() {
-      micPermissionModal.classList.add("hidden");
-    }
-
-    function hasLiveAudioInput() {
+    function isMicrophoneActive() {
       return Boolean(
         micStream &&
         micStream.getAudioTracks().some((track) => track.readyState === "live" && track.enabled)
       );
     }
 
+    function isPlayerPlaying() {
+      return Boolean(playerAudio.src && !playerAudio.paused && !playerAudio.ended);
+    }
+
+    function syncMicButtons() {
+      const micActive = isMicrophoneActive();
+      const playerLocked = isPlayerPlaying();
+      startMicButton.disabled = playerLocked || micActive;
+      stopMicButton.disabled = playerLocked || !micActive;
+      startRecordingButton.disabled = playerLocked || !micActive;
+      if (playerLocked) {
+        updateMeterStatus("Player");
+      }
+    }
+
+    function releaseMicrophoneForPlayer() {
+      if (micStream || activeInputMode === "microphone" || !stopMicButton.disabled) {
+        stopMicrophone();
+      }
+    }
+
+    function setActiveAudioInput(node, analyserNode, mode) {
+      if (visualizer && activeAudioNode && activeAudioNode !== node) {
+        visualizer.disconnectAudio(activeAudioNode);
+      }
+
+      activeAudioNode = node;
+      analyser = analyserNode;
+      activeInputMode = mode;
+
+      if (visualizer && node) {
+        visualizer.connectAudio(node);
+      }
+      refreshMeterRoute();
+    }
+
+    function clearActiveAudioInput(mode) {
+      if (mode && activeInputMode !== mode) {
+        return;
+      }
+
+      if (visualizer && activeAudioNode) {
+        visualizer.disconnectAudio(activeAudioNode);
+      }
+
+      activeAudioNode = null;
+      analyser = null;
+      activeInputMode = "none";
+      meterFill.style.width = "0%";
+      refreshMeterRoute();
+    }
+
+    function isAudioFileCandidate(name, type = "") {
+      const lowerName = name.toLowerCase();
+      return type.startsWith("audio/") || /\.(mp3|wav|ogg|m4a|flac|aac|aiff|opus)$/i.test(lowerName);
+    }
+
+    function createTrackFromFile(file, sourceLabel, handle = null) {
+      return {
+        name: file.name,
+        file,
+        handle,
+        sourceLabel,
+      };
+    }
+
+    function createTrackFromUrl(name, url, sourceLabel) {
+      return {
+        name,
+        sourceLabel,
+        url,
+      };
+    }
+
+    async function getTrackFile(track) {
+      if (track.url) {
+        return null;
+      }
+
+      if (track.handle) {
+        return track.handle.getFile();
+      }
+
+      return track.file;
+    }
+
+    function populatePlayerTrackSelect() {
+      playerTrackSelect.innerHTML = "";
+
+      if (playerPlaylist.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No tracks loaded";
+        playerTrackSelect.appendChild(option);
+        return;
+      }
+
+      playerPlaylist.forEach((track, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = track.name;
+        playerTrackSelect.appendChild(option);
+      });
+
+      suppressPlayerTrackChange = true;
+      playerTrackSelect.value = String(playerTrackIndex);
+      suppressPlayerTrackChange = false;
+    }
+
+    async function savePlayerSourceAsset(asset) {
+      if (!asset) {
+        await deleteAsset("playerSource");
+        return;
+      }
+
+      await saveAsset("playerSource", asset);
+    }
+
+    async function buildTracksFromDirectoryHandle(directoryHandle) {
+      const files = [];
+
+      for await (const entry of directoryHandle.values()) {
+        if (entry.kind === "file" && isAudioFileCandidate(entry.name)) {
+          files.push(createTrackFromFile(await entry.getFile(), directoryHandle.name, entry));
+        }
+      }
+
+      files.sort((a, b) => a.name.localeCompare(b.name));
+      return files;
+    }
+
+    async function buildTracksFromFileHandles(handles, sourceLabel) {
+      const files = [];
+
+      for (const handle of handles) {
+        const file = await handle.getFile();
+        if (isAudioFileCandidate(file.name, file.type)) {
+          files.push(createTrackFromFile(file, sourceLabel, handle));
+        }
+      }
+
+      files.sort((a, b) => a.name.localeCompare(b.name));
+      return files;
+    }
+
+    function buildTracksFromFiles(files, sourceLabel) {
+      return [...files]
+        .filter((file) => isAudioFileCandidate(file.name, file.type))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((file) => createTrackFromFile(file, sourceLabel));
+    }
+
+    async function loadDefaultLibraryPlaylist() {
+      const response = await fetch("/__jam-library__/index.json", { cache: "no-store" });
+      if (!response.ok) {
+        return false;
+      }
+
+      const manifest = await response.json();
+      if (!manifest?.tracks?.length) {
+        return false;
+      }
+
+      const tracks = manifest.tracks.map((track) =>
+        createTrackFromUrl(track.name, track.url, manifest.label || "Default library")
+      );
+
+      await setPlayerPlaylist(tracks, manifest.label || "Default library");
+      persistSetting("playerSourceKind", "default-library");
+      return true;
+    }
+
+    async function setPlayerPlaylist(tracks, playlistLabel, asset = null) {
+      playerPlaylist = tracks;
+      playerTrackIndex = Math.max(0, Math.min(Number(appSettings?.playerTrackIndex || 0), Math.max(0, tracks.length - 1)));
+      playerPlaylistLabel.textContent = playlistLabel || "Playlist";
+      populatePlayerTrackSelect();
+      refreshPlayerUI();
+      persistSetting("playerSourceKind", asset?.kind || "");
+
+      if (asset) {
+        await savePlayerSourceAsset(asset);
+      }
+    }
+
+    async function ensurePlayerAudioGraph() {
+      await ensureVisualizer();
+
+      if (playerSourceNode) {
+        return;
+      }
+
+      playerSourceNode = audioContext.createMediaElementSource(playerAudio);
+      bassFilter = audioContext.createBiquadFilter();
+      bassFilter.type = "lowshelf";
+      bassFilter.frequency.value = 220;
+
+      midFilter = audioContext.createBiquadFilter();
+      midFilter.type = "peaking";
+      midFilter.frequency.value = 1200;
+      midFilter.Q.value = 0.8;
+
+      trebleFilter = audioContext.createBiquadFilter();
+      trebleFilter.type = "highshelf";
+      trebleFilter.frequency.value = 3200;
+
+      playerOutputNode = audioContext.createGain();
+      playerOutputNode.gain.value = 1;
+
+      playerVisualizerNode = audioContext.createGain();
+      playerVisualizerNode.gain.value = 1;
+
+      playerAnalyser = audioContext.createAnalyser();
+      playerAnalyser.fftSize = 1024;
+
+      playerSourceNode.connect(bassFilter);
+      bassFilter.connect(midFilter);
+      midFilter.connect(trebleFilter);
+      trebleFilter.connect(playerOutputNode);
+      trebleFilter.connect(playerVisualizerNode);
+      playerVisualizerNode.connect(playerAnalyser);
+      playerOutputNode.connect(audioContext.destination);
+
+      bassFilter.gain.value = Number(playerBassSlider.value);
+      midFilter.gain.value = Number(playerMidSlider.value);
+      trebleFilter.gain.value = Number(playerTrebleSlider.value);
+    }
+
+    async function restorePlayerSourceFromDb() {
+      const asset = await loadAsset("playerSource");
+      if (!asset) {
+        return;
+      }
+
+      try {
+        if (asset.kind === "directory" && asset.handle) {
+          const permission = asset.handle.queryPermission ? await asset.handle.queryPermission({ mode: "read" }) : "granted";
+          if (permission !== "granted") {
+            log("Saved playlist found but folder permission needs to be granted again");
+            return;
+          }
+
+          const tracks = await buildTracksFromDirectoryHandle(asset.handle);
+          if (tracks.length > 0) {
+            await setPlayerPlaylist(tracks, asset.label || asset.handle.name, asset);
+            await loadPlayerTrack(playerTrackIndex, { resumeTime: Number(appSettings?.playerCurrentTime || 0) });
+          }
+          return;
+        }
+
+        if (asset.kind === "files" && Array.isArray(asset.handles) && asset.handles.length > 0) {
+          const allowedHandles = [];
+          for (const handle of asset.handles) {
+            const permission = handle.queryPermission ? await handle.queryPermission({ mode: "read" }) : "granted";
+            if (permission === "granted") {
+              allowedHandles.push(handle);
+            }
+          }
+
+          if (allowedHandles.length > 0) {
+            const tracks = await buildTracksFromFileHandles(allowedHandles, asset.label || "Saved tracks");
+            await setPlayerPlaylist(tracks, asset.label || "Saved tracks", {
+              kind: "files",
+              handles: allowedHandles,
+              label: asset.label || "Saved tracks",
+            });
+            await loadPlayerTrack(playerTrackIndex, { resumeTime: Number(appSettings?.playerCurrentTime || 0) });
+          }
+        }
+      } catch (error) {
+        log(`Saved playlist restore error: ${error.message}`);
+      }
+    }
+
+    async function loadPlayerTrack(index, { autoplay = false, resumeTime = 0 } = {}) {
+      if (playerPlaylist.length === 0) {
+        updatePlayerStatus("No track");
+        log("Player: no track loaded");
+        refreshPlayerUI();
+        return;
+      }
+
+      await ensurePlayerAudioGraph();
+
+      playerTrackIndex = Math.max(0, Math.min(index, playerPlaylist.length - 1));
+      const track = playerPlaylist[playerTrackIndex];
+      clearPlayerObjectUrl();
+      playerAudio.muted = false;
+      playerAudio.volume = 1;
+
+      if (track.url) {
+        playerAudio.src = track.url;
+      } else {
+        const originalFile = await getTrackFile(track);
+        const file = await normalizePlayableFile(originalFile);
+        const probe = document.createElement("audio");
+        const supported = probe.canPlayType(file.type || inferAudioMimeType(file.name));
+        if (!supported) {
+          throw new Error(`Unsupported audio format for ${track.name}`);
+        }
+
+        playerObjectUrl = URL.createObjectURL(file);
+        playerAudio.src = playerObjectUrl;
+      }
+
+      playerAudio.load();
+
+      await new Promise((resolve) => {
+        const onLoaded = () => {
+          playerAudio.removeEventListener("loadedmetadata", onLoaded);
+          playerAudio.removeEventListener("error", onLoaded);
+          resolve();
+        };
+
+        playerAudio.addEventListener("loadedmetadata", onLoaded, { once: true });
+        playerAudio.addEventListener("error", onLoaded, { once: true });
+      });
+
+      if (resumeTime > 0 && Number.isFinite(playerAudio.duration)) {
+        playerAudio.currentTime = Math.min(resumeTime, Math.max(0, playerAudio.duration - 0.25));
+      }
+
+      suppressPlayerTrackChange = true;
+      playerTrackSelect.value = String(playerTrackIndex);
+      suppressPlayerTrackChange = false;
+      persistPlayerState();
+      if (!isMicrophoneActive() || activeInputMode === "player" || autoplay) {
+        setActiveAudioInput(playerVisualizerNode, playerAnalyser, "player");
+      }
+      refreshPlayerUI();
+      if (activeInputMode === "player") {
+        updateMeterStatus(isPlayerPlaying() ? "Player" : "Ready");
+      }
+      updatePlayerStatus("Loaded");
+      log(`Player ready: ${track.name}`);
+
+      if (autoplay) {
+        await playPlayer();
+      }
+    }
+
+    async function playPlayer() {
+      if (playerPlaylist.length === 0) {
+        updatePlayerStatus("No track");
+        log("Player: load a track before pressing Play");
+        return;
+      }
+
+      releaseMicrophoneForPlayer();
+
+      if (!playerAudio.src) {
+        await loadPlayerTrack(playerTrackIndex);
+      }
+
+      await ensurePlayerAudioGraph();
+      await audioContext.resume();
+      playerAudio.muted = false;
+      playerAudio.volume = 1;
+      setActiveAudioInput(playerVisualizerNode, playerAnalyser, "player");
+      startRenderLoop();
+      const timeBeforePlay = playerAudio.currentTime;
+      await playerAudio.play();
+      clearPlayerProgressWatch();
+      playerProgressWatchTimer = setTimeout(() => {
+        const advanced = playerAudio.currentTime > timeBeforePlay + 0.15;
+        if (!advanced && !playerAudio.paused) {
+          updatePlayerStatus("Stalled");
+          log("Player stalled: the embedded browser did not advance playback time");
+        }
+      }, 1600);
+      syncMicButtons();
+      refreshPlayerUI();
+      updatePlayerStatus("Playing");
+      restartPresetCycle();
+      log(`Player: ${playerPlaylist[playerTrackIndex].name}`);
+    }
+
+    function stopPlayer() {
+      clearPlayerProgressWatch();
+      if (!playerAudio.src) {
+        refreshPlayerUI();
+        return;
+      }
+      playerAudio.pause();
+      persistPlayerState();
+      refreshPlayerUI();
+      syncMicButtons();
+      restartPresetCycle();
+      updateMeterStatus(playerPlaylist.length > 0 ? "Ready" : "Idle");
+      log("Player paused");
+    }
+
+    async function skipPlayerTrack(offset) {
+      if (playerPlaylist.length === 0) {
+        return;
+      }
+
+      const shouldAutoplay = isPlayerPlaying();
+      const nextIndex = (playerTrackIndex + offset + playerPlaylist.length) % playerPlaylist.length;
+      await loadPlayerTrack(nextIndex, { autoplay: shouldAutoplay });
+    }
+
+    async function clearPlayerPlaylist() {
+      stopPlayer();
+      clearPlayerObjectUrl();
+      clearActiveAudioInput("player");
+      playerAudio.removeAttribute("src");
+      playerAudio.load();
+      playerPlaylist = [];
+      playerTrackIndex = 0;
+      await savePlayerSourceAsset(null);
+      persistSetting("playerSourceKind", "");
+      persistSetting("playerTrackIndex", "0");
+      persistSetting("playerCurrentTime", "0");
+      populatePlayerTrackSelect();
+      refreshPlayerUI();
+      syncMicButtons();
+      updateMeterStatus(isMicrophoneActive() ? "Listening" : "Idle");
+      log("Player library cleared");
+    }
+
+    async function loadFolderPlaylist() {
+      try {
+        if (window.showDirectoryPicker) {
+          const directoryHandle = await window.showDirectoryPicker();
+          const tracks = await buildTracksFromDirectoryHandle(directoryHandle);
+          if (tracks.length === 0) {
+            log("No audio files found in the selected folder");
+            return;
+          }
+
+          await setPlayerPlaylist(tracks, directoryHandle.name, {
+            kind: "directory",
+            handle: directoryHandle,
+            label: directoryHandle.name,
+          });
+          await loadPlayerTrack(0);
+          log(`Playlist loaded: ${tracks.length} track(s)`);
+          return;
+        }
+
+        folderTrackInput.click();
+      } catch (error) {
+        log(`Folder load error: ${error.message}`);
+      }
+    }
+
+    async function openSingleTrack() {
+      try {
+        if (window.showOpenFilePicker) {
+          const handles = await window.showOpenFilePicker({
+            multiple: false,
+            types: [{
+              description: "Audio files",
+              accept: { "audio/*": [".mp3", ".wav", ".ogg", ".m4a", ".flac", ".aac", ".opus"] },
+            }],
+          });
+
+          const tracks = await buildTracksFromFileHandles(handles, "Single track");
+          if (tracks.length === 0) {
+            return;
+          }
+
+          await setPlayerPlaylist(tracks, "Single track", {
+            kind: "files",
+            handles,
+            label: "Single track",
+          });
+          await loadPlayerTrack(0);
+          log(`Track loaded: ${tracks[0].name}`);
+          return;
+        }
+
+        singleTrackInput.click();
+      } catch (error) {
+        log(`Track load error: ${error.message}`);
+      }
+    }
+
+    function hasLiveAudioInput() {
+      return isMicrophoneActive() || isPlayerPlaying();
+    }
+
     function showPanel(panelId, shouldPersist = true) {
       const isStudio = panelId === "studio";
       studioPanel.classList.toggle("active", isStudio);
       settingsPanel.classList.toggle("active", !isStudio);
-      studioTabButton.classList.toggle("active", isStudio);
       settingsTabButton.classList.toggle("active", !isStudio);
 
       if (shouldPersist) {
@@ -1060,15 +2214,15 @@
     async function requestMicrophonePermission() {
       try {
         setMicPermissionButtonVisible(false);
-        hideMicPermissionModal();
         const permissionStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         permissionStream.getTracks().forEach((track) => track.stop());
         await loadAudioDevices();
+        audioDeviceHint.textContent = "Microphone access granted. Choose any exposed input or keep the system default route.";
         log("Microphone permission granted");
         return true;
       } catch (error) {
         setMicPermissionButtonVisible(true);
-        showMicPermissionModal("The browser did not reopen the native microphone prompt because access is currently blocked for this page. Re-enable microphone access in the site permissions, then try again.");
+        audioDeviceHint.textContent = "Microphone access is blocked in this browser. Use the site controls near the address bar to allow it, then press Refresh.";
         log(`Permission error: ${error.message}`);
         return false;
       }
@@ -1100,7 +2254,6 @@
         const permissionState = await getMicrophonePermissionState();
         if (permissionState === "granted") {
           setMicPermissionButtonVisible(false);
-          hideMicPermissionModal();
           await loadAudioDevices();
           audioDeviceHint.textContent = "Microphone access is already granted. Choose any exposed input or keep the system default route.";
           return;
@@ -1109,8 +2262,7 @@
         if (permissionState === "denied") {
           setMicPermissionButtonVisible(true);
           await loadAudioDevices();
-          audioDeviceHint.textContent = "Microphone access is blocked in the browser, so the list may stay limited until permission is re-enabled.";
-          showMicPermissionModal("Microphone access is blocked for this page. The browser will not show the native permission popup again until you re-enable access in the site settings.");
+          audioDeviceHint.textContent = "Microphone access is blocked in the browser. Re-enable it from the site controls near the address bar, then press Refresh.";
           log("Microphone permission is currently blocked");
           return;
         }
@@ -1122,21 +2274,6 @@
         log(`Microphone preparation error: ${error.message}`);
       }
 
-      await requestMicrophonePermission();
-    }
-
-    async function activatePreviewForSelectedInput() {
-      if (micStream) {
-        return;
-      }
-
-      const permissionState = await getMicrophonePermissionState();
-      if (permissionState !== "granted") {
-        updateMeterStatus("Ready");
-        return;
-      }
-
-      await startMicrophone();
     }
 
     async function ensureVisualizer() {
@@ -1192,8 +2329,7 @@
 
     function updateMeter() {
       if (!analyser) {
-        meterFill.style.width = "0%";
-        updateMeterStatus(micStream ? "Listening" : "Idle");
+        applyStandbyMeterState();
         return;
       }
 
@@ -1209,7 +2345,12 @@
       const rms = Math.sqrt(sum / data.length);
       const level = Math.min(100, Math.round(rms * 3));
       meterFill.style.width = `${level}%`;
-      updateMeterStatus(level > 3 ? "Live" : "Listening");
+      if (activeInputMode === "player") {
+        updateMeterStatus(level > 3 ? "Player" : "Ready");
+      } else {
+        updateMeterStatus(level > 3 ? "Live" : "Listening");
+      }
+      refreshMeterRoute();
     }
 
     function render() {
@@ -1233,6 +2374,11 @@
 
     async function startMicrophone() {
       try {
+        if (isPlayerPlaying()) {
+          log("Pause the player before enabling the microphone");
+          return;
+        }
+
         await ensureVisualizer();
 
         const constraints = {
@@ -1260,13 +2406,11 @@
 
         micSource.connect(gainNode);
         gainNode.connect(analyser);
-        visualizer.connectAudio(gainNode);
+        setActiveAudioInput(gainNode, analyser, "microphone");
 
         startRenderLoop();
-        startMicButton.disabled = true;
-        stopMicButton.disabled = false;
-        startRecordingButton.disabled = false;
         updateMeterStatus("Listening");
+        syncMicButtons();
 
         await loadAudioDevices();
         restartPresetCycle();
@@ -1277,12 +2421,11 @@
     }
 
     function stopMicrophone() {
+      const activeMicNode = gainNode;
+      const hadMicRoute = activeInputMode === "microphone" || activeAudioNode === activeMicNode;
+
       if (recorder.isRecording()) {
         recorder.stopRecording();
-      }
-
-      if (visualizer && gainNode) {
-        visualizer.disconnectAudio(gainNode);
       }
 
       if (micSource) {
@@ -1304,21 +2447,32 @@
       micStream = null;
       micSource = null;
       gainNode = null;
-      analyser = null;
-      startMicButton.disabled = false;
-      stopMicButton.disabled = true;
-      startRecordingButton.disabled = true;
+      if (hadMicRoute) {
+        if (visualizer && activeAudioNode) {
+          visualizer.disconnectAudio(activeAudioNode);
+        }
+        activeAudioNode = null;
+        activeInputMode = "none";
+      }
+      analyser = activeInputMode === "player" ? playerAnalyser : null;
       stopRecordingButton.disabled = true;
-      meterFill.style.width = "0%";
-      updateMeterStatus("Idle");
+      syncMicButtons();
+      applyStandbyMeterState();
       restartPresetCycle();
-      stopRenderLoop();
+      if (activeInputMode !== "player") {
+        stopRenderLoop();
+      }
       log("Microphone stopped");
     }
 
     async function startRecording() {
       if (!micStream) {
         log("Start microphone first");
+        return;
+      }
+
+      if (isPlayerPlaying()) {
+        log("Stop or pause the player before recording from the microphone");
         return;
       }
 
@@ -1427,8 +2581,17 @@
       }, seconds * 1000);
     }
 
-    studioTabButton.addEventListener("click", () => showPanel("studio"));
-    settingsTabButton.addEventListener("click", () => showPanel("settings"));
+    studioHomeButton.addEventListener("click", () => showPanel("studio"));
+    studioHomeButton.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        showPanel("studio");
+      }
+    });
+    settingsTabButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showPanel(settingsPanel.classList.contains("active") ? "studio" : "settings");
+    });
     startMicButton.addEventListener("click", startMicrophone);
     stopMicButton.addEventListener("click", stopMicrophone);
     startRecordingButton.addEventListener("click", startRecording);
@@ -1468,27 +2631,241 @@
       persistSetting("audioDeviceId", audioDeviceSelect.value);
       refreshAudioSummary();
       log("Audio device selection updated");
-      activatePreviewForSelectedInput().catch((error) => {
-        log(`Audio preview error: ${error.message}`);
-      });
+      applyStandbyMeterState();
     });
     refreshDevicesButton.addEventListener("click", loadAudioDevices);
     requestMicPermissionButton.addEventListener("click", requestMicrophonePermission);
-    micPermissionModalCloseButton.addEventListener("click", hideMicPermissionModal);
-    micPermissionModalRetryButton.addEventListener("click", requestMicrophonePermission);
+    loadFolderButton.addEventListener("click", loadFolderPlaylist);
+    openTrackButton.addEventListener("click", openSingleTrack);
+    clearPlaylistButton.addEventListener("click", () => {
+      clearPlayerPlaylist().catch((error) => {
+        log(`Clear playlist error: ${error.message}`);
+      });
+    });
+    playerPrevButton.addEventListener("click", () => {
+      skipPlayerTrack(-1).catch((error) => {
+        log(`Previous track error: ${error.message}`);
+      });
+    });
+    playerPlayPauseButton.addEventListener("click", () => {
+      if (isPlayerPlaying()) {
+        stopPlayer();
+      } else {
+        releaseMicrophoneForPlayer();
+        refreshPlayerUI();
+        playPlayer().catch((error) => {
+          updatePlayerStatus("Error");
+          syncMicButtons();
+          applyStandbyMeterState();
+          log(`Player error: ${error.message}`);
+        });
+      }
+    });
+    playerNextButton.addEventListener("click", () => {
+      skipPlayerTrack(1).catch((error) => {
+        log(`Next track error: ${error.message}`);
+      });
+    });
+    playerTrackSelect.addEventListener("change", () => {
+      if (suppressPlayerTrackChange || playerTrackSelect.value === "") {
+        return;
+      }
+
+      loadPlayerTrack(Number(playerTrackSelect.value), {
+        autoplay: isPlayerPlaying(),
+      }).catch((error) => {
+        log(`Track selection error: ${error.message}`);
+      });
+    });
+    playerProgress.addEventListener("input", () => {
+      if (!Number.isFinite(playerAudio.duration) || playerAudio.duration <= 0) {
+        return;
+      }
+
+      const nextTime = (Number(playerProgress.value) / 1000) * playerAudio.duration;
+      playerAudio.currentTime = nextTime;
+      updatePlayerTimes();
+      persistPlayerState();
+    });
+    [playerBassSlider, playerMidSlider, playerTrebleSlider].forEach((slider) => {
+      slider.addEventListener("input", () => {
+        if (bassFilter && midFilter && trebleFilter) {
+          bassFilter.gain.value = Number(playerBassSlider.value);
+          midFilter.gain.value = Number(playerMidSlider.value);
+          trebleFilter.gain.value = Number(playerTrebleSlider.value);
+        }
+
+        updateEqValueLabel(playerBassValue, playerBassSlider.value);
+        updateEqValueLabel(playerMidValue, playerMidSlider.value);
+        updateEqValueLabel(playerTrebleValue, playerTrebleSlider.value);
+        persistSetting("playerBassGain", playerBassSlider.value);
+        persistSetting("playerMidGain", playerMidSlider.value);
+        persistSetting("playerTrebleGain", playerTrebleSlider.value);
+      });
+    });
+    singleTrackInput.addEventListener("change", async () => {
+      const tracks = buildTracksFromFiles(singleTrackInput.files, "Single track");
+      if (tracks.length === 0) {
+        return;
+      }
+
+      await setPlayerPlaylist(tracks, "Single track");
+      await savePlayerSourceAsset(null);
+      await loadPlayerTrack(0);
+      log(`Track loaded: ${tracks[0].name}`);
+      singleTrackInput.value = "";
+    });
+    folderTrackInput.addEventListener("change", async () => {
+      const tracks = buildTracksFromFiles(folderTrackInput.files, "Folder playlist");
+      if (tracks.length === 0) {
+        log("No audio files found in the selected folder");
+        return;
+      }
+
+      await setPlayerPlaylist(tracks, "Folder playlist");
+      await savePlayerSourceAsset(null);
+      await loadPlayerTrack(0);
+      log(`Playlist loaded: ${tracks.length} track(s)`);
+      folderTrackInput.value = "";
+    });
+    playerAudio.addEventListener("play", () => {
+      releaseMicrophoneForPlayer();
+
+      setActiveAudioInput(playerVisualizerNode, playerAnalyser, "player");
+      startRenderLoop();
+      syncMicButtons();
+      refreshPlayerUI();
+      updateMeterStatus("Player");
+      restartPresetCycle();
+    });
+    playerAudio.addEventListener("playing", () => {
+      clearPlayerProgressWatch();
+      updatePlayerStatus("Playing");
+      refreshPlayerUI();
+    });
+    playerAudio.addEventListener("pause", () => {
+      clearPlayerProgressWatch();
+      syncMicButtons();
+      refreshPlayerUI();
+      persistPlayerState();
+      applyStandbyMeterState();
+      restartPresetCycle();
+    });
+    playerAudio.addEventListener("waiting", () => {
+      updatePlayerStatus("Buffering");
+    });
+    playerAudio.addEventListener("stalled", () => {
+      updatePlayerStatus("Stalled");
+      log("Player stalled: media playback stopped progressing");
+    });
+    playerAudio.addEventListener("timeupdate", () => {
+      updatePlayerTimes();
+      const currentSecond = Math.floor(playerAudio.currentTime || 0);
+      if (currentSecond !== lastPlayerPersistedSecond) {
+        lastPlayerPersistedSecond = currentSecond;
+        persistPlayerState();
+      }
+    });
+    playerAudio.addEventListener("loadedmetadata", () => {
+      updatePlayerTimes();
+      refreshPlayerUI();
+      if (playerPlaylist.length > 0 && !isPlayerPlaying()) {
+        updatePlayerStatus("Loaded");
+      }
+    });
+    playerAudio.addEventListener("error", () => {
+      clearPlayerProgressWatch();
+      const errorCode = playerAudio.error?.code;
+      const reasonMap = {
+        1: "Playback aborted",
+        2: "Network error while loading local audio",
+        3: "Audio decode error",
+        4: "Unsupported audio format",
+      };
+      updatePlayerStatus("Error");
+      syncMicButtons();
+      applyStandbyMeterState();
+      log(`Player load error: ${reasonMap[errorCode] || "Unknown media error"}`);
+      refreshPlayerUI();
+    });
+    playerAudio.addEventListener("ended", () => {
+      clearPlayerProgressWatch();
+      if (playerPlaylist.length > 1) {
+        skipPlayerTrack(1).catch((error) => {
+          log(`Track advance error: ${error.message}`);
+        });
+      } else {
+        stopPlayer();
+      }
+    });
+    canvasFrame.addEventListener("dblclick", () => {
+      if (document.fullscreenElement === stageShell) {
+        exitStageFullscreen({ collapse: true }).catch((error) => {
+          log(`Fullscreen exit error: ${error.message}`);
+        });
+        return;
+      }
+
+      if (stageExpanded) {
+        requestStageFullscreen().catch((error) => {
+          log(`Fullscreen request error: ${error.message}`);
+        });
+        return;
+      }
+
+      toggleStageExpanded(true);
+    });
+    canvasFrame.querySelectorAll(".resize-handle").forEach((handle) => {
+      handle.addEventListener("pointerdown", (event) => {
+        startStageResize(event, handle.dataset.resize || "e");
+      });
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && document.fullscreenElement === stageShell) {
+        exitStageFullscreen({ collapse: true }).catch((error) => {
+          log(`Fullscreen exit error: ${error.message}`);
+        });
+        return;
+      }
+
+      if (event.key === "Escape" && stageExpanded) {
+        toggleStageExpanded(false);
+      }
+    });
+    document.addEventListener("fullscreenchange", () => {
+      stageFullscreenActive = document.fullscreenElement === stageShell;
+      canvasFrame.classList.toggle("fullscreen-active", stageFullscreenActive);
+      if (!stageFullscreenActive && stageExpanded) {
+        toggleStageExpanded(false);
+      }
+    });
+    window.addEventListener("resize", () => {
+      if (!stageExpanded && stageInlineWidth) {
+        setStageWidth(parseFloat(stageInlineWidth));
+      }
+    });
 
     async function initializeApp() {
       renderSkinOptions();
+      stageInlineWidth = `${Math.round(stageShell.getBoundingClientRect().width)}px`;
       appSettings = await loadSettings();
       applyStoredSettings(appSettings);
       setSkin(appSettings.skinId || defaultSkinId, false);
       loadPresets();
       await prepareMicrophoneAccess();
+      await restorePlayerSourceFromDb();
+      if (playerPlaylist.length === 0) {
+        await loadDefaultLibraryPlaylist().catch((error) => {
+          log(`Default library unavailable: ${error.message}`);
+        });
+      }
       showPanel(appSettings.activeTab || "studio", false);
       restartPresetCycle();
       updateStageMeta();
       refreshAudioSummary();
-      updateMeterStatus(appSettings.audioDeviceId ? "Ready" : "Idle");
+      applyStandbyMeterState();
+      syncMicButtons();
+
       log("Ready");
     }
 

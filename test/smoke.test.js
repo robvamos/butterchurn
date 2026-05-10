@@ -2,7 +2,59 @@ import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import { getBrowser, closeBrowser, createPage } from './visual/utils/puppeteer.js';
 import TestServer from './visual/utils/testServer.js';
 
-describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
+async function injectTestTone(page) {
+  await page.evaluate(() => {
+    function createToneWavFile() {
+      const sampleRate = 44100;
+      const durationSeconds = 3;
+      const frameCount = sampleRate * durationSeconds;
+      const channelCount = 1;
+      const bytesPerSample = 2;
+      const blockAlign = channelCount * bytesPerSample;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = frameCount * blockAlign;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+
+      function writeString(offset, value) {
+        for (let index = 0; index < value.length; index += 1) {
+          view.setUint8(offset + index, value.charCodeAt(index));
+        }
+      }
+
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, channelCount, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bytesPerSample * 8, true);
+      writeString(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      const frequency = 440;
+      for (let sampleIndex = 0; sampleIndex < frameCount; sampleIndex += 1) {
+        const sample = Math.sin((2 * Math.PI * frequency * sampleIndex) / sampleRate);
+        const pcm = Math.max(-1, Math.min(1, sample)) * 0x7fff;
+        view.setInt16(44 + (sampleIndex * 2), pcm, true);
+      }
+
+      return new File([buffer], 'tone.wav', { type: 'audio/wav' });
+    }
+
+    const input = document.querySelector('#singleTrackInput');
+    const transfer = new DataTransfer();
+    transfer.items.add(createToneWavFile());
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+
+describe('JamPal Smoke Test', () => {
   let testServer;
   let serverUrl;
   let page;
@@ -31,7 +83,7 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
 
     // Check page title
     const title = await page.title();
-    expect(title).toBe('Butterchurn Audio Reactive Recorder');
+    expect(title).toBe('JamPal');
 
     // Check main elements exist
     const canvas = await page.$('canvas');
@@ -108,7 +160,7 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
     const summarySkin = await page.$eval('#skinSummaryValue', el => el.textContent);
     expect(summarySkin).toBe('Sea Glass');
 
-    await page.click('#studioTabButton');
+    await page.click('#studioHomeButton');
     const studioVisible = await page.$eval('#studioPanel', el => el.classList.contains('active'));
     expect(studioVisible).toBe(true);
   });
@@ -120,7 +172,7 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
     await page.select('#resolutionSelect', '1920x1080');
     await page.select('#fpsSelect', '30');
     await page.select('#bitrateSelect', '5000000');
-    await page.click('#studioTabButton');
+    await page.click('#studioHomeButton');
     await page.select('#presetSelect', '2');
     const chosenPreset = await page.$eval('#presetSelect', el => el.selectedOptions[0].textContent);
     await page.reload({ waitUntil: 'networkidle0' });
@@ -146,6 +198,8 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
   });
 
   test('should handle audio device selection and refresh', async () => {
+    await page.click('#settingsTabButton');
+
     // Check that refresh button exists
     const refreshButton = await page.$('#refreshDevicesButton');
     expect(refreshButton).toBeTruthy();
@@ -162,9 +216,13 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
     } catch (e) {
       console.log('Audio device selection test skipped due to permissions');
     }
+
+    await page.click('#settingsTabButton');
   });
 
   test('should handle FPS, bitrate, format and resolution selection', async () => {
+    await page.click('#settingsTabButton');
+
     // Change FPS
     await page.select('#fpsSelect', '30');
     let selectedFps = await page.$eval('#fpsSelect', el => el.value);
@@ -184,5 +242,68 @@ describe('Butterchurn Audio Reactive Recorder Smoke Test', () => {
     await page.select('#resolutionSelect', '1920x1080');
     let selectedResolution = await page.$eval('#resolutionSelect', el => el.value);
     expect(selectedResolution).toBe('1920x1080');
+
+    await page.click('#settingsTabButton');
+  });
+
+  test('should load and play a local audio track in the player', async () => {
+    await page.click('#studioHomeButton');
+    await injectTestTone(page);
+    await page.waitForFunction(
+      () => document.querySelector('#playerTrackTitle')?.textContent === 'tone.wav'
+    );
+
+    const playerReadyState = await page.evaluate(() => ({
+      playDisabled: document.querySelector('#playerPlayPauseButton').disabled,
+      status: document.querySelector('#playerStatusLabel').textContent,
+      title: document.querySelector('#playerTrackTitle').textContent,
+    }));
+
+    expect(playerReadyState.playDisabled).toBe(false);
+    expect(playerReadyState.status).toBe('Loaded');
+    expect(playerReadyState.title).toBe('tone.wav');
+
+    await page.click('#playerPlayPauseButton');
+    await page.waitForFunction(
+      () => {
+        const status = document.querySelector('#playerStatusLabel')?.textContent;
+        return status === 'Playing' || status === 'Stalled' || status === 'Paused';
+      }
+    );
+
+    const playingState = await page.evaluate(() => ({
+      status: document.querySelector('#playerStatusLabel').textContent,
+      playLabel: document.querySelector('#playerPlayPauseButton').textContent,
+      micDisabled: document.querySelector('#startMicButton').disabled,
+      playerPaused: document.querySelector('#playerAudio').paused,
+    }));
+
+    expect(['Playing', 'Stalled', 'Paused']).toContain(playingState.status);
+    if (playingState.status !== 'Paused') {
+      expect(playingState.playLabel).toBe('■');
+      expect(playingState.micDisabled).toBe(true);
+      expect(playingState.playerPaused).toBe(false);
+    }
+
+    if (playingState.status !== 'Paused') {
+      await page.click('#playerPlayPauseButton');
+      await page.waitForFunction(
+        () => document.querySelector('#playerStatusLabel')?.textContent === 'Paused'
+      );
+    }
+
+    const stoppedState = await page.evaluate(() => ({
+      status: document.querySelector('#playerStatusLabel').textContent,
+      micDisabled: document.querySelector('#startMicButton').disabled,
+      playLabel: document.querySelector('#playerPlayPauseButton').textContent,
+      playerPaused: document.querySelector('#playerAudio').paused,
+      currentTime: document.querySelector('#playerAudio').currentTime,
+    }));
+
+    expect(stoppedState.status).toBe('Paused');
+    expect(stoppedState.playLabel).toBe('▶');
+    expect(stoppedState.micDisabled).toBe(false);
+    expect(stoppedState.playerPaused).toBe(true);
+    expect(stoppedState.currentTime).toBeGreaterThan(0);
   });
 });
