@@ -17,6 +17,7 @@ const defaultJammerLabState = {
     notes: "",
   },
   favorites: [],
+  deckPresets: [],
   updatedAt: null,
 };
 
@@ -32,6 +33,7 @@ async function loadJammerLabState() {
       ...(state.settings || {}),
     },
     favorites: Array.isArray(state.favorites) ? state.favorites : [],
+    deckPresets: Array.isArray(state.deckPresets) ? state.deckPresets : [],
     updatedAt: state.updatedAt || null,
   };
 }
@@ -77,4 +79,28 @@ async function saveJammerLabFavorite(favorite) {
   return nextState;
 }
 
-export { JAMMER_LAB_ASSET_KEY, loadJammerLabState, saveJammerLabFavorite, saveJammerLabSettings };
+async function saveJammerDeckPreset(preset) {
+  const existing = await loadJammerLabState();
+  const nextPreset = {
+    id: preset.id || `deck-${Date.now()}`,
+    createdAt: preset.createdAt || new Date().toISOString(),
+    name: preset.name || "Deck preset",
+    settings: { ...(preset.settings || {}) },
+  };
+
+  const deduped = existing.deckPresets.filter((entry) => entry.id !== nextPreset.id && entry.name !== nextPreset.name);
+  const nextState = {
+    ...existing,
+    settings: {
+      ...existing.settings,
+      ...(preset.settings || {}),
+    },
+    deckPresets: [nextPreset, ...deduped].slice(0, 16),
+    updatedAt: new Date().toISOString(),
+  };
+
+  await saveAsset(JAMMER_LAB_ASSET_KEY, nextState);
+  return nextState;
+}
+
+export { JAMMER_LAB_ASSET_KEY, loadJammerLabState, saveJammerDeckPreset, saveJammerLabFavorite, saveJammerLabSettings };

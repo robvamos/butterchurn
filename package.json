@@ -44,6 +44,7 @@
     "@ffmpeg/util": "0.12.2",
     "ecma-proposal-math-extensions": "0.0.2",
     "eel-wasm": "^0.0.16",
+    "essentia.js": "^0.1.3",
     "tone": "^15.1.22"
   },
   "devDependencies": {

@@ -31,6 +31,13 @@ export class JammerEngine {
       micLive: false,
       playerLive: false,
     };
+    this.listenerState = {
+      ready: false,
+      tempo: 0,
+      confidence: 0,
+      energy: 0,
+      summary: "Ear layer not ready yet.",
+    };
     this.state = this.buildInitialState();
   }
 
@@ -73,6 +80,16 @@ export class JammerEngine {
       micArmed: Boolean(sourceState.micArmed),
       micLive: Boolean(sourceState.micLive),
       playerLive: Boolean(sourceState.playerLive),
+    };
+  }
+
+  setListenerState(listenerState = {}) {
+    this.listenerState = {
+      ready: Boolean(listenerState.ready),
+      tempo: Number.isFinite(Number(listenerState.tempo)) ? Number(listenerState.tempo) : 0,
+      confidence: Number.isFinite(Number(listenerState.confidence)) ? Number(listenerState.confidence) : 0,
+      energy: Number.isFinite(Number(listenerState.energy)) ? Number(listenerState.energy) : 0,
+      summary: listenerState.summary || "Ear layer is standing by.",
     };
   }
 
@@ -165,11 +182,15 @@ export class JammerEngine {
     } else if (resolvedSource === "player") {
       routeLabel = "Player";
       statusLabel = "Ready";
-      summary = `${profile.name} is following the player path and can sketch ${profile.defaultPattern.toLowerCase()}.`;
+      summary = this.listenerState.ready && this.listenerState.tempo > 0
+        ? `${profile.name} is following the player path around ${this.listenerState.tempo} BPM with ${this.listenerState.confidence}% ear confidence.`
+        : `${profile.name} is following the player path and can sketch ${profile.defaultPattern.toLowerCase()}.`;
     } else if (resolvedSource === "microphone-live") {
       routeLabel = "Mic live";
       statusLabel = "Listening";
-      summary = `${profile.name} is listening to the microphone route and waiting for stable tempo confidence.`;
+      summary = this.listenerState.ready && this.listenerState.tempo > 0
+        ? `${profile.name} is listening to the microphone route around ${this.listenerState.tempo} BPM with ${this.listenerState.confidence}% ear confidence.`
+        : `${profile.name} is listening to the microphone route and waiting for stable tempo confidence.`;
     } else if (resolvedSource === "microphone-armed") {
       routeLabel = "Mic armed";
       statusLabel = "Primed";

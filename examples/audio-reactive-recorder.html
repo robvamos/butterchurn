@@ -7,6 +7,8 @@
   <title>JamPal</title>
   <script src="/node_modules/butterchurn-presets-js/lib/butterchurnPresets.min.js"></script>
   <script src="/node_modules/tone/build/Tone.js"></script>
+  <script src="/node_modules/essentia.js/dist/essentia-wasm.web.js"></script>
+  <script src="/node_modules/essentia.js/dist/essentia.js-core.js"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -410,6 +412,47 @@
       gap: 8px;
     }
 
+    .jammer-icon-toggle {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid var(--field-border);
+      background: var(--panel-2);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+      transition: background 120ms ease, border-color 120ms ease, color 120ms ease, opacity 120ms ease;
+    }
+
+    .jammer-icon-toggle:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .jammer-icon-toggle.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .jammer-icon-toggle:disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .jammer-icon-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .jammer-summary {
       border: 1px solid var(--field-border);
       border-radius: 8px;
@@ -424,6 +467,60 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
+    }
+
+    .jammer-primary-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .jammer-play-card {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: var(--panel-3);
+    }
+
+    .jammer-play-card .hint {
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .jammer-secondary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .jammer-compact-control {
+      gap: 6px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      min-width: 0;
+    }
+
+    .jammer-compact-control label {
+      margin-bottom: 0;
+    }
+
+    .jammer-compact-control input[type="number"],
+    .jammer-compact-control select {
+      min-height: 44px;
+    }
+
+    .jammer-compact-control input[type="range"] {
+      margin-top: 2px;
+    }
+
+    .jammer-inline-hint {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
     }
 
     .jammer-stat-grid {
@@ -501,6 +598,111 @@
 
     .jammer-research-row .jammer-stat-label {
       margin-right: 6px;
+    }
+
+    .jammer-detection-card {
+      border: 1px solid var(--field-border);
+      border-radius: 8px;
+      background: var(--panel-3);
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+      width: min(100%, 980px);
+      justify-self: start;
+    }
+
+    .jammer-detection-card .jammer-topbar {
+      display: grid;
+      grid-template-columns: auto auto;
+      justify-content: start;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #jammerDetectionToggleButton {
+      width: auto;
+      min-width: 34px;
+    }
+
+    .jammer-detection-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .jammer-detection-stat {
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-2);
+      padding: 8px 9px;
+      min-width: 0;
+    }
+
+    .jammer-detection-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .jammer-detection-value {
+      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .jammer-detection-meters {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .jammer-detection-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+
+    .jammer-detection-meter {
+      display: grid;
+      gap: 5px;
+    }
+
+    .jammer-detection-meter-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .jammer-detection-meter-label {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .jammer-detection-meter-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .jammer-detection-meter-bar {
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--panel-2);
+    }
+
+    .jammer-detection-meter-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--meter-b));
+      transition: width 90ms linear;
     }
 
     .jammer-tool-button {
@@ -617,8 +819,47 @@
 
     .jammer-deck-controls {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: auto auto minmax(0, 1fr);
+      align-items: center;
       gap: 6px;
+    }
+
+    .jammer-deck-icon-button {
+      width: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .jammer-deck-icon-button svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .jammer-deck-volume {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      min-height: 36px;
+    }
+
+    .jammer-deck-volume span {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .jammer-deck-volume input[type="range"] {
+      width: 100%;
     }
 
     .jammer-library-actions {
@@ -811,7 +1052,17 @@
       gap: 8px;
     }
 
+    .button-row.triple {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
     .primary-action {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .toggle-button.active {
       background: var(--accent-soft);
       border-color: var(--accent);
       color: var(--accent-strong);
@@ -878,6 +1129,12 @@
       color: var(--muted);
       font-size: 11px;
       line-height: 1.4;
+    }
+
+    .global-route-panel {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 14px;
     }
 
     .log {
@@ -955,6 +1212,10 @@
       min-width: 0;
       padding: 0;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 20%);
+    }
+
+    .stage[hidden] {
+      display: none !important;
     }
 
     .stage-shell {
@@ -1069,7 +1330,7 @@
 
     .stage-loop-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
     }
 
@@ -1109,6 +1370,113 @@
       height: 100%;
       background: linear-gradient(90deg, var(--accent), var(--meter-b));
       transition: width 100ms linear;
+    }
+
+    .stage-loop-metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stage-loop-metric {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .stage-loop-metric-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .stage-loop-metric-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stage-loop-metric-value {
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .stage-loop-metric-bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--panel-3);
+    }
+
+    .stage-loop-metric-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--meter-b));
+      transition: width 140ms ease;
+    }
+
+    .stage-loop-rhythm {
+      display: grid;
+      gap: 6px;
+      padding: 8px 9px;
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-3);
+    }
+
+    .stage-loop-rhythm-row {
+      display: grid;
+      grid-template-columns: 42px repeat(16, minmax(0, 1fr));
+      gap: 4px;
+      align-items: center;
+    }
+
+    .stage-loop-rhythm-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stage-loop-step {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid transparent;
+      transition: transform 100ms ease, background 100ms ease, border-color 100ms ease;
+    }
+
+    .stage-loop-step.active {
+      background: rgba(85, 194, 255, 0.55);
+    }
+
+    .stage-loop-step.current {
+      border-color: rgba(250, 204, 21, 0.9);
+      transform: scaleY(1.2);
+      background: rgba(250, 204, 21, 0.62);
+    }
+
+    .stage-loop-deck-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .stage-loop-chip {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--field-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1.2;
+      white-space: nowrap;
     }
 
     .resize-handle {
@@ -1222,6 +1590,16 @@
         border-right: 0;
         border-bottom: 1px solid var(--field-border);
       }
+
+      .jammer-primary-grid,
+      .jammer-secondary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-loop-grid,
+      .stage-loop-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     @media (max-width: 720px) {
@@ -1249,6 +1627,23 @@
         grid-template-columns: 1fr;
       }
 
+      .jammer-detection-grid,
+      .jammer-detection-meters {
+        grid-template-columns: 1fr;
+      }
+
+      .jammer-detection-card {
+        width: 100%;
+      }
+
+      .jammer-detection-card .jammer-topbar {
+        grid-template-columns: 1fr;
+      }
+
+      #jammerDetectionToggleButton {
+        width: 100%;
+      }
+
       .stage-header {
         display: grid;
       }
@@ -1265,6 +1660,10 @@
     @media (max-width: 540px) {
       .button-row,
       .tab-row {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row.triple {
         grid-template-columns: 1fr;
       }
     }
@@ -1287,31 +1686,31 @@
           </button>
         </div>
         <div class="subtitle">Live audio and video reactions</div>
-        <div class="sidebar-tab-strip">
+      </div>
+
+      <div class="global-route-panel">
+        <div class="control-group">
+          <div class="meter-header">
+            <label>Energy</label>
+            <div class="meter-route">
+              <span id="meterSourceLabel">No input</span>
+              <span> • </span>
+              <span id="meterStatusLabel" class="meter-status">Idle</span>
+            </div>
+          </div>
+          <div class="meter"><div id="meterFill" class="meter-fill"></div></div>
+          <div class="hint">Only one input route is active at a time. Player play takes over and stops the microphone route.</div>
+        </div>
+
+        <div class="button-row triple">
+          <button id="startMicButton" class="primary-action" type="button">Start Mic</button>
+          <button id="stopMicButton" type="button" disabled>Stop</button>
           <button id="jammerTabButton" class="tab-button" type="button" data-tab="jammer">Jammer</button>
         </div>
       </div>
 
       <section id="studioPanel" class="panel-section active" data-panel="studio">
         <div class="controls">
-          <div class="button-row">
-            <button id="startMicButton" class="primary-action" type="button">Start Mic</button>
-            <button id="stopMicButton" type="button" disabled>Stop</button>
-          </div>
-
-          <div class="control-group">
-            <div class="meter-header">
-              <label>Energy</label>
-              <div class="meter-route">
-                <span id="meterSourceLabel">No input</span>
-                <span> • </span>
-                <span id="meterStatusLabel" class="meter-status">Idle</span>
-              </div>
-            </div>
-            <div class="meter"><div id="meterFill" class="meter-fill"></div></div>
-            <div class="hint">Only one input route is active at a time. Player play takes over and stops the microphone route.</div>
-          </div>
-
           <div class="player-panel">
             <div class="player-topbar">
               <label for="playerTrackSelect">Player</label>
@@ -1385,6 +1784,7 @@
           <div class="preset-panel">
             <div class="preset-row">
               <label for="presetSelect">Visualizer</label>
+              <button id="visualizerToggleButton" class="toggle-button active" type="button" aria-pressed="true">On</button>
             </div>
             <select id="presetSelect">
               <option value="">Loading presets...</option>
@@ -1459,17 +1859,17 @@
             </select>
           </div>
 
-          <div class="jammer-grid">
-            <div class="control-group compact-group">
+          <div class="jammer-primary-grid">
+            <div class="jammer-play-card">
               <button id="jammerPlayToggleButton" class="primary-action" type="button">Play Drummer</button>
               <label class="checkbox-row hidden" for="jammerEnabled">
                 <input id="jammerEnabled" type="checkbox">
                 <span>Enable scaffold</span>
               </label>
-              <div class="hint">If no input is active, the drummer invents a four-bar loop and evolves it gently while you tweak parameters live.</div>
+              <div class="hint">With no live input, the drummer invents its own four-bar loop while you shape the groove.</div>
             </div>
 
-            <div class="control-group">
+            <div class="control-group jammer-compact-control">
               <label for="jammerFollowSource">Follow Source</label>
               <select id="jammerFollowSource">
                 <option value="auto">Auto route</option>
@@ -1478,8 +1878,10 @@
                 <option value="player">Player only</option>
               </select>
             </div>
+          </div>
 
-            <div class="control-group">
+          <div class="jammer-secondary-grid">
+            <div class="control-group jammer-compact-control">
               <label for="jammerFeelSelect">Feel</label>
               <select id="jammerFeelSelect">
                 <option value="assist">Assist</option>
@@ -1489,34 +1891,118 @@
               </select>
             </div>
 
-            <div class="control-group">
-              <label for="jammerIntensityRange">Intensity</label>
-              <input id="jammerIntensityRange" type="range" min="0" max="100" step="1" value="55">
-            </div>
-
-            <div class="control-group">
-              <label for="jammerDensityRange">Density</label>
-              <input id="jammerDensityRange" type="range" min="0" max="100" step="1" value="48">
-            </div>
-
-            <div class="control-group">
-              <label for="jammerSwingRange">Swing</label>
-              <input id="jammerSwingRange" type="range" min="0" max="100" step="1" value="8">
-            </div>
-
-            <div class="control-group">
-              <label for="jammerHumanizeRange">Humanize</label>
-              <input id="jammerHumanizeRange" type="range" min="0" max="100" step="1" value="18">
-            </div>
-
-            <div class="control-group">
+            <div class="control-group jammer-compact-control">
               <label for="jammerTempoInput">Tempo Guide</label>
               <input id="jammerTempoInput" type="number" min="60" max="180" step="1" value="104">
             </div>
 
-            <div class="control-group">
+            <div class="control-group jammer-compact-control">
+              <label for="jammerIntensityRange">Intensity</label>
+              <input id="jammerIntensityRange" type="range" min="0" max="100" step="1" value="55">
+            </div>
+
+            <div class="control-group jammer-compact-control">
+              <label for="jammerDensityRange">Density</label>
+              <input id="jammerDensityRange" type="range" min="0" max="100" step="1" value="48">
+            </div>
+
+            <div class="control-group jammer-compact-control">
+              <label for="jammerSwingRange">Swing</label>
+              <input id="jammerSwingRange" type="range" min="0" max="100" step="1" value="8">
+            </div>
+
+            <div class="control-group jammer-compact-control">
+              <label for="jammerHumanizeRange">Humanize</label>
+              <input id="jammerHumanizeRange" type="range" min="0" max="100" step="1" value="18">
+            </div>
+
+            <div class="control-group jammer-compact-control">
               <label for="jammerVolumeRange">Drummer Volume</label>
               <input id="jammerVolumeRange" type="range" min="0" max="100" step="1" value="72">
+            </div>
+          </div>
+
+          <div class="jammer-detection-card">
+            <div class="jammer-topbar">
+              <div class="section-title">Detection</div>
+              <button id="jammerDetectionToggleButton" class="jammer-icon-toggle" type="button" aria-label="Start detection" title="Start detection">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2v10"></path>
+                  <path d="M18.36 5.64a9 9 0 1 1-12.72 0"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="jammer-detection-grid">
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Ear State</div>
+                <div id="jammerDetectionState" class="jammer-detection-value">Waiting</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Input Route</div>
+                <div id="jammerDetectionSource" class="jammer-detection-value">No source</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Detected Tempo</div>
+                <div id="jammerDetectionTempo" class="jammer-detection-value">0 BPM</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Confidence</div>
+                <div id="jammerDetectionConfidence" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Signal Motion</div>
+                <div id="jammerDetectionZcr" class="jammer-detection-value">0.00</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Ear Summary</div>
+                <div id="jammerDetectionSummary" class="jammer-detection-value">Waiting for a live route.</div>
+              </div>
+            </div>
+            <div class="jammer-detection-meters">
+              <div class="jammer-detection-meter">
+                <div class="jammer-detection-meter-head">
+                  <span class="jammer-detection-meter-label">Energy</span>
+                  <span id="jammerDetectionEnergyValue" class="jammer-detection-meter-value">0%</span>
+                </div>
+                <div class="jammer-detection-meter-bar"><div id="jammerDetectionEnergyFill" class="jammer-detection-meter-fill"></div></div>
+              </div>
+              <div class="jammer-detection-meter">
+                <div class="jammer-detection-meter-head">
+                  <span class="jammer-detection-meter-label">Onset</span>
+                  <span id="jammerDetectionOnsetValue" class="jammer-detection-meter-value">0%</span>
+                </div>
+                <div class="jammer-detection-meter-bar"><div id="jammerDetectionOnsetFill" class="jammer-detection-meter-fill"></div></div>
+              </div>
+              <div class="jammer-detection-meter">
+                <div class="jammer-detection-meter-head">
+                  <span class="jammer-detection-meter-label">Tempo Lock</span>
+                  <span id="jammerDetectionLockValue" class="jammer-detection-meter-value">0%</span>
+                </div>
+                <div class="jammer-detection-meter-bar"><div id="jammerDetectionLockFill" class="jammer-detection-meter-fill"></div></div>
+              </div>
+            </div>
+            <div class="jammer-detection-subtitle">Drummer Decisions</div>
+            <div class="jammer-detection-grid">
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Tempo Correction</div>
+                <div id="jammerDecisionTempo" class="jammer-detection-value">0 BPM</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Density Boost</div>
+                <div id="jammerDecisionDensity" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Fill Probability</div>
+                <div id="jammerDecisionFill" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Entry Confidence</div>
+                <div id="jammerDecisionEntry" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Adapt Mode</div>
+                <div id="jammerDecisionMode" class="jammer-detection-value">Standby</div>
+              </div>
             </div>
           </div>
 
@@ -1536,6 +2022,14 @@
             <div class="jammer-stat">
               <div class="jammer-stat-label">Tone.js</div>
               <div id="jammerToneValue" class="jammer-stat-value">Installing...</div>
+            </div>
+            <div class="jammer-stat">
+              <div class="jammer-stat-label">Essentia</div>
+              <div id="jammerEarValue" class="jammer-stat-value">Installing...</div>
+            </div>
+            <div class="jammer-stat">
+              <div class="jammer-stat-label">Pulse</div>
+              <div id="jammerPulseValue" class="jammer-stat-value">Waiting</div>
             </div>
             <div class="jammer-stat">
               <div class="jammer-stat-label">Self Mask</div>
@@ -1618,7 +2112,9 @@
       </section>
     </aside>
 
-    <section class="stage">
+    <section id="jammerRuntimeSection" class="stage" hidden></section>
+
+    <section id="stageSection" class="stage" hidden>
       <div class="stage-shell">
         <div class="stage-header">
           <div>
@@ -1660,8 +2156,59 @@
               <div class="stage-loop-card-label">Now Playing</div>
               <div id="stageLoopEvents" class="stage-loop-card-value">Silence</div>
             </div>
+            <div class="stage-loop-card">
+              <div class="stage-loop-card-label">Ear Input</div>
+              <div id="stageLoopEar" class="stage-loop-card-value">Waiting for source</div>
+            </div>
+            <div class="stage-loop-card">
+              <div class="stage-loop-card-label">Adaptation</div>
+              <div id="stageLoopAdapt" class="stage-loop-card-value">No adjustments</div>
+            </div>
+            <div class="stage-loop-card">
+              <div class="stage-loop-card-label">Instrument Deck</div>
+              <div id="stageLoopDeck" class="stage-loop-card-value">No active instruments</div>
+            </div>
           </div>
           <div class="stage-loop-track"><div id="stageLoopFill" class="stage-loop-track-fill"></div></div>
+          <div class="stage-loop-metrics">
+            <div class="stage-loop-metric">
+              <div class="stage-loop-metric-head">
+                <span class="stage-loop-metric-label">Tempo</span>
+                <span id="stageLoopTempoValue" class="stage-loop-metric-value">104</span>
+              </div>
+              <div class="stage-loop-metric-bar"><div id="stageLoopTempoFill" class="stage-loop-metric-fill"></div></div>
+            </div>
+            <div class="stage-loop-metric">
+              <div class="stage-loop-metric-head">
+                <span class="stage-loop-metric-label">Intensity</span>
+                <span id="stageLoopIntensityValue" class="stage-loop-metric-value">55</span>
+              </div>
+              <div class="stage-loop-metric-bar"><div id="stageLoopIntensityFill" class="stage-loop-metric-fill"></div></div>
+            </div>
+            <div class="stage-loop-metric">
+              <div class="stage-loop-metric-head">
+                <span class="stage-loop-metric-label">Density</span>
+                <span id="stageLoopDensityValue" class="stage-loop-metric-value">48</span>
+              </div>
+              <div class="stage-loop-metric-bar"><div id="stageLoopDensityFill" class="stage-loop-metric-fill"></div></div>
+            </div>
+            <div class="stage-loop-metric">
+              <div class="stage-loop-metric-head">
+                <span class="stage-loop-metric-label">Swing</span>
+                <span id="stageLoopSwingValue" class="stage-loop-metric-value">8</span>
+              </div>
+              <div class="stage-loop-metric-bar"><div id="stageLoopSwingFill" class="stage-loop-metric-fill"></div></div>
+            </div>
+            <div class="stage-loop-metric">
+              <div class="stage-loop-metric-head">
+                <span class="stage-loop-metric-label">Humanize</span>
+                <span id="stageLoopHumanizeValue" class="stage-loop-metric-value">18</span>
+              </div>
+              <div class="stage-loop-metric-bar"><div id="stageLoopHumanizeFill" class="stage-loop-metric-fill"></div></div>
+            </div>
+          </div>
+          <div id="stageLoopRhythm" class="stage-loop-rhythm"></div>
+          <div id="stageLoopDeckList" class="stage-loop-deck-list"></div>
         </div>
 
         <div id="jammerLabPanel" class="jammer-lab-panel">
@@ -1671,12 +2218,19 @@
           <div class="jammer-live-group">
             <div class="jammer-group-heading">
               <strong>Instrument Deck</strong>
-              <span>Preview, mute, replace or remove each instrument. If the deck is empty or fully muted, the drummer stops.</span>
+              <span>Preview, mute or remove each instrument. Adjust the level per voice. If the deck is empty or fully muted, the drummer stops.</span>
             </div>
 
             <div class="jammer-deck-toolbar">
               <div id="jammerDeckSummary" class="hint">No instruments loaded yet.</div>
-              <button id="jammerOpenLibraryButton" type="button">Add Instruments</button>
+              <div class="inline-actions">
+                <select id="jammerDeckPresetSelect">
+                  <option value="">Saved decks</option>
+                </select>
+                <button id="jammerLoadDeckPresetButton" type="button">Load Deck</button>
+                <button id="jammerSaveDeckPresetButton" type="button">Save Deck</button>
+                <button id="jammerOpenLibraryButton" type="button">Add Instruments</button>
+              </div>
             </div>
 
             <div id="jammerDeckGrid" class="jammer-deck-grid"></div>
@@ -1810,15 +2364,17 @@
 
   <script type="module">
     import butterchurn from "../dist/butterchurn.js";
-    import { createJammerEngine, createToneDrumBus, drummerCatalog } from "../jammer/drums/index.js";
+    import { createEssentiaListener, createJammerEngine, createToneDrumBus, drummerCatalog } from "../jammer/drums/index.js";
     import { syncJammerResearchCatalog } from "../src/jammerResearchDb.js";
-    import { loadJammerLabState, saveJammerLabFavorite, saveJammerLabSettings } from "../src/jammerLabDb.js";
+    import { loadJammerLabState, saveJammerDeckPreset, saveJammerLabFavorite, saveJammerLabSettings } from "../src/jammerLabDb.js";
     import Recorder from "../src/recorder.js";
     import { applySkin, defaultSkinId, getSkinById, skinCatalog } from "../src/skins.js";
     import { deleteAsset, loadAsset, loadSettings, saveAsset, saveSetting } from "../src/settingsDb.js";
 
     const root = document.documentElement;
     const canvas = document.getElementById("canvas");
+    const canvasContext = canvas.getContext("2d");
+    const stageSection = document.getElementById("stageSection");
     const stageShell = document.querySelector(".stage-shell");
     const canvasFrame = document.querySelector(".canvas-frame");
     const studioHomeButton = document.getElementById("studioHomeButton");
@@ -1827,6 +2383,7 @@
     const stopMicButton = document.getElementById("stopMicButton");
     const randomPresetButton = document.getElementById("randomPresetButton");
     const nextPresetButton = document.getElementById("nextPresetButton");
+    const visualizerToggleButton = document.getElementById("visualizerToggleButton");
     const cycleSecondsInput = document.getElementById("cycleSeconds");
     const autoCycleEnabledInput = document.getElementById("autoCycleEnabled");
     const startRecordingButton = document.getElementById("startRecordingButton");
@@ -1874,8 +2431,10 @@
     const studioPanel = document.getElementById("studioPanel");
     const jammerPanel = document.getElementById("jammerPanel");
     const settingsPanel = document.getElementById("settingsPanel");
+    const jammerRuntimeSection = document.getElementById("jammerRuntimeSection");
     const jammerDrummerSelect = document.getElementById("jammerDrummerSelect");
     const jammerPlayToggleButton = document.getElementById("jammerPlayToggleButton");
+    const jammerDetectionToggleButton = document.getElementById("jammerDetectionToggleButton");
     const jammerEnabledInput = document.getElementById("jammerEnabled");
     const jammerFollowSourceSelect = document.getElementById("jammerFollowSource");
     const jammerFeelSelect = document.getElementById("jammerFeelSelect");
@@ -1889,6 +2448,9 @@
     const jammerLabPanel = document.getElementById("jammerLabPanel");
     const jammerDeckSummary = document.getElementById("jammerDeckSummary");
     const jammerDeckGrid = document.getElementById("jammerDeckGrid");
+    const jammerDeckPresetSelect = document.getElementById("jammerDeckPresetSelect");
+    const jammerLoadDeckPresetButton = document.getElementById("jammerLoadDeckPresetButton");
+    const jammerSaveDeckPresetButton = document.getElementById("jammerSaveDeckPresetButton");
     const jammerOpenLibraryButton = document.getElementById("jammerOpenLibraryButton");
     const jammerLibraryPanel = document.getElementById("jammerLibraryPanel");
     const jammerLibraryTitle = document.getElementById("jammerLibraryTitle");
@@ -1918,7 +2480,26 @@
     const jammerPatternValue = document.getElementById("jammerPatternValue");
     const jammerLaneValue = document.getElementById("jammerLaneValue");
     const jammerToneValue = document.getElementById("jammerToneValue");
+    const jammerEarValue = document.getElementById("jammerEarValue");
+    const jammerPulseValue = document.getElementById("jammerPulseValue");
     const jammerMaskValue = document.getElementById("jammerMaskValue");
+    const jammerDetectionState = document.getElementById("jammerDetectionState");
+    const jammerDetectionSource = document.getElementById("jammerDetectionSource");
+    const jammerDetectionTempo = document.getElementById("jammerDetectionTempo");
+    const jammerDetectionConfidence = document.getElementById("jammerDetectionConfidence");
+    const jammerDetectionZcr = document.getElementById("jammerDetectionZcr");
+    const jammerDetectionSummary = document.getElementById("jammerDetectionSummary");
+    const jammerDetectionEnergyValue = document.getElementById("jammerDetectionEnergyValue");
+    const jammerDetectionOnsetValue = document.getElementById("jammerDetectionOnsetValue");
+    const jammerDetectionLockValue = document.getElementById("jammerDetectionLockValue");
+    const jammerDetectionEnergyFill = document.getElementById("jammerDetectionEnergyFill");
+    const jammerDetectionOnsetFill = document.getElementById("jammerDetectionOnsetFill");
+    const jammerDetectionLockFill = document.getElementById("jammerDetectionLockFill");
+    const jammerDecisionTempo = document.getElementById("jammerDecisionTempo");
+    const jammerDecisionDensity = document.getElementById("jammerDecisionDensity");
+    const jammerDecisionFill = document.getElementById("jammerDecisionFill");
+    const jammerDecisionEntry = document.getElementById("jammerDecisionEntry");
+    const jammerDecisionMode = document.getElementById("jammerDecisionMode");
     const jammerArchitectureList = document.getElementById("jammerArchitectureList");
     const jammerResearchCount = document.getElementById("jammerResearchCount");
     const jammerResearchUpdated = document.getElementById("jammerResearchUpdated");
@@ -1927,19 +2508,36 @@
     const formatSummaryValue = document.getElementById("formatSummaryValue");
     const skinSummaryValue = document.getElementById("skinSummaryValue");
     const audioSummaryValue = document.getElementById("audioSummaryValue");
+    const stageLoopMonitor = document.querySelector(".stage-loop-monitor");
     const stagePresetLabel = document.getElementById("stagePresetLabel");
     const stageMetaLabel = document.getElementById("stageMetaLabel");
     const stageLoopStatus = document.getElementById("stageLoopStatus");
     const stageLoopPattern = document.getElementById("stageLoopPattern");
     const stageLoopPosition = document.getElementById("stageLoopPosition");
     const stageLoopEvents = document.getElementById("stageLoopEvents");
+    const stageLoopEar = document.getElementById("stageLoopEar");
+    const stageLoopAdapt = document.getElementById("stageLoopAdapt");
+    const stageLoopDeck = document.getElementById("stageLoopDeck");
     const stageLoopFill = document.getElementById("stageLoopFill");
+    const stageLoopTempoValue = document.getElementById("stageLoopTempoValue");
+    const stageLoopIntensityValue = document.getElementById("stageLoopIntensityValue");
+    const stageLoopDensityValue = document.getElementById("stageLoopDensityValue");
+    const stageLoopSwingValue = document.getElementById("stageLoopSwingValue");
+    const stageLoopHumanizeValue = document.getElementById("stageLoopHumanizeValue");
+    const stageLoopTempoFill = document.getElementById("stageLoopTempoFill");
+    const stageLoopIntensityFill = document.getElementById("stageLoopIntensityFill");
+    const stageLoopDensityFill = document.getElementById("stageLoopDensityFill");
+    const stageLoopSwingFill = document.getElementById("stageLoopSwingFill");
+    const stageLoopHumanizeFill = document.getElementById("stageLoopHumanizeFill");
+    const stageLoopRhythm = document.getElementById("stageLoopRhythm");
+    const stageLoopDeckList = document.getElementById("stageLoopDeckList");
 
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     const PSEUDO_AUDIO_DEVICE_IDS = new Set(["default", "communications"]);
     const recorder = new Recorder();
     const jammerEngine = createJammerEngine();
     const toneDrumBus = createToneDrumBus();
+    const essentiaListener = createEssentiaListener();
 
     let audioContext;
     let analyser;
@@ -1976,12 +2574,18 @@
     let stageFullscreenActive = false;
     let jammerResearchCatalog;
     let toneDrumBusSummary = toneDrumBus.getSummary();
+    let essentiaSummary = essentiaListener.getSnapshot();
+    let lastReactiveEarUpdateAt = 0;
+    let currentReactiveAdaptiveState = null;
+    let reactiveListenStartedAt = 0;
+    let reactiveKitStartPending = false;
+    let detectionEnabled = false;
     let jammerLabState;
     let jammerLabOpen = false;
     let jammerLabJamRunning = false;
     let jammerDeckLibraryOpen = false;
-    let jammerDeckReplaceTargetId = null;
     let loopMonitorTimer = null;
+    let visualizerEnabled = true;
 
     const STAGE_MIN_WIDTH = 320;
     const STAGE_MAX_WIDTH = 1400;
@@ -2176,6 +2780,18 @@
       element.textContent = `${Math.round(Number(value))}%`;
     }
 
+    function formatSignedValue(value, suffix = "") {
+      const numeric = Math.round(Number(value) || 0);
+      if (numeric === 0) {
+        return `0${suffix}`;
+      }
+      return `${numeric > 0 ? "+" : ""}${numeric}${suffix}`;
+    }
+
+    function isDetectionActive() {
+      return detectionEnabled || jammerEngine.state.enabled;
+    }
+
     function persistSetting(key, value) {
       if (!appSettings) {
         return;
@@ -2187,7 +2803,51 @@
       });
     }
 
+    function paintVisualizerStandby() {
+      if (!canvasContext) {
+        return;
+      }
+
+      canvasContext.save();
+      canvasContext.fillStyle = "#05070b";
+      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+      canvasContext.fillStyle = "rgba(255, 255, 255, 0.76)";
+      canvasContext.font = "600 20px Inter, system-ui, sans-serif";
+      canvasContext.textAlign = "center";
+      canvasContext.textBaseline = "middle";
+      canvasContext.fillText("Visualizer Off", canvas.width / 2, canvas.height / 2);
+      canvasContext.restore();
+    }
+
+    function updateVisualizerToggleUi() {
+      const jammerActive = jammerPanel?.classList.contains("active");
+      visualizerToggleButton.textContent = visualizerEnabled ? "On" : "Off";
+      visualizerToggleButton.classList.toggle("active", visualizerEnabled);
+      visualizerToggleButton.setAttribute("aria-pressed", String(visualizerEnabled));
+      stageSection.hidden = !visualizerEnabled || jammerActive;
+      stageSection.style.display = (!visualizerEnabled || jammerActive) ? "none" : "";
+      if (!visualizerEnabled) {
+        paintVisualizerStandby();
+      }
+    }
+
+    function setVisualizerEnabled(enabled, persist = true) {
+      visualizerEnabled = Boolean(enabled);
+      if (!visualizerEnabled && document.fullscreenElement === stageShell && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+      if (!visualizerEnabled && stageExpanded) {
+        toggleStageExpanded(false);
+      }
+      updateVisualizerToggleUi();
+      if (persist) {
+        persistSetting("visualizerEnabled", visualizerEnabled);
+      }
+    }
+
     function applyStoredSettings(settings) {
+      visualizerEnabled = settings.visualizerEnabled !== false;
+      detectionEnabled = settings.jammerDetectionEnabled === true;
       autoCycleEnabledInput.checked = settings.autoCycleEnabled !== false;
       cycleSecondsInput.value = settings.cycleSeconds;
       fpsSelect.value = settings.fps;
@@ -2365,7 +3025,7 @@
         kickDecay: jammerLabKickDecay.value,
         snareDecay: jammerLabSnareDecay.value,
         hatBrightness: jammerLabHatBrightness.value,
-        instrumentDeck: toneDrumBus.getDeckSnapshot().map(({ id, catalogId, enabled }) => ({ id, catalogId, enabled })),
+        instrumentDeck: toneDrumBus.getDeckSnapshot().map(({ id, catalogId, enabled, volume }) => ({ id, catalogId, enabled, volume })),
       };
     }
 
@@ -2386,17 +3046,11 @@
       toneDrumBus.setInstrumentDeck(initialDeck);
     }
 
-    function toggleJammerLibrary(forceOpen, replaceTargetId = null) {
-      jammerDeckReplaceTargetId = replaceTargetId;
+    function toggleJammerLibrary(forceOpen) {
       jammerDeckLibraryOpen = typeof forceOpen === "boolean" ? forceOpen : !jammerDeckLibraryOpen;
       jammerLibraryPanel.classList.toggle("active", jammerDeckLibraryOpen);
-      if (jammerDeckReplaceTargetId) {
-        jammerLibraryTitle.textContent = "Replace Instrument";
-        jammerLibraryHint.textContent = "Pick a Tone instrument to swap into this deck slot.";
-      } else {
-        jammerLibraryTitle.textContent = "Tone Instrument Library";
-        jammerLibraryHint.textContent = "Choose one or more instruments to add to the deck.";
-      }
+      jammerLibraryTitle.textContent = "Tone Instrument Library";
+      jammerLibraryHint.textContent = "Choose one or more instruments to add to the deck.";
     }
 
     function renderInstrumentLibrary() {
@@ -2446,6 +3100,7 @@
               id: `library-preview-${instrument.id}`,
               catalogId: instrument.id,
               enabled: true,
+              volume: 1,
             };
             toneDrumBus.previewVoice(temporaryEntry).catch((error) => {
               log(`Instrument preview error: ${error.message}`);
@@ -2453,14 +3108,9 @@
           });
           const addButton = document.createElement("button");
           addButton.type = "button";
-          addButton.textContent = jammerDeckReplaceTargetId ? "Use Here" : "Add To Deck";
+          addButton.textContent = "Add To Deck";
           addButton.addEventListener("click", () => {
-            if (jammerDeckReplaceTargetId) {
-              toneDrumBus.replaceDeckInstrument(jammerDeckReplaceTargetId, instrument.id);
-              toggleJammerLibrary(false, null);
-            } else {
-              toneDrumBus.addInstrumentToDeck(instrument.id);
-            }
+            toneDrumBus.addInstrumentToDeck(instrument.id);
             renderInstrumentDeck();
             persistJammerLabSettings().catch((error) => log(`Drummer lab save error: ${error.message}`));
           });
@@ -2531,7 +3181,24 @@
 
         const muteButton = document.createElement("button");
         muteButton.type = "button";
-        muteButton.textContent = entry.enabled ? "Mute" : "Unmute";
+        muteButton.className = "jammer-deck-icon-button";
+        muteButton.setAttribute("aria-label", entry.enabled ? `Mute ${entry.name}` : `Unmute ${entry.name}`);
+        muteButton.title = entry.enabled ? "Mute" : "Muted";
+        muteButton.innerHTML = entry.enabled
+          ? `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 15h4l5 4V5L8 9H4z"></path>
+              <path d="M17 9a5 5 0 0 1 0 6"></path>
+              <path d="M19.5 6.5a8.5 8.5 0 0 1 0 11"></path>
+            </svg>
+          `
+          : `
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 15h4l5 4V5L8 9H4z"></path>
+              <path d="M5 5 19 19"></path>
+              <path d="M19 5 5 19"></path>
+            </svg>
+          `;
         muteButton.addEventListener("click", () => {
           toneDrumBus.toggleDeckInstrument(entry.id);
           renderInstrumentDeck();
@@ -2539,17 +3206,17 @@
           enforceDeckAvailability();
         });
 
-        const swapButton = document.createElement("button");
-        swapButton.type = "button";
-        swapButton.textContent = "Swap";
-        swapButton.addEventListener("click", () => {
-          toggleJammerLibrary(true, entry.id);
-          renderInstrumentLibrary();
-        });
-
         const removeButton = document.createElement("button");
         removeButton.type = "button";
-        removeButton.textContent = "Remove";
+        removeButton.className = "jammer-deck-icon-button";
+        removeButton.setAttribute("aria-label", `Remove ${entry.name}`);
+        removeButton.title = "Remove";
+        removeButton.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6 18 18"></path>
+            <path d="M18 6 6 18"></path>
+          </svg>
+        `;
         removeButton.addEventListener("click", () => {
           toneDrumBus.removeDeckInstrument(entry.id);
           renderInstrumentDeck();
@@ -2557,9 +3224,27 @@
           enforceDeckAvailability();
         });
 
+        const volumeWrap = document.createElement("label");
+        volumeWrap.className = "jammer-deck-volume";
+        const volumeLabel = document.createElement("span");
+        volumeLabel.textContent = "Vol";
+        const volumeSlider = document.createElement("input");
+        volumeSlider.type = "range";
+        volumeSlider.min = "0";
+        volumeSlider.max = "100";
+        volumeSlider.step = "1";
+        volumeSlider.value = String(Math.round((entry.volume ?? 1) * 100));
+        volumeSlider.setAttribute("aria-label", `Volume for ${entry.name}`);
+        volumeSlider.addEventListener("input", () => {
+          toneDrumBus.setDeckInstrumentVolume(entry.id, Number(volumeSlider.value) / 100);
+          persistJammerLabSettings().catch((error) => log(`Drummer lab save error: ${error.message}`));
+        });
+        volumeWrap.appendChild(volumeLabel);
+        volumeWrap.appendChild(volumeSlider);
+
         controls.appendChild(muteButton);
-        controls.appendChild(swapButton);
         controls.appendChild(removeButton);
+        controls.appendChild(volumeWrap);
 
         card.appendChild(mainButton);
         card.appendChild(meta);
@@ -2570,11 +3255,20 @@
 
     function renderJammerLabState() {
       const favorites = jammerLabState?.favorites || [];
+      const deckPresets = jammerLabState?.deckPresets || [];
       jammerFavoriteCount.textContent = String(favorites.length);
       jammerFavoriteUpdated.textContent = formatShortDate(jammerLabState?.updatedAt);
       jammerFavoriteList.innerHTML = "";
+      jammerDeckPresetSelect.innerHTML = '<option value="">Saved decks</option>';
       renderInstrumentDeck();
       renderInstrumentLibrary();
+
+      deckPresets.forEach((preset) => {
+        const option = document.createElement("option");
+        option.value = preset.id;
+        option.textContent = preset.name;
+        jammerDeckPresetSelect.appendChild(option);
+      });
 
       if (favorites.length === 0) {
         const item = document.createElement("li");
@@ -2597,14 +3291,142 @@
       });
     }
 
+    function applyDeckPreset(preset) {
+      if (!preset?.settings) {
+        return;
+      }
+
+      applyLabConfigToUi({
+        ...jammerLabState.settings,
+        ...(preset.settings || {}),
+      });
+      toneDrumBus.setInstrumentDeck(preset.settings.instrumentDeck || []);
+      syncToneLabShape();
+      renderJammerLabState();
+      updateStageLoopMonitor();
+    }
+
+    function formatMonitorDelta(baseValue, appliedValue, suffix = "") {
+      const delta = Math.round((appliedValue || 0) - (baseValue || 0));
+      if (!delta) {
+        return `${Math.round(appliedValue || 0)}${suffix}`;
+      }
+
+      return `${Math.round(appliedValue || 0)}${suffix} (${delta > 0 ? "+" : ""}${delta})`;
+    }
+
+    function setMonitorMetric(valueElement, fillElement, value, max, suffix = "") {
+      const safeValue = Math.max(0, Math.min(max, Number(value || 0)));
+      valueElement.textContent = `${Math.round(safeValue)}${suffix}`;
+      fillElement.style.width = `${(safeValue / max) * 100}%`;
+    }
+
+    function roleMatchesStep(stepEvents, role) {
+      if (role === "snare") {
+        return stepEvents.includes("snare") || stepEvents.includes("ghost-snare");
+      }
+
+      return stepEvents.includes(role);
+    }
+
+    function renderStageLoopRhythm(loopState) {
+      stageLoopRhythm.innerHTML = "";
+
+      if (!loopState.active || !Array.isArray(loopState.currentBarSteps) || loopState.currentBarSteps.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "stage-loop-card-value";
+        empty.textContent = "No rhythm map yet";
+        stageLoopRhythm.appendChild(empty);
+        return;
+      }
+
+      ["kick", "snare", "hat", "perc"].forEach((role) => {
+        const row = document.createElement("div");
+        row.className = "stage-loop-rhythm-row";
+
+        const label = document.createElement("div");
+        label.className = "stage-loop-rhythm-label";
+        label.textContent = role === "perc" ? "Perc" : role.charAt(0).toUpperCase() + role.slice(1);
+        row.appendChild(label);
+
+        for (let index = 0; index < 16; index += 1) {
+          const cell = document.createElement("div");
+          const stepEvents = loopState.currentBarSteps[index] || [];
+          cell.className = "stage-loop-step";
+          if (roleMatchesStep(stepEvents, role)) {
+            cell.classList.add("active");
+          }
+          if ((loopState.stepInBar - 1) === index) {
+            cell.classList.add("current");
+          }
+          row.appendChild(cell);
+        }
+
+        stageLoopRhythm.appendChild(row);
+      });
+    }
+
+    function renderStageLoopDeck() {
+      const activeDeck = toneDrumBus.getDeckSnapshot().filter((entry) => entry.enabled);
+      stageLoopDeckList.innerHTML = "";
+      stageLoopDeck.textContent = activeDeck.length > 0
+        ? activeDeck.map((entry) => entry.name).join(" • ")
+        : "No active instruments";
+
+      if (activeDeck.length === 0) {
+        return;
+      }
+
+      activeDeck.slice(0, 8).forEach((entry) => {
+        const chip = document.createElement("div");
+        chip.className = "stage-loop-chip";
+        chip.textContent = `${entry.role}: ${entry.name}`;
+        stageLoopDeckList.appendChild(chip);
+      });
+    }
+
     function updateStageLoopMonitor() {
       const loopState = toneDrumBus.getLoopState();
+      const adaptiveState = currentReactiveAdaptiveState || buildAdaptiveReactiveKitConfig();
+      const resolvedSource = jammerEngine.getResolvedSource();
+      const isReactiveListening = jammerEngine.state.enabled
+        && jammerEngine.getProfile().id === "reactive-kit"
+        && (resolvedSource === "player" || resolvedSource === "microphone-live" || resolvedSource === "microphone-armed");
+
       if (!loopState.active) {
-        stageLoopStatus.textContent = "Standby";
-        stageLoopPattern.textContent = "No loop running";
-        stageLoopPosition.textContent = "Bar 0 • Step 0";
-        stageLoopEvents.textContent = "Silence";
+        if (isReactiveListening) {
+          stageLoopStatus.textContent = adaptiveState?.phase
+            ? adaptiveState.phase.charAt(0).toUpperCase() + adaptiveState.phase.slice(1)
+            : "Listening";
+          stageLoopPattern.textContent = "Reactive Kit • listening";
+          stageLoopPosition.textContent = adaptiveState?.listenMs > 0
+            ? `${Math.round(adaptiveState.listenMs / 100) / 10}s listen`
+            : "Waiting for downbeat";
+          stageLoopEvents.textContent = adaptiveState?.entryLevel > 0
+            ? `Entry level ${adaptiveState.entryLevel} primed`
+            : "Holding entry";
+          stageLoopEar.textContent = essentiaSummary.ready
+            ? `${essentiaSummary.tempo > 0 ? `${essentiaSummary.tempo} BPM` : "Tempo scanning"} • ${essentiaSummary.confidence}% conf • ${Math.round((essentiaSummary.energy || 0) * 100)}% energy`
+            : "Ear warming up";
+          stageLoopAdapt.textContent = `Tempo ${adaptiveState.tempo} • Int ${adaptiveState.intensity} • Den ${adaptiveState.density} • Swing ${adaptiveState.swing} • Hum ${adaptiveState.humanize}`;
+          renderStageLoopDeck();
+        } else {
+          stageLoopStatus.textContent = "Standby";
+          stageLoopPattern.textContent = "No loop running";
+          stageLoopPosition.textContent = "Bar 0 • Step 0";
+          stageLoopEvents.textContent = "Silence";
+          stageLoopEar.textContent = "Waiting for source";
+          stageLoopAdapt.textContent = "No adjustments";
+          stageLoopDeck.textContent = "No active instruments";
+          stageLoopDeckList.innerHTML = "";
+        }
         stageLoopFill.style.width = "0%";
+        setMonitorMetric(stageLoopTempoValue, stageLoopTempoFill, jammerEngine.state.tempo, 180, "");
+        setMonitorMetric(stageLoopIntensityValue, stageLoopIntensityFill, jammerEngine.state.intensity, 100, "");
+        setMonitorMetric(stageLoopDensityValue, stageLoopDensityFill, jammerEngine.state.density, 100, "");
+        setMonitorMetric(stageLoopSwingValue, stageLoopSwingFill, jammerEngine.state.swing, 100, "");
+        setMonitorMetric(stageLoopHumanizeValue, stageLoopHumanizeFill, jammerEngine.state.humanize, 100, "");
+        stageLoopRhythm.innerHTML = "";
         return;
       }
 
@@ -2614,10 +3436,50 @@
       stageLoopStatus.textContent = loopState.pattern.startsWith("lab-jam:") ? "Looping" : "Following";
       stageLoopPattern.textContent = patternLabel;
       stageLoopPosition.textContent = `Bar ${loopState.currentBar} • Step ${loopState.stepInBar} / 16`;
-      stageLoopEvents.textContent = loopState.currentEvents.length > 0
-        ? loopState.currentEvents.join(" • ")
-        : "Rest";
+      stageLoopEvents.textContent = loopState.currentVoices.length > 0
+        ? loopState.currentVoices.join(" • ")
+        : loopState.currentEvents.length > 0
+          ? loopState.currentEvents.join(" • ")
+          : "Rest";
+      stageLoopEar.textContent = essentiaSummary.ready
+        ? `${essentiaSummary.tempo > 0 ? `${essentiaSummary.tempo} BPM` : "Tempo scanning"} • ${essentiaSummary.confidence}% conf • ${Math.round((essentiaSummary.energy || 0) * 100)}% energy`
+        : "Waiting for source";
+
+      stageLoopAdapt.textContent = toneDrumBusSummary.pattern === "reactive-kit"
+        ? `Tempo ${adaptiveState.tempo} • Int ${adaptiveState.intensity} • Den ${adaptiveState.density} • Swing ${adaptiveState.swing} • Hum ${adaptiveState.humanize}`
+        : "Manual lab shaping";
       stageLoopFill.style.width = `${Math.max(0, Math.min(100, loopState.progress * 100))}%`;
+      stageLoopTempoValue.textContent = formatMonitorDelta(jammerEngine.state.tempo, adaptiveState.tempo);
+      stageLoopIntensityValue.textContent = formatMonitorDelta(jammerEngine.state.intensity, adaptiveState.intensity);
+      stageLoopDensityValue.textContent = formatMonitorDelta(jammerEngine.state.density, adaptiveState.density);
+      stageLoopSwingValue.textContent = formatMonitorDelta(jammerEngine.state.swing, adaptiveState.swing);
+      stageLoopHumanizeValue.textContent = formatMonitorDelta(jammerEngine.state.humanize, adaptiveState.humanize);
+      stageLoopTempoFill.style.width = `${(Math.max(60, Math.min(180, adaptiveState.tempo)) / 180) * 100}%`;
+      stageLoopIntensityFill.style.width = `${Math.max(0, Math.min(100, adaptiveState.intensity))}%`;
+      stageLoopDensityFill.style.width = `${Math.max(0, Math.min(100, adaptiveState.density))}%`;
+      stageLoopSwingFill.style.width = `${Math.max(0, Math.min(100, adaptiveState.swing))}%`;
+      stageLoopHumanizeFill.style.width = `${Math.max(0, Math.min(100, adaptiveState.humanize))}%`;
+      renderStageLoopRhythm(loopState);
+      renderStageLoopDeck();
+    }
+
+    function placeJammerRuntimePanels() {
+      if (!jammerRuntimeSection) {
+        return;
+      }
+
+      const detectionCard = jammerPanel.querySelector(".jammer-detection-card");
+      if (detectionCard && detectionCard.parentElement !== jammerRuntimeSection) {
+        jammerRuntimeSection.appendChild(detectionCard);
+      }
+
+      if (stageLoopMonitor && stageLoopMonitor.parentElement !== jammerRuntimeSection) {
+        jammerRuntimeSection.appendChild(stageLoopMonitor);
+      }
+
+      if (jammerLabPanel && jammerLabPanel.parentElement !== jammerRuntimeSection) {
+        jammerRuntimeSection.appendChild(jammerLabPanel);
+      }
     }
 
     function toggleJammerLab(forceOpen) {
@@ -2734,15 +3596,103 @@
       }
     }
 
-    function refreshJammerUi() {
+    function refreshJammerRuntimeFields() {
       const snapshot = jammerEngine.getStatusSnapshot();
+      const detectionActive = isDetectionActive();
       jammerStatusPill.textContent = snapshot.readiness;
       jammerSummary.textContent = snapshot.summary;
       jammerRouteValue.textContent = snapshot.routeLabel;
       jammerPatternValue.textContent = snapshot.patternLabel;
       jammerLaneValue.textContent = snapshot.laneLabel;
       jammerToneValue.textContent = `v${toneDrumBusSummary.version} • ${toneDrumBusSummary.started ? "ready" : "installed"}`;
+      jammerEarValue.textContent = essentiaSummary.installed
+        ? `v${essentiaSummary.version} • ${essentiaSummary.ready ? essentiaSummary.statusLabel.toLowerCase() : "installed"}`
+        : "Missing";
+      jammerPulseValue.textContent = essentiaSummary.ready && essentiaSummary.tempo > 0
+        ? `${essentiaSummary.tempo} BPM • ${essentiaSummary.confidence}%`
+        : essentiaSummary.ready
+          ? `${Math.round((essentiaSummary.energy || 0) * 100)}% energy`
+          : "Waiting";
       jammerMaskValue.textContent = toneDrumBusSummary.analysisReferenceReady ? "Bus ready" : "Pending";
+      jammerDetectionToggleButton.classList.toggle("active", detectionEnabled || jammerEngine.state.enabled);
+      jammerDetectionToggleButton.setAttribute("aria-pressed", String(detectionEnabled || jammerEngine.state.enabled));
+      jammerDetectionToggleButton.disabled = jammerEngine.state.enabled;
+      jammerDetectionToggleButton.setAttribute(
+        "aria-label",
+        jammerEngine.state.enabled
+          ? "Detection linked to drummer"
+          : detectionEnabled
+            ? "Stop detection"
+            : "Start detection"
+      );
+      jammerDetectionToggleButton.title = jammerEngine.state.enabled
+        ? "Detection linked to drummer"
+        : detectionEnabled
+          ? "Stop detection"
+          : "Start detection";
+      jammerDetectionState.textContent = !detectionActive
+        ? "Off"
+        : (essentiaSummary.ready ? (essentiaSummary.statusLabel || "Ready") : "Waiting");
+      jammerDetectionSource.textContent = essentiaSummary.sourceMode || "none";
+      jammerDetectionTempo.textContent = essentiaSummary.tempo > 0 ? `${essentiaSummary.tempo} BPM` : "0 BPM";
+      jammerDetectionConfidence.textContent = `${Math.round(Number(essentiaSummary.confidence || 0))}%`;
+      jammerDetectionZcr.textContent = Number(essentiaSummary.zcr || 0).toFixed(3);
+      jammerDetectionSummary.textContent = !detectionActive
+        ? "Detection is idle. Start Detection to listen without enabling the drummer."
+        : (essentiaSummary.summary || "Waiting for a live route.");
+
+      const energyPercent = detectionActive ? Math.max(0, Math.min(100, Math.round((essentiaSummary.energy || 0) * 100))) : 0;
+      const onsetPercent = detectionActive ? Math.max(0, Math.min(100, Math.round((essentiaSummary.onset || 0) * 100))) : 0;
+      const lockPercent = detectionActive ? Math.max(0, Math.min(100, Math.round(Number(essentiaSummary.confidence || 0)))) : 0;
+      jammerDetectionEnergyValue.textContent = `${energyPercent}%`;
+      jammerDetectionOnsetValue.textContent = `${onsetPercent}%`;
+      jammerDetectionLockValue.textContent = `${lockPercent}%`;
+      jammerDetectionEnergyFill.style.width = `${energyPercent}%`;
+      jammerDetectionOnsetFill.style.width = `${onsetPercent}%`;
+      jammerDetectionLockFill.style.width = `${lockPercent}%`;
+
+      const adaptiveState = currentReactiveAdaptiveState || buildAdaptiveReactiveKitConfig();
+      const baseTempo = Number(jammerEngine.state.tempo || 104);
+      const baseDensity = Number(jammerEngine.state.density || 48);
+      const confidenceRatio = Math.max(0, Math.min(1, Number(essentiaSummary.confidence || 0) / 100));
+      const energyRatio = Math.max(0, Math.min(1, Number(essentiaSummary.energy || 0)));
+      const onsetRatio = Math.max(0, Math.min(1, Number(essentiaSummary.onset || 0)));
+      const resolvedSource = jammerEngine.getResolvedSource();
+      const liveFollow = snapshot.profile.id === "reactive-kit"
+        && jammerEngine.state.enabled
+        && (resolvedSource === "player" || resolvedSource === "microphone-live");
+      const tempoCorrection = adaptiveState.tempo - baseTempo;
+      const densityBoost = adaptiveState.density - baseDensity;
+      const fillProbability = liveFollow
+        ? Math.max(0, Math.min(100, Math.round(
+          (onsetRatio * 42)
+          + (energyRatio * 26)
+          + (confidenceRatio * 18)
+          + (Math.max(0, densityBoost) * 0.45)
+        )))
+        : 0;
+      const entryConfidence = liveFollow
+        ? Math.max(0, Math.min(100, Math.round(
+          (confidenceRatio * 72)
+          + (energyRatio * 16)
+          + (onsetRatio * 12)
+        )))
+        : 0;
+
+      jammerDecisionTempo.textContent = formatSignedValue(tempoCorrection, " BPM");
+      jammerDecisionDensity.textContent = formatSignedValue(densityBoost, "%");
+      jammerDecisionFill.textContent = `${fillProbability}%`;
+      jammerDecisionEntry.textContent = `${entryConfidence}%`;
+      jammerDecisionMode.textContent = !detectionActive
+        ? "Detection off"
+        : liveFollow
+          ? (adaptiveState.phase ? adaptiveState.phase[0].toUpperCase() + adaptiveState.phase.slice(1) : `${resolvedSource === "player" ? "Following player" : "Following mic"}`)
+          : (jammerLabJamRunning ? "Free loop" : "Standby");
+    }
+
+    function refreshJammerUi() {
+      const snapshot = jammerEngine.getStatusSnapshot();
+      refreshJammerRuntimeFields();
       jammerArchitectureList.innerHTML = "";
 
       Object.entries(snapshot.profile.architecture).forEach(([key, value]) => {
@@ -2762,8 +3712,248 @@
         micLive: isMicrophoneActive(),
         playerLive: isPlayerPlaying(),
       });
+      jammerEngine.setListenerState(essentiaSummary);
       refreshJammerUi();
       syncJammerPlayback();
+    }
+
+    async function ensureEssentiaListener() {
+      if (!audioContext || !essentiaSummary.installed) {
+        return essentiaSummary;
+      }
+
+      try {
+        essentiaSummary = await essentiaListener.warmup({ sampleRate: audioContext.sampleRate });
+      } catch (error) {
+        essentiaSummary = {
+          ...essentiaSummary,
+          ready: false,
+          statusLabel: "Error",
+          summary: error.message,
+        };
+      }
+
+      jammerEngine.setListenerState(essentiaSummary);
+      return essentiaSummary;
+    }
+
+    function syncEssentiaSource() {
+      if (!audioContext || !essentiaSummary.installed) {
+        return;
+      }
+
+      if (analyser && activeInputMode !== "none") {
+        essentiaSummary = essentiaListener.setSource({
+          analyser,
+          sourceMode: activeInputMode,
+          sampleRate: audioContext.sampleRate,
+        });
+      } else {
+        essentiaSummary = essentiaListener.clearSource();
+      }
+
+      jammerEngine.setListenerState(essentiaSummary);
+      refreshJammerUi();
+    }
+
+    function updateEssentiaAnalysis() {
+      if (!essentiaSummary.installed || !essentiaSummary.ready || !isDetectionActive()) {
+        return;
+      }
+
+      essentiaSummary = essentiaListener.analyzeFrame();
+      jammerEngine.setListenerState(essentiaSummary);
+      currentReactiveAdaptiveState = buildAdaptiveReactiveKitConfig();
+
+      maybeApplyEarDrivenReactiveKit();
+    }
+
+    function getReactiveListenPhaseMetrics() {
+      const resolvedSource = jammerEngine.getResolvedSource();
+      const liveFollow = jammerEngine.state.enabled
+        && jammerEngine.getProfile().id === "reactive-kit"
+        && (resolvedSource === "player" || resolvedSource === "microphone-live");
+
+      if (!liveFollow) {
+        reactiveListenStartedAt = 0;
+        return {
+          liveFollow: false,
+          listenMs: 0,
+          phase: "standby",
+        };
+      }
+
+      const now = performance.now();
+      if (!reactiveListenStartedAt) {
+        reactiveListenStartedAt = now;
+      }
+
+      const listenMs = now - reactiveListenStartedAt;
+      return {
+        liveFollow: true,
+        listenMs,
+        phase: "listening",
+      };
+    }
+
+    function clampPercent(value) {
+      return Math.max(0, Math.min(100, Math.round(value)));
+    }
+
+    function buildAdaptiveReactiveKitConfig() {
+      const baseTempo = Number(jammerEngine.state.tempo || 104);
+      const baseIntensity = Number(jammerEngine.state.intensity || 55);
+      const baseDensity = Number(jammerEngine.state.density || 48);
+      const baseSwing = Number(jammerEngine.state.swing || 8);
+      const baseHumanize = Number(jammerEngine.state.humanize || 18);
+      const sourceMode = essentiaSummary.sourceMode || "none";
+      const isMicrophoneRoute = sourceMode === "microphone";
+      const energy = Math.max(0, Math.min(1, Number(essentiaSummary.energy || 0)));
+      const onset = Math.max(0, Math.min(1, Number(essentiaSummary.onset || 0)));
+      const confidence = Math.max(0, Math.min(100, Number(essentiaSummary.confidence || 0)));
+      const confidenceRatio = confidence / 100;
+      const phaseMetrics = getReactiveListenPhaseMetrics();
+      const listenSeconds = phaseMetrics.listenMs / 1000;
+      const tempoConfidenceThreshold = isMicrophoneRoute ? 22 : 46;
+      const tempoBlend = isMicrophoneRoute
+        ? Math.max(0.24, Math.min(0.78, 0.24 + (confidenceRatio * 0.42) + (onset * 0.12)))
+        : Math.max(0.18, Math.min(0.72, 0.18 + (confidenceRatio * 0.4)));
+      const tempoTarget = confidence >= tempoConfidenceThreshold && essentiaSummary.tempo > 0
+        ? Math.round((baseTempo * (1 - tempoBlend)) + (essentiaSummary.tempo * tempoBlend))
+        : baseTempo;
+      const intensityBoost = isMicrophoneRoute
+        ? (energy * 34) + (onset * 18) + (confidenceRatio * 8)
+        : (energy * 24) + (onset * 10);
+      const densityBoost = isMicrophoneRoute
+        ? (energy * 16) + (onset * 30) + (confidenceRatio * 12)
+        : (energy * 10) + (onset * 24) + (confidenceRatio * 8);
+      const swingBoost = isMicrophoneRoute
+        ? (confidenceRatio * 6) + (onset * 3)
+        : (confidenceRatio * 4);
+      const humanizeShift = isMicrophoneRoute
+        ? ((1 - confidenceRatio) * 10) + ((1 - energy) * 8) - (onset * 4)
+        : ((1 - confidenceRatio) * 8) + ((1 - energy) * 6);
+      const entryConfidence = phaseMetrics.liveFollow
+        ? Math.max(0, Math.min(100, Math.round(
+          (confidenceRatio * 72)
+          + (energy * 16)
+          + (onset * 12)
+        )))
+        : 0;
+
+      let entryLevel = 0;
+      let phase = phaseMetrics.liveFollow ? "listening" : "standby";
+      if (phaseMetrics.liveFollow) {
+        if (listenSeconds < 1.8 || entryConfidence < 18) {
+          entryLevel = 0;
+          phase = "listening";
+        } else if (listenSeconds < 4.2 || entryConfidence < 42) {
+          entryLevel = 1;
+          phase = "entering";
+        } else if (listenSeconds < 7.2 || entryConfidence < 64) {
+          entryLevel = 2;
+          phase = "building";
+        } else if (entryConfidence < 78) {
+          entryLevel = 3;
+          phase = "supporting";
+        } else {
+          entryLevel = 4;
+          phase = "supporting";
+        }
+      }
+
+      const fillProbability = phaseMetrics.liveFollow
+        ? Math.max(0, Math.min(100, Math.round(
+          (onset * 42)
+          + (energy * 26)
+          + (confidenceRatio * 18)
+          + (Math.max(0, clampPercent(baseDensity + densityBoost) - baseDensity) * 0.45)
+        )))
+        : 0;
+      const densityTarget = phaseMetrics.liveFollow
+        ? (entryLevel <= 1
+          ? Math.min(baseDensity + 4, clampPercent(baseDensity + densityBoost))
+          : entryLevel === 2
+            ? Math.min(baseDensity + 12, clampPercent(baseDensity + densityBoost))
+            : clampPercent(baseDensity + densityBoost))
+        : clampPercent(baseDensity + densityBoost);
+
+      return {
+        tempo: tempoTarget,
+        intensity: clampPercent(baseIntensity + intensityBoost),
+        density: densityTarget,
+        swing: clampPercent(baseSwing + swingBoost),
+        humanize: clampPercent(baseHumanize + humanizeShift),
+        energy,
+        onset,
+        confidence,
+        entryConfidence,
+        entryLevel,
+        phase,
+        listenMs: phaseMetrics.listenMs,
+        fillProbability,
+        detectedTempo: Number(essentiaSummary.tempo || 0),
+        sourceMode,
+        downbeatPulse: phaseMetrics.liveFollow && confidence >= tempoConfidenceThreshold && onset >= (isMicrophoneRoute ? 0.56 : 0.48),
+      };
+    }
+
+    function maybeApplyEarDrivenReactiveKit() {
+      const resolvedSource = jammerEngine.getResolvedSource();
+      const activeProfile = jammerEngine.getProfile();
+      if (
+        !jammerEngine.state.enabled
+        || activeProfile.id !== "reactive-kit"
+        || (resolvedSource !== "player" && resolvedSource !== "microphone-live")
+      ) {
+        return;
+      }
+
+      const now = performance.now();
+      const analysisCadence = resolvedSource === "microphone-live" ? 140 : 220;
+      if (now - lastReactiveEarUpdateAt < analysisCadence) {
+        return;
+      }
+      lastReactiveEarUpdateAt = now;
+
+      const adaptiveConfig = buildAdaptiveReactiveKitConfig();
+      currentReactiveAdaptiveState = adaptiveConfig;
+      const deckChanged = toneDrumBus.applyAdaptiveDeckDecision(adaptiveConfig);
+      if (deckChanged) {
+        renderInstrumentDeck();
+      }
+      if (adaptiveConfig.entryLevel <= 0) {
+        toneDrumBusSummary = toneDrumBus.stopPattern();
+        return;
+      }
+      const reactiveLoopActive = toneDrumBus.getLoopState().active && toneDrumBusSummary.pattern === "reactive-kit";
+      if (reactiveLoopActive) {
+        toneDrumBusSummary = toneDrumBus.updateReactiveKit(adaptiveConfig);
+        if (adaptiveConfig.downbeatPulse) {
+          toneDrumBusSummary = toneDrumBus.realignReactiveKit(adaptiveConfig);
+        }
+        return;
+      }
+
+      if (!reactiveKitStartPending) {
+        reactiveKitStartPending = true;
+        void toneDrumBus.startReactiveKit(adaptiveConfig)
+          .then((summary) => {
+            toneDrumBusSummary = summary;
+            if (adaptiveConfig.downbeatPulse) {
+              toneDrumBusSummary = toneDrumBus.realignReactiveKit(adaptiveConfig);
+            }
+            refreshLabJamButtons();
+            refreshJammerUi();
+            updateStageLoopMonitor();
+          })
+          .catch((error) => {
+            log(`Reactive kit error: ${error.message}`);
+          })
+          .finally(() => {
+            reactiveKitStartPending = false;
+          });
+      }
     }
 
     async function syncJammerPlayback() {
@@ -2773,7 +3963,7 @@
         && activeProfile.id === "reactive-kit"
         && (resolvedSource === "player" || resolvedSource === "microphone-live");
       const shouldRunAutonomousLoop = jammerEngine.state.enabled
-        && (resolvedSource === "idle" || resolvedSource === "microphone-armed" || resolvedSource === "waiting-player" || resolvedSource === "waiting-microphone");
+        && resolvedSource === "idle";
 
       if (shouldRunAutonomousLoop) {
         try {
@@ -2786,6 +3976,10 @@
 
       if (!shouldRunReactiveKit) {
         toneDrumBusSummary = toneDrumBus.stopPattern();
+        lastReactiveEarUpdateAt = 0;
+        currentReactiveAdaptiveState = null;
+        reactiveListenStartedAt = 0;
+        reactiveKitStartPending = false;
         refreshLabJamButtons();
         refreshJammerUi();
         updateStageLoopMonitor();
@@ -2793,13 +3987,20 @@
       }
 
       try {
-        toneDrumBusSummary = await toneDrumBus.startReactiveKit({
-          tempo: jammerEngine.state.tempo,
-          intensity: jammerEngine.state.intensity,
-          density: jammerEngine.state.density,
-          swing: jammerEngine.state.swing,
-          humanize: jammerEngine.state.humanize,
-        });
+        const adaptiveConfig = buildAdaptiveReactiveKitConfig();
+        currentReactiveAdaptiveState = adaptiveConfig;
+        if (adaptiveConfig.entryLevel <= 0) {
+          toneDrumBusSummary = toneDrumBus.stopPattern();
+          refreshLabJamButtons();
+          refreshJammerUi();
+          updateStageLoopMonitor();
+          return;
+        }
+        toneDrumBusSummary = await toneDrumBus.startReactiveKit(adaptiveConfig);
+        reactiveKitStartPending = false;
+        if (adaptiveConfig.downbeatPulse) {
+          toneDrumBusSummary = toneDrumBus.realignReactiveKit(adaptiveConfig);
+        }
         refreshLabJamButtons();
         refreshJammerUi();
         updateStageLoopMonitor();
@@ -2914,6 +4115,7 @@
       if (visualizer && node) {
         visualizer.connectAudio(node);
       }
+      syncEssentiaSource();
       refreshMeterRoute();
       updateJammerSourceState();
     }
@@ -2931,6 +4133,7 @@
       analyser = null;
       activeInputMode = "none";
       meterFill.style.width = "0%";
+      syncEssentiaSource();
       refreshMeterRoute();
       updateJammerSourceState();
     }
@@ -3372,6 +4575,9 @@
       settingsPanel.classList.toggle("active", panelId === "settings");
       jammerTabButton.classList.toggle("active", panelId === "jammer");
       settingsTabButton.classList.toggle("active", panelId === "settings");
+      jammerRuntimeSection.hidden = panelId !== "jammer";
+      jammerRuntimeSection.style.display = panelId === "jammer" ? "" : "none";
+      updateVisualizerToggleUi();
 
       if (shouldPersist) {
         persistSetting("activeTab", panelId);
@@ -3616,6 +4822,8 @@
       }
 
       await audioContext.resume();
+      await ensureEssentiaListener();
+      syncEssentiaSource();
 
       if (presetKeys.length > 0) {
         await loadCurrentPreset(0);
@@ -3680,8 +4888,14 @@
 
     function render() {
       animationId = requestAnimationFrame(render);
-      visualizer.render();
+      if (visualizerEnabled) {
+        visualizer.render();
+      } else {
+        paintVisualizerStandby();
+      }
       updateMeter();
+      updateEssentiaAnalysis();
+      refreshJammerRuntimeFields();
     }
 
     function startRenderLoop() {
@@ -3732,10 +4946,13 @@
         micSource.connect(gainNode);
         gainNode.connect(analyser);
         setActiveAudioInput(gainNode, analyser, "microphone");
+        await ensureEssentiaListener();
+        syncEssentiaSource();
 
         startRenderLoop();
         updateMeterStatus("Listening");
         syncMicButtons();
+        refreshJammerUi();
 
         await loadAudioDevices();
         restartPresetCycle();
@@ -3780,6 +4997,7 @@
         activeInputMode = "none";
       }
       analyser = activeInputMode === "player" ? playerAnalyser : null;
+      syncEssentiaSource();
       stopRecordingButton.disabled = true;
       syncMicButtons();
       applyStandbyMeterState();
@@ -3931,6 +5149,9 @@
         selectPreset((presetIndex + 1) % presetKeys.length);
       }
     });
+    visualizerToggleButton.addEventListener("click", () => {
+      setVisualizerEnabled(!visualizerEnabled);
+    });
     presetSelect.addEventListener("change", () => {
       if (presetSelect.value !== "") {
         selectPreset(Number(presetSelect.value));
@@ -3978,11 +5199,38 @@
       syncJammerPlayback();
       log(`Jammer profile: ${jammerEngine.getProfile().name}`);
     });
+    jammerDetectionToggleButton.addEventListener("click", async () => {
+      detectionEnabled = !detectionEnabled;
+      persistSetting("jammerDetectionEnabled", detectionEnabled);
+
+      if (detectionEnabled) {
+        await ensureVisualizer();
+        await ensureEssentiaListener();
+        syncEssentiaSource();
+        refreshJammerUi();
+        log("Detection started");
+      } else {
+        currentReactiveAdaptiveState = null;
+        reactiveListenStartedAt = 0;
+        if (!jammerEngine.state.enabled) {
+          toneDrumBusSummary = toneDrumBus.stopPattern();
+        }
+        refreshJammerUi();
+        updateStageLoopMonitor();
+        log("Detection stopped");
+      }
+    });
     jammerPlayToggleButton.addEventListener("click", async () => {
       const nextEnabled = !jammerEngine.state.enabled;
       if (nextEnabled) {
         try {
           toneDrumBusSummary = await toneDrumBus.warmup();
+          renderInstrumentDeck();
+          detectionEnabled = true;
+          persistSetting("jammerDetectionEnabled", true);
+          await ensureVisualizer();
+          await ensureEssentiaListener();
+          syncEssentiaSource();
         } catch (error) {
           log(`Tone.js warmup error: ${error.message}`);
           refreshJammerUi();
@@ -4001,7 +5249,7 @@
       }
 
       const resolvedSource = jammerEngine.getResolvedSource();
-      if (resolvedSource === "idle" || resolvedSource === "microphone-armed" || resolvedSource === "waiting-player" || resolvedSource === "waiting-microphone") {
+      if (resolvedSource === "idle") {
         try {
           await startAutonomousDrummerLoop();
         } catch (error) {
@@ -4097,11 +5345,45 @@
       });
     });
     jammerOpenLibraryButton.addEventListener("click", () => {
-      toggleJammerLibrary(!jammerDeckLibraryOpen, null);
+      toggleJammerLibrary(!jammerDeckLibraryOpen);
       renderInstrumentLibrary();
     });
+    jammerSaveDeckPresetButton.addEventListener("click", () => {
+      const name = window.prompt("Name this deck preset", `${jammerEngine.getProfile().name} Deck`);
+      if (!name) {
+        return;
+      }
+
+      saveJammerDeckPreset({
+        name,
+        settings: getCurrentLabConfig(),
+      })
+        .then((state) => {
+          jammerLabState = state;
+          renderJammerLabState();
+          jammerDeckPresetSelect.value = state.deckPresets[0]?.id || "";
+          log(`Deck preset saved: ${name}`);
+        })
+        .catch((error) => {
+          log(`Deck preset save error: ${error.message}`);
+        });
+    });
+    jammerLoadDeckPresetButton.addEventListener("click", () => {
+      const presets = jammerLabState?.deckPresets || [];
+      const preset = presets.find((entry) => entry.id === jammerDeckPresetSelect.value);
+      if (!preset) {
+        log("Choose a saved deck first");
+        return;
+      }
+
+      applyDeckPreset(preset);
+      persistJammerLabSettings().catch((error) => {
+        log(`Drummer lab save error: ${error.message}`);
+      });
+      log(`Deck preset loaded: ${preset.name}`);
+    });
     jammerCloseLibraryButton.addEventListener("click", () => {
-      toggleJammerLibrary(false, null);
+      toggleJammerLibrary(false);
     });
     jammerLabJamToggleButton.addEventListener("click", () => {
       startLabJam().catch((error) => {
@@ -4352,10 +5634,12 @@
     async function initializeApp() {
       renderSkinOptions();
       stageInlineWidth = `${Math.round(stageShell.getBoundingClientRect().width)}px`;
+      placeJammerRuntimePanels();
       appSettings = await loadSettings();
       jammerResearchCatalog = await syncJammerResearchCatalog();
       jammerLabState = await loadJammerLabState();
       applyStoredSettings(appSettings);
+      updateVisualizerToggleUi();
       applyLabConfigToUi(jammerLabState.settings);
       syncToneLabShape();
       renderJammerCatalog();

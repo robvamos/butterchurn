@@ -8,9 +8,9 @@ function getToneGlobal() {
 }
 
 const DEFAULT_DECK_BLUEPRINT = [
-  { catalogId: "kick-punch", enabled: true },
-  { catalogId: "snare-tight", enabled: true },
-  { catalogId: "hat-bright", enabled: true },
+  { catalogId: "kick-punch", enabled: true, volume: 0.92 },
+  { catalogId: "snare-tight", enabled: true, volume: 0.88 },
+  { catalogId: "hat-bright", enabled: true, volume: 0.72 },
 ];
 
 const TONE_INSTRUMENT_CATALOG = [
@@ -345,6 +345,8 @@ class ToneDrumBus {
       stepInBar: 0,
       cycle: 0,
       currentEvents: [],
+      currentVoices: [],
+      currentBarSteps: [],
       progress: 0,
     };
     this.labConfig = {
@@ -359,6 +361,7 @@ class ToneDrumBus {
       hat: 0,
       perc: 0,
     };
+    this.lastReactiveRealignAt = 0;
   }
 
   getVersion() {
@@ -384,6 +387,8 @@ class ToneDrumBus {
     return {
       ...this.loopState,
       currentEvents: [...this.loopState.currentEvents],
+      currentVoices: [...this.loopState.currentVoices],
+      currentBarSteps: this.loopState.currentBarSteps.map((step) => [...step]),
     };
   }
 
@@ -460,6 +465,7 @@ class ToneDrumBus {
       id: `deck-${Date.now()}-${index}`,
       catalogId: entry.catalogId,
       enabled: entry.enabled !== false,
+      volume: Number.isFinite(Number(entry.volume)) ? Number(entry.volume) : 1,
     }));
   }
 
@@ -501,7 +507,42 @@ class ToneDrumBus {
 
     const node = catalogEntry.create(this.tone, this.output);
     this.deckNodes.set(deckEntry.id, node);
+    this.applyDeckEntryState(deckEntry);
     return node;
+  }
+
+  getDeckVolumeTarget(node) {
+    if (!node) {
+      return null;
+    }
+
+    if (node.synth?.volume) {
+      return node.synth;
+    }
+
+    if (node.volume) {
+      return node;
+    }
+
+    return null;
+  }
+
+  volumeToDecibels(volume) {
+    const normalized = Math.max(0, Math.min(1, Number(volume ?? 1)));
+    if (normalized <= 0.0001) {
+      return -60;
+    }
+
+    return 20 * Math.log10(normalized);
+  }
+
+  applyDeckEntryState(deckEntry) {
+    const volumeTarget = this.getDeckVolumeTarget(this.deckNodes.get(deckEntry.id));
+    if (!volumeTarget) {
+      return;
+    }
+
+    volumeTarget.volume.value = this.volumeToDecibels(deckEntry.volume ?? 1);
   }
 
   applyLabConfigToDeck() {
@@ -511,6 +552,7 @@ class ToneDrumBus {
       if (catalogEntry?.applyConfig && node) {
         catalogEntry.applyConfig(node, this.labConfig);
       }
+      this.applyDeckEntryState(entry);
     });
   }
 
@@ -526,6 +568,7 @@ class ToneDrumBus {
         id: entry.id || `deck-${Date.now()}-${index}`,
         catalogId: entry.catalogId,
         enabled: entry.enabled !== false,
+        volume: Number.isFinite(Number(entry.volume)) ? Math.max(0, Math.min(1, Number(entry.volume))) : 1,
       }))
       .filter((entry) => this.getCatalogEntry(entry.catalogId));
 
@@ -551,6 +594,7 @@ class ToneDrumBus {
         id: entry.id,
         catalogId: entry.catalogId,
         enabled: entry.enabled,
+        volume: entry.volume ?? 1,
         name: catalogEntry?.name || entry.catalogId,
         group: catalogEntry?.group || "Other",
         role: catalogEntry?.role || "perc",
@@ -569,19 +613,8 @@ class ToneDrumBus {
       id: `deck-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       catalogId,
       enabled: true,
+      volume: 1,
     }];
-    return this.setInstrumentDeck(nextDeck);
-  }
-
-  replaceDeckInstrument(deckId, catalogId) {
-    const catalogEntry = this.getCatalogEntry(catalogId);
-    if (!catalogEntry) {
-      return this.getDeckSnapshot();
-    }
-
-    const nextDeck = this.deck.map((entry) =>
-      entry.id === deckId ? { ...entry, catalogId } : entry
-    );
     return this.setInstrumentDeck(nextDeck);
   }
 
@@ -589,6 +622,19 @@ class ToneDrumBus {
     this.deck = this.deck.map((entry) =>
       entry.id === deckId ? { ...entry, enabled: !entry.enabled } : entry
     );
+    return this.getDeckSnapshot();
+  }
+
+  setDeckInstrumentVolume(deckId, volume) {
+    this.deck = this.deck.map((entry) =>
+      entry.id === deckId
+        ? { ...entry, volume: Math.max(0, Math.min(1, Number(volume ?? 1))) }
+        : entry
+    );
+    const deckEntry = this.deck.find((entry) => entry.id === deckId);
+    if (deckEntry) {
+      this.applyDeckEntryState(deckEntry);
+    }
     return this.getDeckSnapshot();
   }
 
@@ -602,6 +648,75 @@ class ToneDrumBus {
 
   getActiveDeckEntries(role = null) {
     return this.getDeckSnapshot().filter((entry) => entry.enabled && (!role || entry.role === role));
+  }
+
+  findDeckEntryByCatalogId(catalogId) {
+    return this.deck.find((entry) => entry.catalogId === catalogId) || null;
+  }
+
+  upsertDeckEntry(catalogId, { enabled = true, volume = 1 } = {}) {
+    const existing = this.findDeckEntryByCatalogId(catalogId);
+    if (existing) {
+      existing.enabled = enabled;
+      existing.volume = Math.max(0, Math.min(1, Number(volume ?? existing.volume ?? 1)));
+      this.applyDeckEntryState(existing);
+      return existing;
+    }
+
+    const next = {
+      id: `deck-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      catalogId,
+      enabled,
+      volume: Math.max(0, Math.min(1, Number(volume ?? 1))),
+    };
+    this.deck.push(next);
+    if (this.output) {
+      this.ensureDeckNode(next);
+      this.applyDeckEntryState(next);
+    }
+    return next;
+  }
+
+  disableDeckRole(role) {
+    this.deck.forEach((entry) => {
+      const catalogEntry = this.getCatalogEntry(entry.catalogId);
+      if (catalogEntry?.role === role) {
+        entry.enabled = false;
+        this.applyDeckEntryState(entry);
+      }
+    });
+  }
+
+  applyAdaptiveDeckDecision(decision = {}) {
+    const entryLevel = Math.max(0, Math.min(4, Number(decision.entryLevel ?? 0)));
+    const energy = Math.max(0, Math.min(1, Number(decision.energy ?? 0)));
+    const fillProbability = Math.max(0, Math.min(100, Number(decision.fillProbability ?? 0)));
+    const sourceMode = decision.sourceMode || "none";
+
+    const kickId = energy >= 0.58 ? "kick-punch" : "kick-round";
+    const snareId = fillProbability >= 58 || energy >= 0.64 ? "snare-wide" : "snare-tight";
+    const hatId = sourceMode === "microphone"
+      ? (energy >= 0.52 ? "hat-soft" : "hat-bright")
+      : (energy >= 0.55 ? "hat-bright" : "hat-soft");
+    const percId = fillProbability >= 72 ? "perc-blip" : "perc-click";
+
+    const before = JSON.stringify(this.getDeckSnapshot().map(({ catalogId, enabled, volume }) => ({ catalogId, enabled, volume })));
+
+    if (entryLevel >= 1 && this.getActiveDeckEntries("kick").length === 0) {
+      this.upsertDeckEntry(kickId, { enabled: true, volume: energy >= 0.58 ? 0.96 : 0.84 });
+    }
+    if (entryLevel >= 2 && this.getActiveDeckEntries("hat").length === 0) {
+      this.upsertDeckEntry(hatId, { enabled: true, volume: energy >= 0.55 ? 0.74 : 0.62 });
+    }
+    if (entryLevel >= 3 && this.getActiveDeckEntries("snare").length === 0) {
+      this.upsertDeckEntry(snareId, { enabled: true, volume: fillProbability >= 58 ? 0.94 : 0.82 });
+    }
+    if (entryLevel >= 4 && fillProbability >= 48 && this.getActiveDeckEntries("perc").length === 0) {
+      this.upsertDeckEntry(percId, { enabled: true, volume: fillProbability >= 72 ? 0.76 : 0.58 });
+    }
+
+    const after = JSON.stringify(this.getDeckSnapshot().map(({ catalogId, enabled, volume }) => ({ catalogId, enabled, volume })));
+    return before !== after;
   }
 
   hasActiveDeck() {
@@ -757,7 +872,29 @@ class ToneDrumBus {
     return steps;
   }
 
+  filterEventsForEntryLevel(events, config = {}) {
+    const entryLevel = Math.max(0, Math.min(4, Number(config.entryLevel ?? 4)));
+    if (entryLevel <= 0) {
+      return [];
+    }
+
+    if (entryLevel === 1) {
+      return events.filter((eventName) => eventName === "kick").slice(0, 1);
+    }
+
+    if (entryLevel === 2) {
+      return events.filter((eventName) => eventName === "kick" || eventName === "hat");
+    }
+
+    if (entryLevel === 3) {
+      return events.filter((eventName) => eventName !== "perc");
+    }
+
+    return [...events];
+  }
+
   triggerStep(events, config, time, stepIndex) {
+    const gatedEvents = this.filterEventsForEntryLevel(events, config);
     const intensity = Math.max(0.1, Number(config.intensity || 55) / 100);
     const humanize = (Number(config.humanize || 18) / 100) * 0.018;
     const hatVelocity = Math.min(1, 0.16 + intensity * 0.42);
@@ -765,7 +902,8 @@ class ToneDrumBus {
     const snareVelocity = Math.min(1, 0.22 + intensity * 0.46);
     const drift = () => (Math.random() * 2 - 1) * humanize;
 
-    events.forEach((eventName) => {
+    const triggeredVoices = [];
+    gatedEvents.forEach((eventName) => {
       const deckEntry = this.pickDeckEntry(eventName);
       if (!deckEntry) {
         return;
@@ -802,10 +940,17 @@ class ToneDrumBus {
         velocity,
         duration
       );
+      triggeredVoices.push({
+        event: eventName,
+        role: deckEntry.role,
+        name: deckEntry.name,
+      });
     });
+
+    return triggeredVoices;
   }
 
-  startPatternScheduler(steps, config, patternName) {
+  startPatternScheduler(steps, config, patternName, { resetIndex = true } = {}) {
     this.activeSteps = [...steps];
     this.activePatternName = patternName;
     const totalSteps = Math.max(1, this.activeSteps.length);
@@ -817,7 +962,9 @@ class ToneDrumBus {
       this.patternTimer = null;
     }
 
-    this.currentPatternIndex = 0;
+    if (resetIndex) {
+      this.currentPatternIndex = 0;
+    }
     this.patternTimer = globalThis.setInterval(() => {
       const safeTotal = Math.max(1, this.activeSteps.length);
       const stepIndex = this.currentPatternIndex % safeTotal;
@@ -825,8 +972,8 @@ class ToneDrumBus {
       this.absoluteStepCount += 1;
       const activeConfig = this.lastConfig || config;
       const evolvedEvents = this.evolveEvents(events, activeConfig, stepIndex, safeTotal);
-      this.updateLoopState(stepIndex, safeTotal, evolvedEvents, this.activePatternName || patternName);
-      this.triggerStep(evolvedEvents, activeConfig, this.tone.now() + 0.01, stepIndex);
+      const triggeredVoices = this.triggerStep(evolvedEvents, activeConfig, this.tone.now() + 0.01, stepIndex);
+      this.updateLoopState(stepIndex, safeTotal, evolvedEvents, this.activePatternName || patternName, triggeredVoices);
       this.currentPatternIndex += 1;
     }, stepDurationMs);
   }
@@ -857,17 +1004,7 @@ class ToneDrumBus {
     const bpm = Math.max(60, Math.min(180, nextConfig.tempo));
     const stepDurationMs = (60 / bpm / 4) * 1000;
     if (this.patternTimer) {
-      globalThis.clearInterval(this.patternTimer);
-      this.patternTimer = globalThis.setInterval(() => {
-        const safeTotal = Math.max(1, this.activeSteps.length);
-        const stepIndex = this.currentPatternIndex % safeTotal;
-        const events = this.activeSteps[stepIndex] || [];
-        this.absoluteStepCount += 1;
-        const evolvedEvents = this.evolveEvents(events, this.lastConfig, stepIndex, safeTotal);
-        this.updateLoopState(stepIndex, safeTotal, evolvedEvents, this.activePatternName);
-        this.triggerStep(evolvedEvents, this.lastConfig, this.tone.now() + 0.01, stepIndex);
-        this.currentPatternIndex += 1;
-      }, stepDurationMs);
+      this.startPatternScheduler(this.activeSteps, this.lastConfig, this.activePatternName, { resetIndex: false });
     }
 
     return this.getSummary();
@@ -895,7 +1032,14 @@ class ToneDrumBus {
     return nextEvents;
   }
 
-  updateLoopState(stepIndex, totalSteps, events, pattern) {
+  buildCurrentBarSteps(stepIndex) {
+    const currentBarIndex = Math.floor(stepIndex / 16);
+    const start = currentBarIndex * 16;
+    const end = Math.min(start + 16, this.activeSteps.length);
+    return this.activeSteps.slice(start, end).map((stepEvents) => [...stepEvents]);
+  }
+
+  updateLoopState(stepIndex, totalSteps, events, pattern, triggeredVoices = []) {
     const safeTotal = Math.max(1, totalSteps || 1);
     const cycle = Math.floor(this.absoluteStepCount / safeTotal) + 1;
     this.loopState = {
@@ -907,6 +1051,8 @@ class ToneDrumBus {
       stepInBar: (stepIndex % 16) + 1,
       cycle,
       currentEvents: [...events],
+      currentVoices: triggeredVoices.map((voice) => voice.name),
+      currentBarSteps: this.buildCurrentBarSteps(stepIndex),
       progress: (stepIndex + 1) / safeTotal,
     };
   }
@@ -939,13 +1085,59 @@ class ToneDrumBus {
     this.startPatternScheduler(steps, nextConfig, "reactive-kit");
 
     const previewEvents = this.evolveEvents(steps[0] || ["kick", "hat"], nextConfig, 0, totalSteps);
-    this.updateLoopState(0, totalSteps, previewEvents, "reactive-kit");
-    this.triggerStep(previewEvents, nextConfig, this.tone.now() + 0.02, 0);
+    const previewVoices = this.triggerStep(previewEvents, nextConfig, this.tone.now() + 0.02, 0);
+    this.updateLoopState(0, totalSteps, previewEvents, "reactive-kit", previewVoices);
 
     if (transport.state !== "started") {
       transport.start();
     }
 
+    return this.getSummary();
+  }
+
+  updateReactiveKit(config = {}) {
+    if (this.labJamActive || this.activePattern !== "reactive-kit" || !this.lastConfig) {
+      return this.getSummary();
+    }
+
+    const nextConfig = {
+      ...this.lastConfig,
+      density: Number(config.density ?? this.lastConfig.density ?? 48),
+      intensity: Number(config.intensity ?? this.lastConfig.intensity ?? 55),
+      humanize: Number(config.humanize ?? this.lastConfig.humanize ?? 18),
+      swing: Number(config.swing ?? this.lastConfig.swing ?? 8),
+      tempo: Number(config.tempo ?? this.lastConfig.tempo ?? 104),
+    };
+
+    const transport = this.tone.getTransport();
+    transport.bpm.value = Math.max(60, Math.min(180, nextConfig.tempo));
+    transport.swing = Math.max(0, Math.min(0.45, Number(nextConfig.swing || 8) / 100 * 0.45));
+    transport.swingSubdivision = "16n";
+
+    this.lastConfig = nextConfig;
+    this.activeSteps = this.getStepPattern(nextConfig);
+
+    if (this.patternTimer) {
+      this.startPatternScheduler(this.activeSteps, nextConfig, "reactive-kit", { resetIndex: false });
+    }
+
+    return this.getSummary();
+  }
+
+  realignReactiveKit(config = {}) {
+    if (this.labJamActive || this.activePattern !== "reactive-kit" || !this.lastConfig || !this.activeSteps.length) {
+      return this.getSummary();
+    }
+
+    const now = Date.now();
+    if (now - this.lastReactiveRealignAt < 1200) {
+      return this.getSummary();
+    }
+    this.lastReactiveRealignAt = now;
+    this.currentPatternIndex = 0;
+    this.absoluteStepCount = 0;
+    const previewEvents = this.evolveEvents(this.activeSteps[0] || ["kick"], this.lastConfig, 0, this.activeSteps.length);
+    this.updateLoopState(0, this.activeSteps.length, previewEvents, "reactive-kit", []);
     return this.getSummary();
   }
 
@@ -981,8 +1173,8 @@ class ToneDrumBus {
     this.startPatternScheduler(steps, nextConfig, `lab-jam:${nextConfig.style}`);
 
     const previewEvents = this.evolveEvents(steps[0] || ["kick", "hat"], nextConfig, 0, totalSteps);
-    this.updateLoopState(0, totalSteps, previewEvents, `lab-jam:${nextConfig.style}`);
-    this.triggerStep(previewEvents, nextConfig, this.tone.now() + 0.02, 0);
+    const previewVoices = this.triggerStep(previewEvents, nextConfig, this.tone.now() + 0.02, 0);
+    this.updateLoopState(0, totalSteps, previewEvents, `lab-jam:${nextConfig.style}`, previewVoices);
 
     if (transport.state !== "started") {
       transport.start();
@@ -1017,6 +1209,8 @@ class ToneDrumBus {
       stepInBar: 0,
       cycle: 0,
       currentEvents: [],
+      currentVoices: [],
+      currentBarSteps: [],
       progress: 0,
     };
     return this.getSummary();
