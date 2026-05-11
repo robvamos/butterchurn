@@ -117,3 +117,120 @@ So the intended companion stack remains:
 - `Magenta.js`
 - `Meyda`
 - optional `ONNX` / `TensorFlow.js` models
+
+## Detection preprocessing plan
+
+The detection layer should treat preprocessing as a first-class musical stage,
+not just as cleanup.
+
+Goal:
+
+- transform noisy or ambiguous audio into rhythm-focused information
+- make beat tracking, bar anchoring and phrase detection more reliable
+- give the drummer enough structure to enter gently and stay aligned
+
+### Core preprocessing chain
+
+Recommended pipeline:
+
+`audio input -> resample -> mono -> normalize -> band split -> envelope extraction -> onset enhancement -> beat tracking -> bar detection -> groove analysis`
+
+Main preprocessing stages:
+
+1. `Mono`
+   Collapse stereo into a single rhythm analysis channel.
+2. `Normalize`
+   Keep level in a stable range so quiet material still reads and loud material
+   does not overwhelm onset detectors.
+3. `Band split`
+   Separate the signal into rhythm-relevant zones:
+   - `low` -> kick / bass / downbeat hints
+   - `mid` -> snare / backbeat / body
+   - `high` -> hats / transients / subdivisions
+4. `Envelope extraction`
+   Track energy over time rather than raw waveform ambiguity.
+5. `Onset enhancement`
+   Emphasize attacks and transient change while reducing pads, sustain and wash.
+6. `Noise reduction`
+   Especially important for live microphone use.
+7. `Spectral flux / novelty`
+   Measure frame-to-frame change to reveal beat and onset candidates.
+8. `Tempo stabilization`
+   Smooth jitter before the groove brain reacts to tempo movement.
+
+### Parallel detector model
+
+JamPal should eventually run multiple rhythm views in parallel:
+
+- `LOW rhythm detector`
+  - kick emphasis
+  - downbeat candidates
+  - stronger beat-1 evidence
+- `MID groove detector`
+  - snare and backbeat
+  - body of the pulse
+- `HIGH subdivision detector`
+  - hats
+  - eighths / sixteenths
+  - local groove density
+
+These should feed a fused rhythm state rather than competing directly.
+
+### Recommended roles
+
+- `aubio`
+  - fast realtime ear
+  - immediate onset / pulse / local tempo hints
+- `Essentia`
+  - slower but more robust validator
+  - beat positions, BPM stability, confidence, longer-window rhythm structure
+- `Master Rhythm Brain`
+  - JamPal-owned fusion layer
+  - turns pulses into a musical grid:
+    - `1 2 3 4`
+    - bar anchor
+    - phrase bars
+    - groove stability
+
+### Beat grid output
+
+The fused detector should converge toward a structure like:
+
+```json
+{
+  "bpm": 121,
+  "beat": 3,
+  "bar": 12,
+  "phase": 3,
+  "barStart": false,
+  "barAnchorConfidence": 0.82,
+  "phraseBars": 4,
+  "groove": "shuffle_light",
+  "energy": 0.72
+}
+```
+
+### Why this matters for the drummer
+
+The drummer should not react to raw audio directly. It should react to the
+preprocessed and fused musical interpretation.
+
+That lets it:
+
+- stay sparse in silence or low-intensity passages
+- place kick on a credible `1`
+- mark `2 3 4` with simple hats before attempting richer patterns
+- expand only after bar anchor and phrase confidence improve
+- eventually support swing, anticipation, lag and more human timing
+
+### Default behavioral consequence
+
+Until the grid is stable, the drummer should prefer:
+
+- very few instruments
+- very few hits
+- kick on `1`
+- hats on `2 3 4`
+- no aggressive fill logic
+
+This keeps alignment more important than density.

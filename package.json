@@ -42,9 +42,16 @@
     "@ffmpeg/core": "^0.12.10",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "0.12.2",
+    "@magenta/music": "^1.23.1",
+    "@rayyamhk/matrix": "^1.0.8",
+    "@sevthjs/kalman-filter": "^2.3.0",
+    "aubiojs": "^0.2.1",
     "ecma-proposal-math-extensions": "0.0.2",
     "eel-wasm": "^0.0.16",
     "essentia.js": "^0.1.3",
+    "matrix-inverse": "^2.0.0",
+    "particle-filter": "^0.0.4",
+    "simple-linalg": "^1.5.0",
     "tone": "^15.1.22"
   },
   "devDependencies": {

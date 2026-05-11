@@ -27,6 +27,7 @@ const defaultSettings = {
   jammerEnabled: false,
   jammerFeel: "assist",
   jammerFollowSource: "auto",
+  jammerTimingModel: "kalman",
   jammerHumanize: "18",
   jammerIntensity: "55",
   jammerDensity: "48",
