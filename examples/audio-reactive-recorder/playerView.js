@@ -40,6 +40,17 @@ export function createPlayerView({ refs, getState, callbacks, formatters }) {
     refs.playerNextButton.title = "Next track";
     refs.playerNextButton.setAttribute("aria-label", "Next track");
     refs.playerPlayPauseButton.classList.toggle("active", isPlaying);
+    if (refs.playerAutoplayButton) {
+      refs.playerAutoplayButton.classList.toggle("active", state.playerAutoplay !== false);
+      refs.playerAutoplayButton.setAttribute("aria-pressed", String(state.playerAutoplay !== false));
+      refs.playerAutoplayButton.title = state.playerAutoplay !== false
+        ? "Autoplay is on"
+        : "Autoplay is off";
+      refs.playerAutoplayButton.setAttribute(
+        "aria-label",
+        state.playerAutoplay !== false ? "Turn autoplay off" : "Turn autoplay on"
+      );
+    }
     updateStatus(!hasTracks ? "No track" : isPlaying ? "Playing" : isPaused ? "Paused" : "Ready");
   }
 
@@ -64,6 +75,7 @@ export function createPlayerView({ refs, getState, callbacks, formatters }) {
     refs.playerPrevButton.addEventListener("click", callbacks.onPrevTrack);
     refs.playerPlayPauseButton.addEventListener("click", callbacks.onPlayPause);
     refs.playerNextButton.addEventListener("click", callbacks.onNextTrack);
+    refs.playerAutoplayButton?.addEventListener("click", callbacks.onToggleAutoplay);
 
     refs.playerTrackSelect.addEventListener("change", () => {
       const state = getState();

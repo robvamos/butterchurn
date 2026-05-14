@@ -10,6 +10,8 @@ const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
 const defaultLibraryDir = process.env.JAMPAL_LIBRARY_DIR || "F:\\chiavetta musica";
 const libraryPrefix = "/__jam-library__";
+const bpmBenchmarkDir = path.resolve(root, "BPMtest");
+const bpmBenchmarkPrefix = "/__jam-bpmtest__";
 const audioPattern = /\.(mp3|ogg|opus|wav|m4a|aac|flac)$/i;
 
 const contentTypes = {
@@ -49,6 +51,7 @@ function streamFile(req, res, absolutePath, extraHeaders = {}) {
     const rangeHeader = req.headers.range;
     const baseHeaders = {
       "Accept-Ranges": "bytes",
+      "Access-Control-Allow-Origin": "*",
       "Cache-Control": "no-store",
       "Content-Type": contentType,
       ...extraHeaders,
@@ -139,6 +142,45 @@ async function getDefaultLibraryManifest() {
   };
 }
 
+function parseKnownBpmFromName(name) {
+  const match = String(name || "").match(/(\d+(?:\.\d+)?)\s*-\s*bpm|(\d+(?:\.\d+)?)\s*bpm/i);
+  const bpm = Number(match?.[1] || match?.[2] || 0);
+  return Number.isFinite(bpm) && bpm > 0 ? bpm : 0;
+}
+
+async function getBpmBenchmarkManifest() {
+  if (!fs.existsSync(bpmBenchmarkDir)) {
+    return null;
+  }
+
+  const entries = await readdir(bpmBenchmarkDir, { withFileTypes: true });
+  const tracks = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !audioPattern.test(entry.name)) {
+      continue;
+    }
+
+    const absoluteTrackPath = path.join(bpmBenchmarkDir, entry.name);
+    const info = await stat(absoluteTrackPath);
+    tracks.push({
+      id: `${entry.name}:${info.size}:${parseKnownBpmFromName(entry.name)}`,
+      name: entry.name,
+      size: info.size,
+      knownBpm: parseKnownBpmFromName(entry.name),
+      durationLabel: "",
+      url: `${bpmBenchmarkPrefix}/files/${encodeURIComponent(entry.name)}`,
+    });
+  }
+
+  tracks.sort((left, right) => left.name.localeCompare(right.name));
+  return {
+    label: "BPMtest",
+    path: bpmBenchmarkDir,
+    tracks,
+  };
+}
+
 const server = http.createServer((req, res) => {
   const requestUrl = req.url || "/";
   const urlPath = decodeURIComponent(requestUrl.split("?")[0]);
@@ -153,6 +195,7 @@ const server = http.createServer((req, res) => {
 
         res.writeHead(200, {
           "Content-Type": "application/json; charset=utf-8",
+          "Access-Control-Allow-Origin": "*",
           "Cache-Control": "no-store",
         });
         res.end(JSON.stringify(manifest));
@@ -163,11 +206,44 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (urlPath === `${bpmBenchmarkPrefix}/index.json`) {
+    getBpmBenchmarkManifest()
+      .then((manifest) => {
+        if (!manifest) {
+          sendError(res, 404, "BPM benchmark folder not found");
+          return;
+        }
+
+        res.writeHead(200, {
+          "Content-Type": "application/json; charset=utf-8",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store",
+        });
+        res.end(JSON.stringify(manifest));
+      })
+      .catch(() => {
+        sendError(res, 500, "BPM benchmark manifest error");
+      });
+    return;
+  }
+
   if (urlPath.startsWith(`${libraryPrefix}/files/`)) {
     const fileName = urlPath.slice(`${libraryPrefix}/files/`.length);
     const absoluteTrackPath = path.resolve(defaultLibraryDir, fileName);
 
     if (!absoluteTrackPath.startsWith(path.resolve(defaultLibraryDir))) {
+      sendError(res, 403, "Forbidden");
+      return;
+    }
+    streamFile(req, res, absoluteTrackPath);
+    return;
+  }
+
+  if (urlPath.startsWith(`${bpmBenchmarkPrefix}/files/`)) {
+    const fileName = urlPath.slice(`${bpmBenchmarkPrefix}/files/`.length);
+    const absoluteTrackPath = path.resolve(bpmBenchmarkDir, fileName);
+
+    if (!absoluteTrackPath.startsWith(path.resolve(bpmBenchmarkDir))) {
       sendError(res, 403, "Forbidden");
       return;
     }

@@ -52,6 +52,15 @@
       overflow: auto;
     }
 
+    .right-rail {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+      min-width: 0;
+      padding: 18px;
+      overflow: auto;
+    }
+
     .sidebar-header {
       display: grid;
       gap: 6px;
@@ -64,6 +73,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+    }
+
+    .sidebar-header-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .brand-line {
@@ -140,6 +156,35 @@
       stroke: currentColor;
     }
 
+    .jammer-header-button {
+      width: auto;
+      min-width: 64px;
+      padding: 0 12px;
+      gap: 7px;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .jammer-header-toggle {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1.5px solid currentColor;
+      display: inline-block;
+      opacity: 0.9;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    .jammer-header-text {
+      line-height: 1;
+    }
+
+    .jammer-header-button.active .jammer-header-toggle {
+      background: currentColor;
+      box-shadow: 0 0 0 3px rgba(108, 184, 255, 0.16);
+    }
+
     .panel-section {
       display: none;
       gap: 14px;
@@ -152,6 +197,20 @@
     .settings-grid {
       display: grid;
       gap: 14px;
+    }
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .settings-main-column,
+    .settings-side-column {
+      display: grid;
+      gap: 14px;
+      align-content: start;
     }
 
     .summary-card,
@@ -208,6 +267,137 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.5;
+    }
+
+    .wiring-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .wiring-panel-body {
+      display: grid;
+      gap: 12px;
+    }
+
+    .wiring-summary {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-2);
+      padding: 10px 12px;
+    }
+
+    .wiring-summary.compact {
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .wiring-flow-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .wiring-flow-grid.secondary {
+      margin-top: 2px;
+    }
+
+    .wiring-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .wiring-detail-section {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .wiring-branch-grid,
+    .wiring-chip-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .wiring-flow-arrow {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .wiring-node,
+    .wiring-chip {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-2);
+      padding: 10px 11px;
+      transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .wiring-node-label,
+    .wiring-chip-label,
+    .wiring-chip-section-title {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .wiring-node-value,
+    .wiring-chip-value {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wiring-chip-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .wiring-node[data-state="active"],
+    .wiring-chip[data-state="active"] {
+      border-color: rgba(108, 184, 255, 0.55);
+      background: rgba(108, 184, 255, 0.08);
+    }
+
+    .wiring-node[data-state="focus"],
+    .wiring-chip[data-state="focus"] {
+      border-color: rgba(156, 230, 99, 0.72);
+      background: rgba(156, 230, 99, 0.1);
+      box-shadow: inset 0 0 0 1px rgba(156, 230, 99, 0.16);
+    }
+
+    @media (max-width: 1120px) {
+      .wiring-detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wiring-flow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wiring-flow-arrow {
+        transform: rotate(90deg);
+      }
+
+      .wiring-branch-grid,
+      .wiring-chip-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .controls {
@@ -274,7 +464,7 @@
 
     .player-controls {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
     }
 
@@ -397,7 +587,14 @@
     .jammer-topbar-actions {
       display: inline-flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 8px;
+    }
+
+    .jammer-topbar-actions .jammer-section-toggle {
+      order: 99;
+      margin-left: 2px;
+      flex-shrink: 0;
     }
 
     .jammer-icon-toggle {
@@ -601,21 +798,85 @@
 
     .jammer-detection-card .jammer-topbar {
       display: grid;
-      grid-template-columns: auto auto;
-      justify-content: start;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: 10px;
     }
 
+    .jammer-detection-titlebar {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .jammer-detection-titlebar .section-title {
+      margin: 0;
+    }
+
+    .jammer-detection-inline-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      justify-content: end;
+      gap: 8px;
+      min-width: min(100%, 240px);
+    }
+
+    .jammer-detection-inline-tools .jammer-inline-select-group,
+    .jammer-detection-inline-tools .jammer-inline-select {
+      grid-column: 1;
+      min-width: 0;
+    }
+
+    .jammer-detection-inline-tools .jammer-section-toggle {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+      align-self: start;
+      margin-left: 0;
+      flex-shrink: 0;
+    }
+
+    .jammer-inline-select-group {
+      display: grid;
+      gap: 4px;
+      min-width: 176px;
+    }
+
+    .jammer-detection-inline-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1;
+    }
+
     #jammerDetectionToggleButton {
-      width: auto;
-      min-width: 34px;
+      width: 42px;
+      min-width: 42px;
+      min-height: 42px;
+      padding: 0;
     }
 
     .jammer-detection-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
+    }
+
+    .jammer-detection-primary-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .jammer-detection-summary-stat {
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-2);
+      padding: 8px 9px;
+      min-width: 0;
     }
 
     .jammer-detection-stat {
@@ -653,6 +914,45 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       margin-top: 2px;
+    }
+
+    .jammer-detection-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .jammer-detection-headline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .jammer-detection-headline-block {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .jammer-panel-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(114, 160, 255, 0.22);
+      background: rgba(24, 33, 48, 0.88);
+      color: rgba(223, 232, 255, 0.86);
+      font-size: 0.74rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .jammer-detection-section-head .jammer-detection-subtitle {
+      margin-top: 0;
     }
 
     .jammer-detection-meter {
@@ -699,6 +999,130 @@
       gap: 8px;
     }
 
+    .jammer-detection-preprocess-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .jammer-detection-band-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .jammer-detection-preprocess-grid .jammer-detection-stat {
+      cursor: help;
+    }
+
+    .jammer-detection-analysis-card {
+      display: grid;
+      gap: 6px;
+      padding: 2px 0 0;
+    }
+
+    .jammer-detection-analysis-card.hidden {
+      display: none;
+    }
+
+    .jammer-section-toggle {
+      width: 30px;
+      min-width: 30px;
+      height: 30px;
+      padding: 0;
+    }
+
+    .jammer-detection-section-head > .jammer-section-toggle,
+    .jammer-card-header > .jammer-section-toggle {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .jammer-section-toggle-glyph {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      line-height: 1;
+      transition: transform 120ms ease;
+    }
+
+    .jammer-section-toggle[aria-expanded="false"] .jammer-section-toggle-glyph {
+      transform: rotate(-90deg);
+    }
+
+    .jammer-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .jammer-subsection-header {
+      align-items: center;
+    }
+
+    .jammer-inline-action {
+      min-height: 34px;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+
+    .jammer-detection-calibration-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+      gap: 8px;
+      align-items: end;
+    }
+
+    .jammer-detection-calibration-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .jammer-detection-calibration-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .jammer-detection-calibration-grid.compact {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .jammer-detection-calibration-grid.module-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .jammer-detection-stat.module-card {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .jammer-detection-meta {
+      color: rgba(233, 241, 255, 0.72);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .jammer-detection-calibration-actions.module-actions {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .jammer-detection-analysis-card .jammer-detection-stat,
+    .jammer-detection-analysis-card .jammer-detection-summary-stat {
+      padding: 10px 12px;
+    }
+
+    .jammer-detection-grid-panel {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
     .jammer-detection-grid-hint {
       color: var(--muted);
       font-size: 12px;
@@ -713,6 +1137,11 @@
     .jammer-detection-beat-row {
       display: grid;
       gap: 6px;
+    }
+
+    .jammer-detection-beat-row.is-secondary {
+      gap: 4px;
+      opacity: 0.72;
     }
 
     .jammer-detection-beat-row-head {
@@ -736,9 +1165,19 @@
       white-space: nowrap;
     }
 
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-row-label,
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-row-meta {
+      font-size: 10px;
+      color: rgba(222, 230, 255, 0.68);
+    }
+
     .jammer-detection-beat-cells {
       display: grid;
       gap: 4px;
+    }
+
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cells {
+      gap: 3px;
     }
 
     .jammer-detection-beat-cell {
@@ -754,6 +1193,15 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+    }
+
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cell {
+      min-height: 18px;
+      border-radius: 5px;
+      font-size: 9px;
+      color: rgba(222, 230, 255, 0.58);
+      border-color: rgba(108, 184, 255, 0.28);
+      background: rgba(22, 28, 40, 0.72);
     }
 
     .jammer-detection-beat-cell::before {
@@ -779,8 +1227,21 @@
       opacity: 1;
     }
 
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cell.is-active {
+      color: rgba(255, 255, 255, 0.82);
+      border-color: rgba(108, 184, 255, 0.45);
+    }
+
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cell.is-active::before {
+      opacity: 0.28;
+    }
+
     .jammer-detection-beat-cell.is-anchor {
       box-shadow: inset 0 0 0 1px var(--meter-c);
+    }
+
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cell.is-anchor {
+      box-shadow: inset 0 0 0 1px rgba(255, 214, 10, 0.5);
     }
 
     .jammer-detection-beat-cell.is-current {
@@ -795,6 +1256,14 @@
       right: 0;
       height: 3px;
       background: var(--accent-strong);
+    }
+
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cell.is-current {
+      transform: none;
+    }
+
+    .jammer-detection-beat-row.is-secondary .jammer-detection-beat-cell.is-current::after {
+      display: none;
     }
 
     .jammer-tool-button {
@@ -1110,6 +1579,19 @@
       list-style: none;
     }
 
+    .jammer-favorite-list.compact {
+      gap: 6px;
+    }
+
+    .jammer-favorite-list.compact li {
+      border: 1px solid var(--field-border);
+      border-radius: 6px;
+      background: var(--panel-2);
+      padding: 7px 9px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
     .jammer-favorite-item {
       border: 1px solid var(--field-border);
       border-radius: 6px;
@@ -1382,6 +1864,23 @@
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 20%);
     }
 
+    #stageSection {
+      order: 1;
+    }
+
+    #jammerRuntimeSection {
+      order: 2;
+    }
+
+    #jammerLabPanel {
+      order: 3;
+    }
+
+    .wiring-rail-section {
+      order: 4;
+      background: none;
+    }
+
     .stage[hidden] {
       display: none !important;
     }
@@ -1408,6 +1907,10 @@
       display: grid;
       gap: 10px;
       justify-items: end;
+    }
+
+    .stage-panel-body.hidden {
+      display: none;
     }
 
     .stage-capture-actions {
@@ -1810,6 +2313,10 @@
         border-bottom: 1px solid var(--field-border);
       }
 
+      .right-rail {
+        padding: 18px;
+      }
+
       .jammer-primary-grid,
       .jammer-secondary-grid {
         grid-template-columns: 1fr;
@@ -1847,8 +2354,10 @@
       }
 
       .jammer-detection-grid,
+      .jammer-detection-primary-row,
       .jammer-detection-meters,
-      .jammer-detection-mini-grid {
+      .jammer-detection-mini-grid,
+      .jammer-detection-band-row {
         grid-template-columns: 1fr;
       }
 
@@ -1902,6 +2411,7 @@
   
 .jammer-inline-select {
   min-width: 132px;
+  max-width: 100%;
   height: 36px;
   padding: 0 10px;
   border-radius: 10px;
@@ -1909,4 +2419,373 @@
   background: rgba(23, 33, 48, 0.9);
   color: #dfe8ff;
   font: inherit;
+}
+
+.jammer-inline-multiselect {
+  height: auto;
+  min-height: 132px;
+  padding: 10px;
+}
+
+.jammer-benchmark-results {
+  display: grid;
+  gap: 10px;
+}
+
+.jammer-benchmark-file-card {
+  border: 1px solid rgba(114, 160, 255, 0.18);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(13, 18, 26, 0.64);
+}
+
+.jammer-benchmark-file-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.jammer-benchmark-file-title {
+  color: #f3f7ff;
+  font-weight: 700;
+}
+
+.jammer-benchmark-file-meta {
+  color: rgba(223, 232, 255, 0.72);
+  font-size: 0.88rem;
+}
+
+.jammer-benchmark-file-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.jammer-benchmark-module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.jammer-benchmark-module-card {
+  border: 1px solid rgba(114, 160, 255, 0.16);
+  border-radius: 10px;
+  padding: 9px;
+  background: rgba(23, 33, 48, 0.42);
+}
+
+.jammer-benchmark-suggestion-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.jammer-benchmark-suggestion-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: rgba(223, 232, 255, 0.9);
+  font-size: 0.88rem;
+}
+
+.jammer-benchmark-history-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.jammer-benchmark-file-card .jammer-favorite-list.compact {
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.jammer-benchmark-file-card .jammer-detection-meta {
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .jammer-benchmark-file-grid,
+  .jammer-benchmark-module-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+#jammerCalibrationTrackSelect {
+  flex: 1 1 240px;
+}
+
+@media (max-width: 1280px) {
+  .jammer-detection-calibration-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .jammer-detection-calibration-grid.module-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) {
+  .jammer-detection-calibration-top {
+    grid-template-columns: 1fr;
+  }
+
+  .jammer-detection-calibration-grid,
+  .jammer-detection-calibration-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jammer-detection-calibration-grid.module-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jammer-detection-experiment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.jammer-detection-experiment-topbar {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.jammer-detection-experiment-topline {
+  display: grid;
+  gap: 6px;
+}
+
+.jammer-detection-experiment-topline.primary {
+  grid-template-columns: minmax(220px, 1.35fr) repeat(6, minmax(108px, 1fr));
+}
+
+.jammer-detection-experiment-topline.secondary {
+  grid-template-columns: repeat(4, minmax(108px, 1fr)) minmax(260px, 2fr);
+}
+
+.jammer-detection-experiment-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.jammer-detection-experiment-section {
+  border: 1px solid rgba(114, 160, 255, 0.16);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(13, 18, 26, 0.52);
+}
+
+.jammer-detection-experiment-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.jammer-detection-experiment-controls.weights {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.jammer-detection-experiment-controls.setup {
+  grid-template-columns: minmax(180px, 1.25fr) minmax(180px, 1.25fr) auto auto auto;
+  align-items: end;
+}
+
+.jammer-detection-experiment-preset-section {
+  grid-column: 1 / -1;
+}
+
+.jammer-experiment-field,
+.jammer-experiment-toggle {
+  display: grid;
+  gap: 6px;
+  color: rgba(223, 232, 255, 0.86);
+  font-size: 0.82rem;
+}
+
+.jammer-experiment-field input {
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(114, 160, 255, 0.24);
+  background: rgba(23, 33, 48, 0.9);
+  color: #dfe8ff;
+  font: inherit;
+}
+
+.jammer-experiment-field select {
+  min-width: 0;
+  height: 32px;
+}
+
+.jammer-compact-action {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(114, 160, 255, 0.24);
+  background: rgba(23, 33, 48, 0.9);
+  color: #dfe8ff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.jammer-compact-action.subtle {
+  color: rgba(223, 232, 255, 0.82);
+  border-color: rgba(114, 160, 255, 0.18);
+}
+
+.jammer-compact-action:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.jammer-experiment-toggle {
+  grid-template-columns: 18px 1fr;
+  align-items: center;
+}
+
+.jammer-detection-lane-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.jammer-experiment-lane-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(114, 160, 255, 0.24);
+  background: rgba(18, 27, 40, 0.88);
+  color: rgba(223, 232, 255, 0.9);
+  font-size: 0.8rem;
+}
+
+.jammer-experiment-lane-toggle input {
+  margin: 0;
+}
+
+.jammer-experiment-solo-button {
+  min-height: 32px;
+  padding: 0 12px;
+}
+
+.jammer-experiment-solo-button.active {
+  background: rgba(96, 171, 255, 0.2);
+  border-color: rgba(96, 171, 255, 0.95);
+  color: #f7fbff;
+}
+
+.jammer-detection-experiment-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.jammer-detection-experiment-chart-grid.top {
+  margin-top: 0;
+}
+
+.jammer-detection-chart-card {
+  border: 1px solid rgba(114, 160, 255, 0.16);
+  border-radius: 10px;
+  padding: 6px;
+  background: rgba(13, 18, 26, 0.52);
+}
+
+.jammer-detection-chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  color: rgba(223, 232, 255, 0.88);
+  font-size: 0.82rem;
+}
+
+.jammer-detection-chart-card canvas {
+  width: 100%;
+  height: 78px;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid rgba(114, 160, 255, 0.12);
+  background: rgba(7, 10, 14, 0.94);
+}
+
+.experiment-topline {
+  margin-top: 8px;
+}
+
+.jammer-detection-experiment-topbar .jammer-detection-stat,
+.jammer-detection-experiment-topbar .jammer-detection-summary-stat {
+  padding: 7px 10px;
+}
+
+.jammer-detection-experiment-topbar .jammer-detection-value {
+  margin-top: 3px;
+}
+
+.jammer-detection-experiment-summary-stat {
+  display: grid;
+  align-content: center;
+}
+
+.jammer-detection-experiment-topbar .jammer-inline-select {
+  height: 34px;
+}
+
+.jammer-experiment-window-control {
+  display: inline-grid;
+  grid-template-columns: 28px minmax(58px, auto) 28px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.jammer-experiment-window-value {
+  margin-top: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.jammer-mini-stepper {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid rgba(114, 160, 255, 0.3);
+  background: rgba(20, 28, 42, 0.94);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.jammer-mini-stepper:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+@media (max-width: 1080px) {
+  .jammer-detection-experiment-topline.primary,
+  .jammer-detection-experiment-topline.secondary,
+  .jammer-detection-experiment-grid,
+  .jammer-detection-experiment-chart-grid,
+  .jammer-detection-experiment-controls.weights,
+  .jammer-detection-experiment-controls.setup,
+  .jammer-detection-lane-toggle-row {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,3 +1,5 @@
+import { computeBandSnapshot } from "./audioPreprocessing.js";
+
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
@@ -44,12 +46,30 @@ class AubioListener {
     this.bufferSize = 1024;
     this.hopSize = 256;
     this.frameBuffer = new Float32Array(this.bufferSize);
+    this.frequencyBuffer = new Uint8Array(this.bufferSize / 2);
+    this.previousSpectrum = new Float32Array(this.bufferSize / 2);
     this.analysisCadenceMs = 42;
     this.lastAnalysisAt = 0;
     this.lastBeatAt = 0;
     this.lastOnsetValue = 0;
     this.tempoDetector = null;
     this.onsetDetector = null;
+    this.tuningConfig = {
+      normalizeEnabled: true,
+      normalizeTargetPeak: 0.94,
+      lowCutoffHz: 140,
+      midCutoffHz: 2400,
+      rawEnabled: true,
+      lowEnabled: true,
+      midEnabled: true,
+      highEnabled: true,
+      rawWeight: 0.18,
+      onsetThreshold: 0.085,
+      aubioSettings: {
+        transientBias: 0.64,
+        lowPulseBias: 0.42,
+      },
+    };
     this.snapshot = {
       installed: this.installed,
       ready: false,
@@ -69,6 +89,24 @@ class AubioListener {
 
   getSnapshot() {
     return { ...this.snapshot };
+  }
+
+  setTuningConfig(nextConfig = {}) {
+    const current = this.tuningConfig || {};
+    this.tuningConfig = {
+      ...current,
+      ...nextConfig,
+      aubioSettings: {
+        ...(current.aubioSettings || {}),
+        ...(nextConfig.aubioSettings || {}),
+      },
+    };
+
+    if (this.onsetDetector && typeof this.onsetDetector.setThreshold === "function") {
+      const threshold = clamp(Number(this.tuningConfig.onsetThreshold || 0.085) * 2.1, 0.05, 0.45);
+      this.onsetDetector.setThreshold(threshold);
+    }
+    return { ...this.tuningConfig };
   }
 
   async warmup({ sampleRate = 44100 } = {}) {
@@ -168,6 +206,32 @@ class AubioListener {
         this.frameBuffer[index] = (byteBuffer[index] - 128) / 128;
       }
     }
+    if (this.analyser.getByteFrequencyData) {
+      if (this.analyser.frequencyBinCount !== this.frequencyBuffer.length) {
+        this.frequencyBuffer = new Uint8Array(this.analyser.frequencyBinCount);
+        this.previousSpectrum = new Float32Array(this.analyser.frequencyBinCount);
+      }
+      this.analyser.getByteFrequencyData(this.frequencyBuffer);
+    }
+
+    const tuning = this.tuningConfig || {};
+    let rawAmplitude = 0;
+    for (let index = 0; index < this.frameBuffer.length; index += 1) {
+      rawAmplitude += Math.abs(this.frameBuffer[index]);
+    }
+    rawAmplitude /= Math.max(1, this.frameBuffer.length);
+    if (tuning.normalizeEnabled !== false) {
+      let peak = 0;
+      for (let index = 0; index < this.frameBuffer.length; index += 1) {
+        peak = Math.max(peak, Math.abs(this.frameBuffer[index]));
+      }
+      if (peak > 0.000001) {
+        const gain = clamp(Number(tuning.normalizeTargetPeak || 0.94) / peak, 0.5, 8);
+        for (let index = 0; index < this.frameBuffer.length; index += 1) {
+          this.frameBuffer[index] = clamp(this.frameBuffer[index] * gain, -1, 1);
+        }
+      }
+    }
 
     const onsetRaw = Number(this.onsetDetector.do(this.frameBuffer) || 0);
     const tempoRaw = Number(this.tempoDetector.do(this.frameBuffer) || 0);
@@ -179,6 +243,16 @@ class AubioListener {
     const reference = shouldSuppressReference(this.sourceMode) && this.referenceProvider
       ? this.referenceProvider()
       : null;
+    const bandSnapshot = this.frequencyBuffer.length > 0
+      ? computeBandSnapshot(this.frequencyBuffer, this.sampleRate, this.previousSpectrum, {
+        scaleMode: "byte",
+        lowCutoffHz: tuning.lowCutoffHz,
+        midCutoffHz: tuning.midCutoffHz,
+      })
+      : { low: 0, mid: 0, high: 0, flux: 0 };
+    const lowPulse = tuning.lowEnabled === false ? 0 : bandSnapshot.low;
+    const midPulse = tuning.midEnabled === false ? 0 : bandSnapshot.mid;
+    const highPulse = tuning.highEnabled === false ? 0 : bandSnapshot.high;
     const referenceBias = clamp(
       ((reference?.lowOnset || 0) * 0.55)
       + ((reference?.highOnset || 0) * 0.3)
@@ -186,9 +260,22 @@ class AubioListener {
       0,
       1
     );
-    const onset = clamp(Math.max(onsetRaw - (referenceBias * 0.72), this.lastOnsetValue * 0.75), 0, 1);
-    const beatPulse = (onsetRaw > 0 || tempoRaw > 0) && onset > 0.08;
-    const maskedConfidence = Math.round(clamp(confidence - (referenceBias * 26), 0, 100));
+    const rawWeight = tuning.rawEnabled === false ? 0 : clamp(Number(tuning.rawWeight || 0.18), 0, 1.5);
+    const rawAmplitudeCue = tuning.rawEnabled === false ? 0 : clamp(rawAmplitude * 4.8, 0, 1);
+    const transientBias = clamp(Number(tuning.aubioSettings?.transientBias || 0.64), 0, 1.5);
+    const lowPulseBias = clamp(Number(tuning.aubioSettings?.lowPulseBias || 0.42), 0, 1.5);
+    const boostedOnset = clamp(
+      (onsetRaw * (0.68 + (transientBias * 0.34)))
+      + (rawAmplitudeCue * rawWeight * 0.18)
+      + (lowPulse * (0.24 + (lowPulseBias * 0.2)))
+      + (midPulse * 0.08)
+      + (highPulse * 0.06),
+      0,
+      1.2
+    );
+    const onset = clamp(Math.max(boostedOnset - (referenceBias * 0.72), this.lastOnsetValue * 0.75), 0, 1);
+    const beatPulse = (onsetRaw > 0 || tempoRaw > 0) && onset > clamp(Number(tuning.onsetThreshold || 0.085), 0.03, 0.35);
+    const maskedConfidence = Math.round(clamp(confidence - (referenceBias * 26) + (lowPulse * lowPulseBias * 18) + (rawAmplitudeCue * rawWeight * 10) - (highPulse * 4), 0, 100));
     if (beatPulse) {
       this.lastBeatAt = now;
     }

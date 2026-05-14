@@ -4,6 +4,9 @@ import pocketGroove from "./pocket-groove/index.js";
 import reactiveKit from "./reactive-kit/index.js";
 import { createAdaptiveTimingEngine } from "./adaptiveTiming.js";
 import { createRhythmConvergenceEngine } from "./rhythmConvergence.js";
+import { createAdaptiveSongFormPredictor } from "./structurePredictor.js";
+import { createBpmBenchmarkAnalyzer } from "./bpmBenchmarkAnalyzer.js";
+import { createOfflineSongAnalyzer } from "./offlineSongAnalyzer.js";
 import { createAubioListener } from "./aubioListener.js";
 import { JammerEngine } from "./engine.js";
 import { createEssentiaListener } from "./essentiaListener.js";
@@ -23,9 +26,12 @@ function createJammerEngine() {
 
 export {
   createAdaptiveTimingEngine,
+  createAdaptiveSongFormPredictor,
   createAubioListener,
+  createBpmBenchmarkAnalyzer,
   createEssentiaListener,
   createJammerEngine,
+  createOfflineSongAnalyzer,
   createRhythmConvergenceEngine,
   createToneDrumBus,
   deriveReactiveBehavior,

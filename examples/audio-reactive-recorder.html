@@ -22,12 +22,18 @@
             <div class="eyebrow">JamPal</div>
             <h1>Listen&React</h1>
           </div>
-          <button id="settingsTabButton" class="tab-button settings-icon-button" type="button" data-tab="settings" aria-label="Open settings" title="Settings">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M10.2 3.6h3.6l.42 2.1a6.9 6.9 0 0 1 1.45.6l1.82-1.14 2.54 2.54-1.14 1.82c.24.46.44.95.6 1.45l2.1.42v3.6l-2.1.42a6.9 6.9 0 0 1-.6 1.45l1.14 1.82-2.54 2.54-1.82-1.14c-.46.24-.95.44-1.45.6l-.42 2.1h-3.6l-.42-2.1a6.9 6.9 0 0 1-1.45-.6l-1.82 1.14-2.54-2.54 1.14-1.82a6.9 6.9 0 0 1-.6-1.45l-2.1-.42v-3.6l2.1-.42c.16-.5.36-.99.6-1.45L3.67 7.7 6.2 5.16l1.82 1.14c.46-.24.95-.44 1.45-.6l.73-2.1Z" stroke-width="1.35" stroke-linejoin="round"/>
-              <circle cx="12" cy="12" r="3.1" stroke-width="1.5"/>
-            </svg>
-          </button>
+          <div class="sidebar-header-actions">
+            <button id="jammerTabButton" class="tab-button settings-icon-button jammer-header-button" type="button" data-tab="jammer" aria-label="Open Jammer" title="Jammer">
+              <span class="jammer-header-toggle" aria-hidden="true"></span>
+              <span class="jammer-header-text">JAM</span>
+            </button>
+            <button id="settingsTabButton" class="tab-button settings-icon-button" type="button" data-tab="settings" aria-label="Open settings" title="Settings">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M10.2 3.6h3.6l.42 2.1a6.9 6.9 0 0 1 1.45.6l1.82-1.14 2.54 2.54-1.14 1.82c.24.46.44.95.6 1.45l2.1.42v3.6l-2.1.42a6.9 6.9 0 0 1-.6 1.45l1.14 1.82-2.54 2.54-1.82-1.14c-.46.24-.95.44-1.45.6l-.42 2.1h-3.6l-.42-2.1a6.9 6.9 0 0 1-1.45-.6l-1.82 1.14-2.54-2.54 1.14-1.82a6.9 6.9 0 0 1-.6-1.45l-2.1-.42v-3.6l2.1-.42c.16-.5.36-.99.6-1.45L3.67 7.7 6.2 5.16l1.82 1.14c.46-.24.95-.44 1.45-.6l.73-2.1Z" stroke-width="1.35" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3.1" stroke-width="1.5"/>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="subtitle">Live audio and video reactions</div>
       </div>
@@ -46,10 +52,9 @@
           <div class="hint">Only one input route is active at a time. Player play takes over and stops the microphone route.</div>
         </div>
 
-        <div class="button-row triple">
+        <div class="button-row">
           <button id="startMicButton" class="primary-action" type="button">Start Mic</button>
           <button id="stopMicButton" type="button" disabled>Stop</button>
-          <button id="jammerTabButton" class="tab-button" type="button" data-tab="jammer">Jammer</button>
         </div>
       </div>
 
@@ -77,6 +82,7 @@
               <button id="playerPrevButton" type="button" disabled title="Previous track" aria-label="Previous track">&#9664;&#9664;</button>
               <button id="playerPlayPauseButton" class="player-play-button" type="button" disabled title="Play" aria-label="Play">&#9654;</button>
               <button id="playerNextButton" type="button" disabled title="Next track" aria-label="Next track">&#9654;&#9654;</button>
+              <button id="playerAutoplayButton" class="toggle-button active" type="button" aria-pressed="true" title="Autoplay is on">Autoplay</button>
             </div>
 
             <div class="player-progress">
@@ -182,9 +188,21 @@
       <section id="jammerPanel" class="panel-section" data-panel="jammer">
         <div class="jammer-panel">
           <div class="jammer-topbar">
-            <label for="jammerDrummerSelect">JamPal Drummer</label>
+            <div class="jammer-detection-headline">
+              <label for="jammerDrummerSelect">JamPal Drummer</label>
+            </div>
             <div class="jammer-topbar-actions">
               <div id="jammerStatusPill" class="player-mini-status">Standby</div>
+              <button
+                id="jammerMainPanelToggleButton"
+                class="jammer-icon-toggle jammer-section-toggle"
+                type="button"
+                aria-label="Collapse JamPal drummer"
+                aria-expanded="true"
+                title="Collapse JamPal drummer"
+              >
+                <span class="jammer-section-toggle-glyph" aria-hidden="true">▾</span>
+              </button>
               <button id="jammerStrategyToggleButton" class="tab-button jammer-tool-button" type="button" aria-label="Open drummer strategies" title="Drummer Strategies">
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M4 7h10"></path>
@@ -206,35 +224,35 @@
               </button>
             </div>
           </div>
+          <div id="jammerMainPanelBody">
 
-          <div id="jammerSummary" class="jammer-summary">Choose a drummer profile to scaffold the groove engine layer that will sit above JamPal audio routing.</div>
-
-          <div class="control-group">
-            <label for="jammerDrummerSelect">Drummer Type</label>
-            <select id="jammerDrummerSelect">
-              <option value="">Loading drummer profiles...</option>
-            </select>
-          </div>
+          <div id="jammerSummary" class="jammer-summary hidden" aria-hidden="true">Choose a drummer profile to scaffold the groove engine layer that will sit above JamPal audio routing.</div>
 
           <div class="jammer-primary-grid">
-            <div class="jammer-play-card">
-              <button id="jammerPlayToggleButton" class="primary-action" type="button">Play Drummer</button>
-              <label class="checkbox-row hidden" for="jammerEnabled">
-                <input id="jammerEnabled" type="checkbox">
-                <span>Enable scaffold</span>
-              </label>
-              <div class="hint">With no live input, the drummer invents its own four-bar loop while you shape the groove.</div>
-            </div>
-
             <div class="control-group jammer-compact-control">
-              <label for="jammerFollowSource">Follow Source</label>
-              <select id="jammerFollowSource">
+              <label for="jammerFollowSource" title="Choose which live route the drummer should follow, or let it listen automatically.">Follow Source</label>
+              <select id="jammerFollowSource" title="Choose which live route the drummer should follow, or let it listen automatically.">
                 <option value="auto">Auto route</option>
                 <option value="none">No source</option>
                 <option value="microphone">Microphone only</option>
                 <option value="player">Player only</option>
               </select>
             </div>
+
+            <div class="jammer-play-card">
+              <button id="jammerPlayToggleButton" class="primary-action" type="button" title="Start the drummer. With no live input, it can invent its own loop while you shape the groove.">Play Drummer</button>
+              <label class="checkbox-row hidden" for="jammerEnabled">
+                <input id="jammerEnabled" type="checkbox">
+                <span>Enable scaffold</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="jammerDrummerSelect" title="Choose a drummer profile to scaffold the groove engine layer that will sit above JamPal audio routing.">Drummer Type</label>
+            <select id="jammerDrummerSelect" title="Choose a drummer profile to scaffold the groove engine layer that will sit above JamPal audio routing.">
+              <option value="">Loading drummer profiles...</option>
+            </select>
           </div>
 
           <div class="jammer-secondary-grid">
@@ -287,21 +305,75 @@
             <div id="jammerStrategyList" class="jammer-strategy-list"></div>
           </div>
 
+          <div id="jammerDetectionExperimentMount"></div>
+
           <div class="jammer-detection-card">
             <div class="jammer-topbar">
-              <div class="section-title">Detection</div>
-              <select id="jammerTimingModelSelect" class="jammer-inline-select" aria-label="Timing model">
-                <option value="kalman">Kalman PLL</option>
-                <option value="particle">Particle Grid</option>
-              </select>
-              <button id="jammerDetectionToggleButton" class="jammer-icon-toggle" type="button" aria-label="Start detection" title="Start detection">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2v10"></path>
-                  <path d="M18.36 5.64a9 9 0 1 1-12.72 0"></path>
-                </svg>
-              </button>
+              <div class="jammer-detection-titlebar">
+                <button id="jammerDetectionToggleButton" class="jammer-icon-toggle" type="button" aria-label="Start detection" title="Start detection">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2v10"></path>
+                    <path d="M18.36 5.64a9 9 0 1 1-12.72 0"></path>
+                  </svg>
+                </button>
+                <div class="jammer-detection-headline-block">
+                  <div class="jammer-detection-headline">
+                    <div class="section-title">Detection</div>
+                    <div id="jammerDetectionPanelStatus" class="jammer-panel-status">Off</div>
+                  </div>
+                  <div class="jammer-inline-hint">Listen to the source, estimate BPM, and lock beat plus bar phase before the drummer reacts.</div>
+                </div>
+              </div>
+              <div class="jammer-detection-inline-tools">
+                <label class="jammer-inline-select-group" for="jammerTimingModelSelect" title="Clock model decides how the app smooths tempo and phase. Kalman is softer and more forgiving, Particle is stricter.">
+                  <span class="jammer-detection-inline-label">Clock Model</span>
+                  <select id="jammerTimingModelSelect" class="jammer-inline-select" aria-label="Clock model" title="Clock model decides how the app smooths tempo and phase. Kalman is softer and more forgiving, Particle is stricter.">
+                    <option value="kalman">Kalman PLL</option>
+                    <option value="particle">Particle Grid</option>
+                  </select>
+                </label>
+                <button
+                  id="jammerDetectionPanelToggleButton"
+                  class="jammer-icon-toggle jammer-section-toggle"
+                  type="button"
+                  aria-label="Collapse detection"
+                  aria-expanded="true"
+                  title="Collapse detection"
+                >
+                  <span class="jammer-section-toggle-glyph" aria-hidden="true">▾</span>
+                </button>
+              </div>
             </div>
-            <div class="jammer-detection-grid">
+            <div id="jammerDetectionPanelBody">
+            <div class="jammer-detection-subtitle">Beat Grid</div>
+            <div class="jammer-detection-grid-panel">
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Grid Tempo</div>
+                <div id="jammerDetectionGridTempo" class="jammer-detection-value">0 BPM</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Current Beat</div>
+                <div id="jammerDetectionGridBeat" class="jammer-detection-value">0 / 4</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Bar Anchor</div>
+                <div id="jammerDetectionGridAnchor" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Stability</div>
+                <div id="jammerDetectionGridStability" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">PLL</div>
+                <div id="jammerDetectionGridPll" class="jammer-detection-value">Waiting</div>
+              </div>
+              <div class="jammer-detection-stat">
+                <div class="jammer-detection-label">Windows</div>
+                <div id="jammerDetectionGridWindows" class="jammer-detection-value">F 0 / M 0 / L 0</div>
+              </div>
+            </div>
+            <div id="jammerDetectionGrid" class="jammer-detection-beat-grid"></div>
+            <div class="jammer-detection-primary-row">
               <div class="jammer-detection-stat">
                 <div class="jammer-detection-label">Ear State</div>
                 <div id="jammerDetectionState" class="jammer-detection-value">Waiting</div>
@@ -322,10 +394,10 @@
                 <div class="jammer-detection-label">Signal Motion</div>
                 <div id="jammerDetectionZcr" class="jammer-detection-value">0.00</div>
               </div>
-              <div class="jammer-detection-stat">
-                <div class="jammer-detection-label">Ear Summary</div>
-                <div id="jammerDetectionSummary" class="jammer-detection-value">Waiting for a live route.</div>
-              </div>
+            </div>
+            <div class="jammer-detection-summary-stat">
+              <div class="jammer-detection-label">Ear Summary</div>
+              <div id="jammerDetectionSummary" class="jammer-detection-value">Waiting for a live route.</div>
             </div>
             <div class="jammer-detection-meters">
               <div class="jammer-detection-meter">
@@ -351,33 +423,60 @@
               </div>
             </div>
             <div class="jammer-detection-subtitle">Preprocessing</div>
-            <div class="jammer-detection-mini-grid">
-              <div class="jammer-detection-stat">
+            <div class="jammer-detection-preprocess-grid">
+              <div class="jammer-detection-mini-grid">
+              <div class="jammer-detection-stat" title="Normalize shows how strongly the live signal is being leveled before rhythm analysis. Higher gain means the input needed more lift.">
                 <div class="jammer-detection-label">Normalize</div>
                 <div id="jammerDetectionNormalize" class="jammer-detection-value">0%</div>
               </div>
-              <div class="jammer-detection-stat">
+              <div class="jammer-detection-stat" title="Spectral Flux measures how much the sound spectrum changes from one analysis frame to the next. Sharp rises usually mean fresh rhythmic events or attacks.">
                 <div class="jammer-detection-label">Spectral Flux</div>
                 <div id="jammerDetectionFlux" class="jammer-detection-value">0%</div>
               </div>
-              <div class="jammer-detection-stat">
-                <div class="jammer-detection-label">Low Band</div>
-                <div id="jammerDetectionLowBand" class="jammer-detection-value">0%</div>
-              </div>
-              <div class="jammer-detection-stat">
-                <div class="jammer-detection-label">Mid Band</div>
-                <div id="jammerDetectionMidBand" class="jammer-detection-value">0%</div>
-              </div>
-              <div class="jammer-detection-stat">
-                <div class="jammer-detection-label">High Band</div>
-                <div id="jammerDetectionHighBand" class="jammer-detection-value">0%</div>
-              </div>
-              <div class="jammer-detection-stat">
+              <div class="jammer-detection-stat" title="Band Pulse summarizes the transient activity detected separately in low, mid and high ranges. It helps us tell kick-like hits from backbeat and fast subdivisions.">
                 <div class="jammer-detection-label">Band Pulse</div>
                 <div id="jammerDetectionBandPulse" class="jammer-detection-value">L 0 / M 0 / H 0</div>
               </div>
+              </div>
+              <div class="jammer-detection-band-row">
+              <div class="jammer-detection-stat" title="Low Band focuses on bass energy, where kick and downbeat information usually live.">
+                <div class="jammer-detection-label">Low Band</div>
+                <div id="jammerDetectionLowBand" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat" title="Mid Band tracks the middle of the spectrum, often useful for snare, voice articulation and backbeat clues.">
+                <div class="jammer-detection-label">Mid Band</div>
+                <div id="jammerDetectionMidBand" class="jammer-detection-value">0%</div>
+              </div>
+              <div class="jammer-detection-stat" title="High Band highlights hats, bright transients and finer rhythmic subdivisions.">
+                <div class="jammer-detection-label">High Band</div>
+                <div id="jammerDetectionHighBand" class="jammer-detection-value">0%</div>
+              </div>
+              </div>
             </div>
-            <div class="jammer-detection-subtitle">Module Contributions</div>
+            <div class="jammer-card-header jammer-subsection-header">
+              <div class="jammer-detection-headline">
+                <div class="jammer-detection-subtitle">Module Contributions</div>
+                <div id="jammerModuleContributionsStatus" class="jammer-panel-status">Fusion</div>
+              </div>
+              <div class="jammer-detection-inline-tools">
+                <select id="jammerDetectorModeSelect" class="jammer-inline-select" aria-label="Detector mode">
+                  <option value="fusion">Aubio + Essentia fused</option>
+                  <option value="aubio">Aubio only</option>
+                  <option value="essentia">Essentia only</option>
+                </select>
+                <button
+                  id="jammerModuleContributionsToggleButton"
+                  class="jammer-icon-toggle jammer-section-toggle"
+                  type="button"
+                  aria-label="Collapse module contributions"
+                  aria-expanded="true"
+                  title="Collapse module contributions"
+                >
+                  <span class="jammer-section-toggle-glyph" aria-hidden="true">▾</span>
+                </button>
+              </div>
+            </div>
+            <div id="jammerModuleContributionsPanelBody">
             <div class="jammer-detection-mini-grid">
               <div class="jammer-detection-stat">
                 <div class="jammer-detection-label">Aubio</div>
@@ -404,9 +503,9 @@
                 <div id="jammerDetectionGridState" class="jammer-detection-value">Waiting</div>
               </div>
             </div>
-            <div class="jammer-detection-subtitle">Beat Grid</div>
-            <div id="jammerDetectionGridHint" class="jammer-detection-grid-hint">Waiting for a stable pulse.</div>
-            <div id="jammerDetectionGrid" class="jammer-detection-beat-grid"></div>
+            </div>
+            <div id="jammerDetectorCalibrationMount"></div>
+            <div id="jammerBpmBenchmarkMount"></div>
             <div class="jammer-detection-subtitle">Drummer Decisions</div>
             <div class="jammer-detection-grid">
               <div class="jammer-detection-stat">
@@ -439,6 +538,7 @@
                 <div class="jammer-detection-label">Loop Span</div>
                 <div id="jammerDecisionBars" class="jammer-detection-value">4 bars</div>
               </div>
+            </div>
             </div>
           </div>
 
@@ -482,6 +582,7 @@
               <div><span class="jammer-stat-label">Updated</span><span id="jammerResearchUpdated">Not cached yet</span></div>
             </div>
             <div id="jammerResearchSummary" class="hint">Curated rhythm engines, analyzers and sample libraries will be cached locally for the drummer roadmap.</div>
+          </div>
           </div>
         </div>
       </section>
@@ -547,9 +648,7 @@
         </div>
       </section>
     </aside>
-
-    <section id="jammerRuntimeSection" class="stage" hidden></section>
-
+    <div id="rightRail" class="right-rail">
     <section id="stageSection" class="stage" hidden>
       <div class="stage-shell">
         <div class="stage-header">
@@ -558,9 +657,20 @@
             <div id="stagePresetLabel">Waiting for a preset...</div>
           </div>
           <div class="stage-header-side">
+            <button
+              id="stagePanelToggleButton"
+              class="jammer-icon-toggle jammer-section-toggle active"
+              type="button"
+              aria-label="Collapse live visual stage"
+              aria-expanded="true"
+              title="Collapse live visual stage"
+            >
+              <span class="jammer-section-toggle-glyph" aria-hidden="true">▾</span>
+            </button>
             <div id="stageMetaLabel">720p - 60 FPS - WebM</div>
           </div>
         </div>
+        <div id="stagePanelBody" class="stage-panel-body">
 
         <div class="canvas-frame">
           <canvas id="canvas" width="1280" height="720"></canvas>
@@ -656,10 +766,32 @@
           <div id="stageLoopRhythm" class="stage-loop-rhythm"></div>
           <div id="stageLoopDeckList" class="stage-loop-deck-list"></div>
         </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="jammerRuntimeSection" class="stage" hidden></section>
+    <section id="wiringRailSection" class="stage wiring-rail-section"></section>
 
         <div id="jammerLabPanel" class="jammer-lab-panel">
-          <div class="section-title">Drummer Lab</div>
-          <div class="hint">Build a live deck of Tone instruments. The drummer only plays instruments that are present here and not muted.</div>
+          <div class="jammer-detection-section-head">
+            <div class="jammer-detection-headline-block">
+              <div class="section-title">Drummer Lab</div>
+              <div id="jammerLabPanelStatus" class="jammer-panel-status">Deck empty</div>
+              <div class="hint">Build a live deck of Tone instruments. The drummer only plays instruments that are present here and not muted.</div>
+            </div>
+            <button
+              id="jammerLabPanelToggleButton"
+              class="jammer-icon-toggle jammer-section-toggle"
+              type="button"
+              aria-label="Collapse drummer lab"
+              aria-expanded="true"
+              title="Collapse drummer lab"
+            >
+              <span class="jammer-section-toggle-glyph" aria-hidden="true">▾</span>
+            </button>
+          </div>
+          <div id="jammerLabPanelBody">
 
           <div class="jammer-live-group">
             <div class="jammer-group-heading">
@@ -799,9 +931,11 @@
             <div><span class="jammer-stat-label">Last save</span><span id="jammerFavoriteUpdated">Not saved yet</span></div>
           </div>
           <ul id="jammerFavoriteList" class="jammer-favorite-list"></ul>
+          </div>
         </div>
       </div>
     </section>
+    </div>
   </main>
 
   <input id="singleTrackInput" class="hidden" type="file" accept="audio/*">
@@ -813,15 +947,21 @@
     import {
       createAdaptiveTimingEngine,
       createAubioListener,
+      createBpmBenchmarkAnalyzer,
       createEssentiaListener,
       createJammerEngine,
+      createOfflineSongAnalyzer,
       createToneDrumBus,
       deriveReactiveBehavior,
       drummerCatalog,
     } from "../jammer/drums/index.js";
+    import { createDetectionExperimentEngine, createDefaultDetectionExperimentConfig } from "../jammer/drums/detectionExperimentEngine.js";
     import { syncJammerResearchCatalog } from "../src/jammerResearchDb.js";
     import { loadJammerReactiveStrategies, saveJammerReactiveStrategies } from "../src/jammerStrategyDb.js";
     import { loadJammerLabState, saveJammerDeckPreset, saveJammerLabFavorite, saveJammerLabSettings } from "../src/jammerLabDb.js";
+    import { loadDetectorCalibrationHistory, saveDetectorCalibrationRun } from "../src/detectorCalibrationDb.js";
+    import { appendBpmBenchmarkRun, loadBpmBenchmarkManifest, loadBpmBenchmarkState, saveBpmBenchmarkState } from "../src/bpmBenchmarkService.js";
+    import { analyzeAndStoreSong, buildSongAnalysisTrackId, loadSongAnalysisForTrack, seedKnownSongReferencesForTracks } from "../src/songAnalysisService.js";
     import Recorder from "../src/recorder.js";
     import { applySkin, defaultSkinId, getSkinById, skinCatalog } from "../src/skins.js";
     import { deleteAsset, loadAsset, loadSettings, saveAsset, saveSetting } from "../src/settingsDb.js";
@@ -836,15 +976,52 @@
     } from "./audio-reactive-recorder/formatters.js";
     import { createAudioInputController } from "./audio-reactive-recorder/audioInputController.js";
     import { bindAppEvents, initializeRecorderApp } from "./audio-reactive-recorder/appBootstrap.js";
+    import {
+      buildDetectorCalibrationRecommendations,
+      buildDetectorCalibrationModuleRecommendations,
+      buildLiveSongAnalysisRecommendations,
+      computeDetectorCalibrationScore,
+      computeDetectorCalibrationModuleScore,
+      createDetectorCalibrationProgressState,
+      createDetectorCalibrationTestState,
+      getDetectorCalibrationAverages,
+      getDetectorCalibrationModuleAverages,
+      getDetectorCalibrationModuleSuggestionConfig,
+      getDetectorCalibrationSuggestedModule,
+      getDetectorCalibrationSuggestionConfig,
+    } from "./audio-reactive-recorder/detectorCalibrationController.js";
+    import { getBpmBenchmarkRefs, renderBpmBenchmarkPanel } from "./audio-reactive-recorder/bpmBenchmarkPanel.js";
+    import { getDetectionExperimentRefs, renderDetectionExperimentPanel } from "./audio-reactive-recorder/detectionExperimentPanel.js";
+    import { getDetectorCalibrationRefs, renderDetectorCalibrationPanel } from "./audio-reactive-recorder/detectorCalibrationPanel.js";
     import { createJammerLabView } from "./audio-reactive-recorder/jammerLabView.js";
+    import { getNextCollapsedState, syncCollapsedPanelUi } from "./audio-reactive-recorder/panelCollapse.js";
     import { createPlayerView } from "./audio-reactive-recorder/playerView.js";
     import { createReactiveDrummerController } from "./audio-reactive-recorder/reactiveDrummerController.js";
     import { createJammerRuntimeView } from "./audio-reactive-recorder/jammerRuntimeView.js";
+    import { createWiringPanelView, getWiringRefs, renderWiringPanel } from "./audio-reactive-recorder/wiringPanel.js";
 
     const root = document.documentElement;
     const canvas = document.getElementById("canvas");
     const canvasContext = canvas.getContext("2d");
+    const jammerDetectorCalibrationMount = document.getElementById("jammerDetectorCalibrationMount");
+    if (jammerDetectorCalibrationMount) {
+      jammerDetectorCalibrationMount.innerHTML = renderDetectorCalibrationPanel();
+    }
+    const jammerBpmBenchmarkMount = document.getElementById("jammerBpmBenchmarkMount");
+    if (jammerBpmBenchmarkMount) {
+      jammerBpmBenchmarkMount.innerHTML = renderBpmBenchmarkPanel();
+    }
+    const jammerDetectionExperimentMount = document.getElementById("jammerDetectionExperimentMount");
+    if (jammerDetectionExperimentMount) {
+      jammerDetectionExperimentMount.innerHTML = renderDetectionExperimentPanel();
+    }
+    const wiringRailSection = document.getElementById("wiringRailSection");
+    if (wiringRailSection) {
+      wiringRailSection.innerHTML = renderWiringPanel();
+    }
     const stageSection = document.getElementById("stageSection");
+    const stagePanelToggleButton = document.getElementById("stagePanelToggleButton");
+    const stagePanelBody = document.getElementById("stagePanelBody");
     const stageShell = document.querySelector(".stage-shell");
     const canvasFrame = document.querySelector(".canvas-frame");
     const studioHomeButton = document.getElementById("studioHomeButton");
@@ -854,6 +1031,7 @@
     const randomPresetButton = document.getElementById("randomPresetButton");
     const nextPresetButton = document.getElementById("nextPresetButton");
     const visualizerToggleButton = document.getElementById("visualizerToggleButton");
+    const wiringRefs = getWiringRefs(document);
     const cycleSecondsInput = document.getElementById("cycleSeconds");
     const autoCycleEnabledInput = document.getElementById("autoCycleEnabled");
     const startRecordingButton = document.getElementById("startRecordingButton");
@@ -870,6 +1048,7 @@
     const playerPrevButton = document.getElementById("playerPrevButton");
     const playerPlayPauseButton = document.getElementById("playerPlayPauseButton");
     const playerNextButton = document.getElementById("playerNextButton");
+    const playerAutoplayButton = document.getElementById("playerAutoplayButton");
     const playerProgress = document.getElementById("playerProgress");
     const playerCurrentTimeLabel = document.getElementById("playerCurrentTimeLabel");
     const playerDurationLabel = document.getElementById("playerDurationLabel");
@@ -901,12 +1080,21 @@
     const studioPanel = document.getElementById("studioPanel");
     const jammerPanel = document.getElementById("jammerPanel");
     const settingsPanel = document.getElementById("settingsPanel");
+    const jammerMainPanelToggleButton = document.getElementById("jammerMainPanelToggleButton");
+    const jammerMainPanelBody = document.getElementById("jammerMainPanelBody");
     const jammerRuntimeSection = document.getElementById("jammerRuntimeSection");
     const jammerDetectionCard = jammerPanel.querySelector(".jammer-detection-card");
     const jammerDrummerSelect = document.getElementById("jammerDrummerSelect");
     const jammerPlayToggleButton = document.getElementById("jammerPlayToggleButton");
     const jammerDetectionToggleButton = document.getElementById("jammerDetectionToggleButton");
+    const jammerDetectionPanelToggleButton = document.getElementById("jammerDetectionPanelToggleButton");
+    const jammerDetectionPanelBody = document.getElementById("jammerDetectionPanelBody");
+    const jammerDetectionPanelStatus = document.getElementById("jammerDetectionPanelStatus");
     const jammerTimingModelSelect = document.getElementById("jammerTimingModelSelect");
+    const jammerDetectorModeSelect = document.getElementById("jammerDetectorModeSelect");
+    const jammerModuleContributionsToggleButton = document.getElementById("jammerModuleContributionsToggleButton");
+    const jammerModuleContributionsPanelBody = document.getElementById("jammerModuleContributionsPanelBody");
+    const jammerModuleContributionsStatus = document.getElementById("jammerModuleContributionsStatus");
     const jammerStrategyToggleButton = document.getElementById("jammerStrategyToggleButton");
     const jammerEnabledInput = document.getElementById("jammerEnabled");
     const jammerFollowSourceSelect = document.getElementById("jammerFollowSource");
@@ -919,6 +1107,9 @@
     const jammerVolumeRange = document.getElementById("jammerVolumeRange");
     const jammerLabToggleButton = document.getElementById("jammerLabToggleButton");
     const jammerLabPanel = document.getElementById("jammerLabPanel");
+    const jammerLabPanelStatus = document.getElementById("jammerLabPanelStatus");
+    const jammerLabPanelToggleButton = document.getElementById("jammerLabPanelToggleButton");
+    const jammerLabPanelBody = document.getElementById("jammerLabPanelBody");
     const jammerDeckSummary = document.getElementById("jammerDeckSummary");
     const jammerDeckGrid = document.getElementById("jammerDeckGrid");
     const jammerDeckPresetSelect = document.getElementById("jammerDeckPresetSelect");
@@ -973,6 +1164,12 @@
     const jammerDetectionLowBand = document.getElementById("jammerDetectionLowBand");
     const jammerDetectionMidBand = document.getElementById("jammerDetectionMidBand");
     const jammerDetectionHighBand = document.getElementById("jammerDetectionHighBand");
+    const jammerDetectionGridTempo = document.getElementById("jammerDetectionGridTempo");
+    const jammerDetectionGridBeat = document.getElementById("jammerDetectionGridBeat");
+    const jammerDetectionGridAnchor = document.getElementById("jammerDetectionGridAnchor");
+    const jammerDetectionGridStability = document.getElementById("jammerDetectionGridStability");
+    const jammerDetectionGridPll = document.getElementById("jammerDetectionGridPll");
+    const jammerDetectionGridWindows = document.getElementById("jammerDetectionGridWindows");
     const jammerDetectionBandPulse = document.getElementById("jammerDetectionBandPulse");
     const jammerDetectionAubio = document.getElementById("jammerDetectionAubio");
     const jammerDetectionEssentia = document.getElementById("jammerDetectionEssentia");
@@ -980,8 +1177,143 @@
     const jammerDetectionStability = document.getElementById("jammerDetectionStability");
     const jammerDetectionAgreement = document.getElementById("jammerDetectionAgreement");
     const jammerDetectionGridState = document.getElementById("jammerDetectionGridState");
-    const jammerDetectionGridHint = document.getElementById("jammerDetectionGridHint");
     const jammerDetectionGrid = document.getElementById("jammerDetectionGrid");
+    const {
+      jammerSongAnalyzeButton,
+      jammerCalibrationToggleButton,
+      jammerCalibrationPanelBody,
+      jammerCalibrationTrackSelect,
+      jammerCalibrationRunTestButton,
+      jammerCalibrationProgressValue,
+      jammerCalibrationProgressFill,
+      jammerSongAnalysisStatus,
+      jammerSongAnalysisTempo,
+      jammerSongAnalysisBars,
+      jammerSongAnalysisPhrase,
+      jammerSongAnalysisForm,
+      jammerCalibrationScore,
+      jammerCalibrationTestMode,
+      jammerCalibrationSamples,
+      jammerCalibrationTempoDelta,
+      jammerCalibrationSuggestedModule,
+      jammerCalibrationSuggestedTiming,
+      jammerSongAnalysisSummary,
+      jammerSongAnalysisCompare,
+      jammerSongAnalysisRecommendations,
+      jammerCalibrationAubioScore,
+      jammerCalibrationAubioMeta,
+      jammerCalibrationAubioSuggestions,
+      jammerCalibrationApplyAubioCheckbox,
+      jammerCalibrationRetestAubioButton,
+      jammerCalibrationAubioHistorySummary,
+      jammerCalibrationAubioHistoryList,
+      jammerCalibrationEssentiaScore,
+      jammerCalibrationEssentiaMeta,
+      jammerCalibrationEssentiaSuggestions,
+      jammerCalibrationApplyEssentiaCheckbox,
+      jammerCalibrationRetestEssentiaButton,
+      jammerCalibrationEssentiaHistorySummary,
+      jammerCalibrationEssentiaHistoryList,
+      jammerCalibrationRepeatSelectedButton,
+      jammerCalibrationHistorySummary,
+      jammerCalibrationHistoryList,
+    } = getDetectorCalibrationRefs(document);
+    const {
+      jammerBpmBenchmarkToggleButton,
+      jammerBpmBenchmarkPanelBody,
+      jammerBpmBenchmarkTrackSelect,
+      jammerBpmBenchmarkReloadButton,
+      jammerBpmBenchmarkRunButton,
+      jammerBpmBenchmarkStatus,
+      jammerBpmBenchmarkSelectionSummary,
+      jammerBpmBenchmarkProgressValue,
+      jammerBpmBenchmarkProgressFill,
+      jammerBpmBenchmarkKnownTempo,
+      jammerBpmBenchmarkReferenceTempo,
+      jammerBpmBenchmarkBars,
+      jammerBpmBenchmarkPhrase,
+      jammerBpmBenchmarkSummary,
+      jammerBpmBenchmarkAubioScore,
+      jammerBpmBenchmarkAubioMeta,
+      jammerBpmBenchmarkAubioSuggestions,
+      jammerBpmBenchmarkApplyAubioCheckbox,
+      jammerBpmBenchmarkRetestAubioButton,
+      jammerBpmBenchmarkEvolveAubioButton,
+      jammerBpmBenchmarkAubioHistorySummary,
+      jammerBpmBenchmarkAubioHistoryList,
+      jammerBpmBenchmarkEssentiaScore,
+      jammerBpmBenchmarkEssentiaMeta,
+      jammerBpmBenchmarkEssentiaSuggestions,
+      jammerBpmBenchmarkApplyEssentiaCheckbox,
+      jammerBpmBenchmarkRetestEssentiaButton,
+      jammerBpmBenchmarkEvolveEssentiaButton,
+      jammerBpmBenchmarkEssentiaHistorySummary,
+      jammerBpmBenchmarkEssentiaHistoryList,
+      jammerBpmBenchmarkRepeatSelectedButton,
+      jammerBpmBenchmarkResultsSummary,
+      jammerBpmBenchmarkResults,
+      jammerBpmBenchmarkHistorySummary,
+      jammerBpmBenchmarkHistoryList,
+    } = getBpmBenchmarkRefs(document);
+    const {
+      jammerDetectionExperimentToggleButton,
+      jammerDetectionExperimentPanelBody,
+      jammerDetectionExperimentPluginSelect,
+      jammerDetectionExperimentPresetSelect,
+      jammerDetectionExperimentPresetName,
+      jammerDetectionExperimentSavePresetButton,
+      jammerDetectionExperimentRenamePresetButton,
+      jammerDetectionExperimentLoadPresetButton,
+      jammerDetectionExperimentDeletePresetButton,
+      jammerDetectionExperimentNormalizeEnabled,
+      jammerDetectionExperimentNormalizeTarget,
+      jammerDetectionExperimentLowBandMin,
+      jammerDetectionExperimentLowCutoff,
+      jammerDetectionExperimentMidCutoff,
+      jammerDetectionExperimentRawEnabled,
+      jammerDetectionExperimentLowEnabled,
+      jammerDetectionExperimentMidEnabled,
+      jammerDetectionExperimentHighEnabled,
+      jammerDetectionExperimentTonalEnabled,
+      jammerDetectionExperimentSoloButton,
+      jammerDetectionExperimentRawWeight,
+      jammerDetectionExperimentLowWeight,
+      jammerDetectionExperimentMidWeight,
+      jammerDetectionExperimentHighWeight,
+      jammerDetectionExperimentTonalWeight,
+      jammerDetectionExperimentOnsetThreshold,
+      jammerDetectionExperimentTempoMin,
+      jammerDetectionExperimentTempoMax,
+      jammerDetectionExperimentAubioTransientBias,
+      jammerDetectionExperimentAubioLowBias,
+      jammerDetectionExperimentEssentiaTickBias,
+      jammerDetectionExperimentEssentiaHarmonicBias,
+      jammerDetectionExperimentTempo,
+      jammerDetectionExperimentConfidence,
+      jammerDetectionExperimentPulse,
+      jammerDetectionExperimentBeatPhase,
+      jammerDetectionExperimentLoopBar,
+      jammerDetectionExperimentWindowDownButton,
+      jammerDetectionExperimentWindowLabel,
+      jammerDetectionExperimentWindowUpButton,
+      jammerDetectionExperimentSummary,
+      jammerDetectionExperimentFastTempo,
+      jammerDetectionExperimentMediumTempo,
+      jammerDetectionExperimentLongTempo,
+      jammerDetectionExperimentPhaseLock,
+      jammerDetectionExperimentRawCanvas,
+      jammerDetectionExperimentLowCanvas,
+      jammerDetectionExperimentMidCanvas,
+      jammerDetectionExperimentHighCanvas,
+      jammerDetectionExperimentTonalCanvas,
+      jammerDetectionExperimentWeightedCanvas,
+      jammerDetectionExperimentRawMeta,
+      jammerDetectionExperimentLowMeta,
+      jammerDetectionExperimentMidMeta,
+      jammerDetectionExperimentHighMeta,
+      jammerDetectionExperimentTonalMeta,
+      jammerDetectionExperimentWeightedMeta,
+    } = getDetectionExperimentRefs(document);
     const jammerDecisionTempo = document.getElementById("jammerDecisionTempo");
     const jammerDecisionDensity = document.getElementById("jammerDecisionDensity");
     const jammerDecisionFill = document.getElementById("jammerDecisionFill");
@@ -1034,6 +1366,9 @@
     const essentiaListener = createEssentiaListener();
     const aubioListener = createAubioListener();
     const adaptiveTiming = createAdaptiveTimingEngine();
+    const detectionExperimentEngine = createDetectionExperimentEngine();
+    const offlineSongAnalyzer = createOfflineSongAnalyzer();
+    const bpmBenchmarkAnalyzer = createBpmBenchmarkAnalyzer();
     const reactiveDrummerController = createReactiveDrummerController({
       adaptiveTiming,
       aubioListener,
@@ -1058,11 +1393,23 @@
     let playerAnalyser;
     let playerOutputNode;
     let playerVisualizerNode;
+    let detectionExperimentSoloOutputNode;
+    let detectionExperimentSoloLowHighpass;
+    let detectionExperimentSoloLowLowpass;
+    let detectionExperimentSoloMidHighpass;
+    let detectionExperimentSoloMidLowpass;
+    let detectionExperimentSoloHighHighpass;
+    let detectionExperimentSoloLowGain;
+    let detectionExperimentSoloMidGain;
+    let detectionExperimentSoloHighGain;
+    let detectionExperimentSoloSourceNode = null;
+    let detectionExperimentSoloSourceConnected = false;
     let bassFilter;
     let midFilter;
     let trebleFilter;
     let playerPlaylist = [];
     let playerTrackIndex = 0;
+    let playerAutoplay = true;
     let playerObjectUrl = null;
     let suppressPlayerTrackChange = false;
     let lastPlayerPersistedSecond = -1;
@@ -1071,9 +1418,11 @@
     let cycleTimer;
     let presets = {};
     let presetKeys = [];
+    let jammerMainPanelCollapsed = false;
     let presetIndex = 0;
     let activeDownloadUrl = null;
     let activeSkinId = defaultSkinId;
+    let activePanel = "studio";
     let appSettings;
     let stageResizeState = null;
     let stageExpanded = false;
@@ -1087,12 +1436,123 @@
     let detectionSummary = adaptiveTiming.getSnapshot();
     let detectionEnabled = false;
     let jammerLabState;
-    let jammerLabOpen = false;
+    let jammerLabOpen = true;
     let jammerStrategiesOpen = false;
     let jammerLabJamRunning = false;
     let jammerDeckLibraryOpen = false;
+    let currentSongAnalysis = null;
+    let songAnalysisStatus = "No analysis yet";
+    let songAnalysisRunning = false;
+    let detectorCalibrationHistory = [];
+    let detectorCalibrationTrackId = "";
+    let detectorCalibrationProgress = 0;
+    let detectorCalibrationProgressLabel = "Idle";
+    let detectorCalibrationTest = createDetectorCalibrationTestState({ mode: "comparison" });
+    let detectorCalibrationPlaybackTrackId = "";
+    let detectorCalibrationQueue = [];
+    let detectorCalibrationQueueRunning = false;
+    let detectorCalibrationCollapsed = false;
+    let bpmBenchmarkTracks = [];
+    let bpmBenchmarkTrackIds = [];
+    let bpmBenchmarkState = null;
+    let bpmBenchmarkStates = [];
+    let bpmBenchmarkSelectionSummary = null;
+    let bpmBenchmarkCollapsed = false;
+    let bpmBenchmarkRunning = false;
+    let bpmBenchmarkProgress = 0;
+    let bpmBenchmarkProgressLabel = "Idle";
+    let detectionPanelCollapsed = false;
+    let moduleContributionsCollapsed = false;
+    let detectionExperimentCollapsed = false;
+    let wiringPanelCollapsed = false;
+    let stagePanelCollapsed = false;
+    const DETECTION_EXPERIMENT_CHART_WINDOWS = [2, 4, 8, 12, 16, 24];
+    let detectionExperimentConfig = createDefaultDetectionExperimentConfig();
+    let detectionExperimentPluginConfigs = {
+      aubio: createDefaultDetectionExperimentConfig(),
+      essentia: createDefaultDetectionExperimentConfig(),
+    };
+    let detectionExperimentPresets = [];
+    let detectionExperimentLastPresetId = "";
+    let detectionExperimentSnapshot = detectionExperimentEngine.getSnapshot();
     let loopMonitorTimer = null;
     let visualizerEnabled = true;
+
+    function cloneDetectionExperimentValue(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function mergeDetectionExperimentConfig(baseConfig, patch = {}) {
+      const base = cloneDetectionExperimentValue(baseConfig || createDefaultDetectionExperimentConfig());
+      return {
+        ...base,
+        ...patch,
+        aubioSettings: {
+          ...(base.aubioSettings || {}),
+          ...(patch.aubioSettings || {}),
+        },
+        essentiaSettings: {
+          ...(base.essentiaSettings || {}),
+          ...(patch.essentiaSettings || {}),
+        },
+      };
+    }
+
+    function normalizeDetectionExperimentConfig(pluginMode, config = {}) {
+      const normalizedPluginMode = pluginMode === "aubio" ? "aubio" : "essentia";
+      const merged = mergeDetectionExperimentConfig(createDefaultDetectionExperimentConfig(), config);
+      merged.pluginMode = normalizedPluginMode;
+      return merged;
+    }
+
+    function createDetectionExperimentPluginConfigSet(seedConfigMap = null, legacyConfig = null) {
+      const defaults = {
+        aubio: normalizeDetectionExperimentConfig("aubio"),
+        essentia: normalizeDetectionExperimentConfig("essentia"),
+      };
+
+      if (seedConfigMap && typeof seedConfigMap === "object") {
+        if (seedConfigMap.aubio && typeof seedConfigMap.aubio === "object") {
+          defaults.aubio = normalizeDetectionExperimentConfig("aubio", seedConfigMap.aubio);
+        }
+        if (seedConfigMap.essentia && typeof seedConfigMap.essentia === "object") {
+          defaults.essentia = normalizeDetectionExperimentConfig("essentia", seedConfigMap.essentia);
+        }
+      } else if (legacyConfig && typeof legacyConfig === "object") {
+        const legacyMode = legacyConfig.pluginMode === "aubio" ? "aubio" : "essentia";
+        defaults[legacyMode] = normalizeDetectionExperimentConfig(legacyMode, legacyConfig);
+      }
+
+      return defaults;
+    }
+
+    function getDetectionExperimentPluginMode(mode = detectionExperimentConfig.pluginMode) {
+      return mode === "aubio" ? "aubio" : "essentia";
+    }
+
+    function getDetectionExperimentCurrentSharedState() {
+      return {
+        chartWindowSeconds: Number(detectionExperimentConfig.chartWindowSeconds || 8),
+        soloEnabled: detectionExperimentConfig.soloEnabled === true,
+      };
+    }
+
+    function getDetectionExperimentConfigForPlugin(pluginMode, sharedState = getDetectionExperimentCurrentSharedState()) {
+      const normalizedPluginMode = getDetectionExperimentPluginMode(pluginMode);
+      const storedConfig = detectionExperimentPluginConfigs[normalizedPluginMode]
+        || normalizeDetectionExperimentConfig(normalizedPluginMode);
+      return normalizeDetectionExperimentConfig(normalizedPluginMode, {
+        ...storedConfig,
+        ...sharedState,
+      });
+    }
+
+    function persistDetectionExperimentSettings() {
+      persistSetting("detectionExperimentPluginConfigs", detectionExperimentPluginConfigs);
+      persistSetting("detectionExperimentConfig", detectionExperimentConfig);
+      persistSetting("detectionExperimentChartWindowSeconds", Number(detectionExperimentConfig.chartWindowSeconds || 8));
+      persistSetting("detectionExperimentSoloEnabled", detectionExperimentConfig.soloEnabled === true);
+    }
 
     const STAGE_MIN_WIDTH = 320;
     const STAGE_MAX_WIDTH = 1400;
@@ -1101,12 +1561,18 @@
     const jammerRuntimeView = createJammerRuntimeView({
       refs: {
         jammerRuntimeSection,
+        jammerDetectionExperimentMount,
         jammerStrategyPanel,
         jammerDetectionCard,
         stageLoopMonitor,
+        jammerMainPanelToggleButton,
+        jammerMainPanelBody,
         jammerLabPanel,
+        jammerLabPanelStatus,
         jammerStatusPill,
         jammerSummary,
+        jammerDetectionPanelStatus,
+        jammerDrummerSelect,
         jammerRouteValue,
         jammerPatternValue,
         jammerLaneValue,
@@ -1116,6 +1582,10 @@
         jammerMaskValue,
         jammerDetectionToggleButton,
         jammerTimingModelSelect,
+        jammerDetectorModeSelect,
+        jammerModuleContributionsStatus,
+        jammerModuleContributionsToggleButton,
+        jammerModuleContributionsPanelBody,
         jammerDetectionState,
         jammerDetectionSource,
         jammerDetectionTempo,
@@ -1133,6 +1603,12 @@
         jammerDetectionLowBand,
         jammerDetectionMidBand,
         jammerDetectionHighBand,
+        jammerDetectionGridTempo,
+        jammerDetectionGridBeat,
+        jammerDetectionGridAnchor,
+        jammerDetectionGridStability,
+        jammerDetectionGridPll,
+        jammerDetectionGridWindows,
         jammerDetectionBandPulse,
         jammerDetectionAubio,
         jammerDetectionEssentia,
@@ -1140,8 +1616,109 @@
         jammerDetectionStability,
         jammerDetectionAgreement,
         jammerDetectionGridState,
-        jammerDetectionGridHint,
         jammerDetectionGrid,
+        jammerSongAnalyzeButton,
+        jammerCalibrationToggleButton,
+        jammerCalibrationPanelStatus,
+        jammerCalibrationPanelBody,
+        jammerCalibrationTrackSelect,
+        jammerCalibrationRunTestButton,
+        jammerCalibrationProgressValue,
+        jammerCalibrationProgressFill,
+        jammerSongAnalysisStatus,
+        jammerSongAnalysisTempo,
+        jammerSongAnalysisBars,
+        jammerSongAnalysisPhrase,
+        jammerSongAnalysisForm,
+        jammerCalibrationScore,
+        jammerCalibrationTestMode,
+        jammerCalibrationSamples,
+        jammerCalibrationTempoDelta,
+        jammerCalibrationSuggestedModule,
+        jammerCalibrationSuggestedTiming,
+        jammerSongAnalysisSummary,
+        jammerSongAnalysisCompare,
+        jammerSongAnalysisRecommendations,
+        jammerCalibrationAubioScore,
+        jammerCalibrationAubioMeta,
+        jammerCalibrationAubioSuggestions,
+        jammerCalibrationApplyAubioCheckbox,
+        jammerCalibrationRetestAubioButton,
+        jammerCalibrationAubioHistorySummary,
+        jammerCalibrationAubioHistoryList,
+        jammerCalibrationEssentiaScore,
+        jammerCalibrationEssentiaMeta,
+        jammerCalibrationEssentiaSuggestions,
+        jammerCalibrationApplyEssentiaCheckbox,
+        jammerCalibrationRetestEssentiaButton,
+        jammerCalibrationEssentiaHistorySummary,
+        jammerCalibrationEssentiaHistoryList,
+        jammerCalibrationRepeatSelectedButton,
+        jammerCalibrationHistorySummary,
+        jammerCalibrationHistoryList,
+        jammerBpmBenchmarkToggleButton,
+        jammerBpmBenchmarkPanelStatus,
+        jammerBpmBenchmarkPanelBody,
+        jammerBpmBenchmarkTrackSelect,
+        jammerBpmBenchmarkReloadButton,
+        jammerBpmBenchmarkRunButton,
+        jammerBpmBenchmarkStatus,
+        jammerBpmBenchmarkSelectionSummary,
+        jammerBpmBenchmarkProgressValue,
+        jammerBpmBenchmarkProgressFill,
+        jammerBpmBenchmarkKnownTempo,
+        jammerBpmBenchmarkReferenceTempo,
+        jammerBpmBenchmarkBars,
+        jammerBpmBenchmarkPhrase,
+        jammerBpmBenchmarkSummary,
+        jammerBpmBenchmarkAubioScore,
+        jammerBpmBenchmarkAubioMeta,
+        jammerBpmBenchmarkAubioSuggestions,
+        jammerBpmBenchmarkApplyAubioCheckbox,
+        jammerBpmBenchmarkRetestAubioButton,
+        jammerBpmBenchmarkEvolveAubioButton,
+        jammerBpmBenchmarkAubioHistorySummary,
+        jammerBpmBenchmarkAubioHistoryList,
+        jammerBpmBenchmarkEssentiaScore,
+        jammerBpmBenchmarkEssentiaMeta,
+        jammerBpmBenchmarkEssentiaSuggestions,
+        jammerBpmBenchmarkApplyEssentiaCheckbox,
+        jammerBpmBenchmarkRetestEssentiaButton,
+        jammerBpmBenchmarkEvolveEssentiaButton,
+        jammerBpmBenchmarkEssentiaHistorySummary,
+        jammerBpmBenchmarkEssentiaHistoryList,
+        jammerBpmBenchmarkRepeatSelectedButton,
+        jammerBpmBenchmarkResultsSummary,
+        jammerBpmBenchmarkResults,
+        jammerBpmBenchmarkHistorySummary,
+        jammerBpmBenchmarkHistoryList,
+        jammerDetectionExperimentToggleButton,
+        jammerDetectionExperimentPanelStatus,
+        jammerDetectionExperimentPanelBody,
+        jammerDetectionExperimentPluginSelect,
+        jammerDetectionExperimentSoloButton,
+        jammerDetectionExperimentTempo,
+        jammerDetectionExperimentConfidence,
+        jammerDetectionExperimentPulse,
+        jammerDetectionExperimentBeatPhase,
+        jammerDetectionExperimentLoopBar,
+        jammerDetectionExperimentSummary,
+        jammerDetectionExperimentFastTempo,
+        jammerDetectionExperimentMediumTempo,
+        jammerDetectionExperimentLongTempo,
+        jammerDetectionExperimentPhaseLock,
+        jammerDetectionExperimentRawCanvas,
+        jammerDetectionExperimentLowCanvas,
+        jammerDetectionExperimentMidCanvas,
+        jammerDetectionExperimentHighCanvas,
+        jammerDetectionExperimentTonalCanvas,
+        jammerDetectionExperimentWeightedCanvas,
+        jammerDetectionExperimentRawMeta,
+        jammerDetectionExperimentLowMeta,
+        jammerDetectionExperimentMidMeta,
+        jammerDetectionExperimentHighMeta,
+        jammerDetectionExperimentTonalMeta,
+        jammerDetectionExperimentWeightedMeta,
         jammerDecisionTempo,
         jammerDecisionDensity,
         jammerDecisionFill,
@@ -1182,6 +1759,29 @@
         essentiaSummary,
         jammerEngine,
         jammerLabJamRunning,
+        currentSongAnalysis,
+        songAnalysisRunning,
+        songAnalysisStatus,
+        detectorCalibrationTrackId,
+        detectorCalibrationProgress,
+        detectorCalibrationProgressLabel,
+        detectorCalibrationTest,
+        detectorCalibrationHistory,
+        detectorCalibrationCollapsed,
+        moduleContributionsCollapsed,
+        bpmBenchmarkTracks,
+        bpmBenchmarkTrackId: bpmBenchmarkTrackIds[0] || "",
+        bpmBenchmarkTrackIds,
+        bpmBenchmarkState,
+        bpmBenchmarkStates,
+        bpmBenchmarkSelectionSummary,
+        bpmBenchmarkCollapsed,
+        bpmBenchmarkRunning,
+        bpmBenchmarkProgress,
+        bpmBenchmarkProgressLabel,
+        detectionExperimentCollapsed,
+        detectionExperimentConfig,
+        detectionExperimentSnapshot,
         toneDrumBus,
         toneDrumBusSummary,
       }),
@@ -1191,6 +1791,31 @@
         formatSectionLabel,
         formatSignedValue,
       },
+    });
+    const wiringPanelView = createWiringPanelView({
+      refs: wiringRefs,
+      getState: () => ({
+        activeInputMode,
+        activePanel,
+        aubioSummary,
+        bpmBenchmarkRunning,
+        currentSongAnalysis,
+        detectionEnabled,
+        detectionExperimentActive: detectionEnabled || Number(detectionExperimentSnapshot?.weightedPulse || 0) > 0,
+        detectionExperimentConfig,
+        detectionExperimentSnapshot,
+        detectionSummary,
+        detectorCalibrationActive: detectorCalibrationTest.active,
+        essentiaSummary,
+        jammerEnabled: jammerEngine.state.enabled,
+        jammerLabOpen,
+        micLive: isMicrophoneActive(),
+        playerLive: isPlayerPlaying(),
+        recordingActive: recorder.isRecording(),
+        songAnalysisRunning,
+        visualizerEnabled,
+        wiringPanelCollapsed,
+      }),
     });
 
     const jammerLabView = createJammerLabView({
@@ -1220,6 +1845,7 @@
         persistSetting,
         setLibraryOpen: (value) => {
           jammerDeckLibraryOpen = value;
+          persistSetting("jammerDeckLibraryOpen", jammerDeckLibraryOpen);
         },
         stopLabJam,
         syncJammerControlsFromEngine,
@@ -1242,6 +1868,7 @@
         playerCurrentTimeLabel,
         playerDurationLabel,
         playerMidSlider,
+        playerAutoplayButton,
         playerNextButton,
         playerPlayPauseButton,
         playerPlaylistLabel,
@@ -1256,6 +1883,7 @@
       },
       getState: () => ({
         isPlayerPlaying,
+        playerAutoplay,
         playerPlaylist,
         playerProgressWatchTimer,
         playerTrackIndex,
@@ -1263,8 +1891,15 @@
       }),
       callbacks: {
         onAudioEnded: () => {
-          if (playerPlaylist.length > 1) {
-            skipPlayerTrack(1).catch((error) => {
+          const currentTrackSongId = buildTrackSongId(getCurrentPlayerTrack());
+          if (detectorCalibrationTest.active || (detectorCalibrationPlaybackTrackId && detectorCalibrationPlaybackTrackId === currentTrackSongId)) {
+            completeDetectorCalibrationPlayback("ended");
+            detectorCalibrationPlaybackTrackId = "";
+            stopPlayer();
+            return;
+          }
+          if (playerAutoplay && playerPlaylist.length > 1) {
+            skipPlayerTrack(1, true).catch((error) => {
               log(`Track advance error: ${error.message}`);
             });
           } else {
@@ -1291,6 +1926,10 @@
           }
         },
         onAudioPause: () => {
+          if (!isMicrophoneActive()) {
+            clearActiveAudioInput("player");
+            stopRenderLoop();
+          }
           syncMicButtons();
           refreshPlayerUI();
           persistPlayerState();
@@ -1356,6 +1995,11 @@
         },
         onOpenTrack: openSingleTrack,
         onPersistPlayerState: persistPlayerState,
+        onToggleAutoplay: () => {
+          playerAutoplay = !playerAutoplay;
+          persistSetting("playerAutoplay", playerAutoplay);
+          refreshPlayerUI();
+        },
         onPlayPause: () => {
           if (isPlayerPlaying()) {
             stopPlayer();
@@ -1395,9 +2039,7 @@
           });
         },
         onVolumeInput: () => {
-          if (playerOutputNode) {
-            playerOutputNode.gain.value = Number(playerVolumeSlider.value) / 100;
-          }
+          syncPlayerOutputGain();
           updatePercentValueLabel(playerVolumeValue, playerVolumeSlider.value);
           persistSetting("playerVolume", playerVolumeSlider.value);
         },
@@ -1444,6 +2086,10 @@
         ensureAubioListener,
         ensureEssentiaListener,
         ensureVisualizer,
+        clearDetectionExperiment: () => {
+          detectionExperimentSnapshot = detectionExperimentEngine.clear();
+          refreshJammerUi();
+        },
         getStoredAudioDeviceId: () => appSettings?.audioDeviceId || audioDeviceSelect.value,
         isRecorderRecording: () => recorder.isRecording(),
         log,
@@ -1455,6 +2101,7 @@
         stopRecording,
         stopRenderLoop,
         syncAubioSource,
+        syncDetectionExperimentSolo: updateDetectionExperimentSoloRouting,
         syncEssentiaSource,
         updateAudioDeviceHint,
         updateJammerSourceState,
@@ -1476,6 +2123,10 @@
         URL.revokeObjectURL(activeDownloadUrl);
         activeDownloadUrl = null;
       }
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
     }
 
     function clampStageWidth(width) {
@@ -1704,7 +2355,43 @@
     function applyStoredSettings(settings) {
       visualizerEnabled = settings.visualizerEnabled !== false;
       detectionEnabled = settings.jammerDetectionEnabled === true;
+      jammerMainPanelCollapsed = settings.jammerMainPanelCollapsed === true;
+      detectorCalibrationCollapsed = settings.detectorCalibrationCollapsed === true;
+      detectionPanelCollapsed = settings.detectionPanelCollapsed === true;
+      moduleContributionsCollapsed = settings.moduleContributionsCollapsed === true;
+      bpmBenchmarkCollapsed = settings.bpmBenchmarkCollapsed === true;
+      detectionExperimentCollapsed = settings.detectionExperimentCollapsed === true;
+      wiringPanelCollapsed = settings.wiringPanelCollapsed === true;
+      stagePanelCollapsed = settings.stagePanelCollapsed === true;
+      const storedExperimentMode = settings.detectionExperimentConfig?.pluginMode === "aubio" ? "aubio" : "essentia";
+      detectionExperimentPluginConfigs = createDetectionExperimentPluginConfigSet(
+        settings.detectionExperimentPluginConfigs,
+        settings.detectionExperimentConfig
+      );
+      const sharedExperimentState = {
+        chartWindowSeconds: Number.isFinite(Number(settings.detectionExperimentChartWindowSeconds))
+          ? Number(settings.detectionExperimentChartWindowSeconds)
+          : 8,
+        soloEnabled: settings.detectionExperimentSoloEnabled === true
+          || settings.detectionExperimentConfig?.soloEnabled === true,
+      };
+      detectionExperimentConfig = detectionExperimentEngine.setConfig(
+        getDetectionExperimentConfigForPlugin(storedExperimentMode, sharedExperimentState)
+      );
+      detectionExperimentPresets = Array.isArray(settings.detectionExperimentPresets)
+        ? settings.detectionExperimentPresets.filter((entry) => entry && typeof entry === "object" && entry.id)
+        : [];
+      detectionExperimentLastPresetId = typeof settings.detectionExperimentLastPresetId === "string"
+        ? settings.detectionExperimentLastPresetId
+        : "";
+      jammerLabOpen = settings.jammerLabOpen !== false;
+      jammerStrategiesOpen = settings.jammerStrategiesOpen === true;
+      jammerDeckLibraryOpen = settings.jammerDeckLibraryOpen === true;
       adaptiveTiming.setTimingModel(settings.jammerTimingModel || "kalman");
+      const storedDetectorMode = settings.jammerDetectorMode === "parallel"
+        ? "fusion"
+        : (settings.jammerDetectorMode || "fusion");
+      adaptiveTiming.setDetectorMode(storedDetectorMode);
       autoCycleEnabledInput.checked = settings.autoCycleEnabled !== false;
       cycleSecondsInput.value = settings.cycleSeconds;
       fpsSelect.value = settings.fps;
@@ -1715,8 +2402,10 @@
       playerMidSlider.value = settings.playerMidGain;
       playerTrebleSlider.value = settings.playerTrebleGain;
       playerVolumeSlider.value = settings.playerVolume;
+      playerAutoplay = settings.playerAutoplay !== false;
       jammerVolumeRange.value = settings.jammerVolume;
       jammerTimingModelSelect.value = settings.jammerTimingModel || "kalman";
+      jammerDetectorModeSelect.value = storedDetectorMode;
       updateEqValueLabel(playerBassValue, settings.playerBassGain);
       updateEqValueLabel(playerMidValue, settings.playerMidGain);
       updateEqValueLabel(playerTrebleValue, settings.playerTrebleGain);
@@ -1724,6 +2413,14 @@
       jammerEngine.applySettings(settings);
       syncJammerControlsFromEngine();
       toneDrumBusSummary = toneDrumBus.setOutputGain(Number(settings.jammerVolume) / 100);
+      syncJammerMainPanelState();
+      syncDetectionPanelState();
+      syncJammerLabPanelState();
+      jammerStrategyToggleButton?.classList.toggle("active", jammerStrategiesOpen);
+      jammerStrategyPanel?.classList.toggle("hidden", !jammerStrategiesOpen);
+      jammerLibraryPanel?.classList.toggle("active", jammerDeckLibraryOpen);
+      syncWiringPanelState();
+      syncStagePanelState();
     }
 
     function refreshAudioSummary() {
@@ -1848,6 +2545,1352 @@
       jammerResearchSummary.textContent = `Cached ${count} drummer research entries across ${categorySummary}.`;
     }
 
+    function buildTrackSongId(track) {
+      return buildSongAnalysisTrackId(track);
+    }
+
+    function getCurrentPlayerTrack() {
+      return playerPlaylist[playerTrackIndex] || null;
+    }
+
+    function getDetectorModeLabel(mode) {
+      switch (mode) {
+        case "comparison":
+          return "Aubio + Essentia side by side";
+        case "aubio":
+          return "Aubio only";
+        case "essentia":
+          return "Essentia only";
+        default:
+          return "Aubio + Essentia side by side";
+      }
+    }
+
+    function getTrackBySongId(songId) {
+      if (!songId) {
+        return null;
+      }
+      return playerPlaylist.find((track) => buildTrackSongId(track) === songId) || null;
+    }
+
+    function getBpmBenchmarkTrackById(fileId) {
+      if (!fileId) {
+        return null;
+      }
+      return bpmBenchmarkTracks.find((track) => track.id === fileId) || null;
+    }
+
+    function getSelectedBpmBenchmarkTracks() {
+      return bpmBenchmarkTrackIds
+        .map((fileId) => getBpmBenchmarkTrackById(fileId))
+        .filter(Boolean);
+    }
+
+    function getSelectedBpmBenchmarkTrack() {
+      return getSelectedBpmBenchmarkTracks()[0] || null;
+    }
+
+    function buildBpmBenchmarkSelectionSummary(states = [], tracks = getSelectedBpmBenchmarkTracks()) {
+      if (!tracks.length) {
+        return null;
+      }
+
+      const aubioScores = states.map((entry) => Number(entry?.latestRun?.aubio?.score || 0)).filter((value) => value > 0);
+      const essentiaScores = states.map((entry) => Number(entry?.latestRun?.essentia?.score || 0)).filter((value) => value > 0);
+      return {
+        trackCount: tracks.length,
+        testedCount: states.filter((entry) => entry?.latestRun).length,
+        averageAubioScore: aubioScores.length ? Math.round(aubioScores.reduce((sum, value) => sum + value, 0) / aubioScores.length) : 0,
+        averageEssentiaScore: essentiaScores.length ? Math.round(essentiaScores.reduce((sum, value) => sum + value, 0) / essentiaScores.length) : 0,
+      };
+    }
+
+    function syncBpmBenchmarkTrackOptions() {
+      if (!jammerBpmBenchmarkTrackSelect) {
+        return;
+      }
+
+      jammerBpmBenchmarkTrackSelect.innerHTML = "";
+      if (bpmBenchmarkTracks.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "No BPM benchmark files";
+        jammerBpmBenchmarkTrackSelect.appendChild(option);
+        bpmBenchmarkTrackIds = [];
+        return;
+      }
+
+      bpmBenchmarkTracks.forEach((track, index) => {
+        const option = document.createElement("option");
+        option.value = track.id;
+        option.textContent = `${index + 1}. ${track.name}`;
+        jammerBpmBenchmarkTrackSelect.appendChild(option);
+      });
+
+      if (!bpmBenchmarkTrackIds.length) {
+        bpmBenchmarkTrackIds = bpmBenchmarkTracks.map((track) => track.id);
+      }
+      Array.from(jammerBpmBenchmarkTrackSelect.options).forEach((option) => {
+        option.selected = bpmBenchmarkTrackIds.includes(option.value);
+      });
+    }
+
+    async function loadCurrentBpmBenchmarkState(tracks = getSelectedBpmBenchmarkTracks()) {
+      if (!tracks.length) {
+        bpmBenchmarkState = null;
+        bpmBenchmarkStates = [];
+        bpmBenchmarkSelectionSummary = null;
+        refreshJammerUi();
+        return null;
+      }
+
+      const states = await Promise.all(tracks.map((track) => loadBpmBenchmarkState(track)));
+      bpmBenchmarkState = states[0] || null;
+      bpmBenchmarkStates = states.filter(Boolean);
+      bpmBenchmarkSelectionSummary = buildBpmBenchmarkSelectionSummary(states, tracks);
+      refreshJammerUi();
+      return bpmBenchmarkState;
+    }
+
+    async function loadBpmBenchmarkCatalogFromServer() {
+      bpmBenchmarkProgressLabel = "Loading BPM benchmark files...";
+      refreshJammerUi();
+      try {
+        bpmBenchmarkTracks = await loadBpmBenchmarkManifest();
+        syncBpmBenchmarkTrackOptions();
+        bpmBenchmarkProgressLabel = `${bpmBenchmarkTracks.length} BPM benchmark file${bpmBenchmarkTracks.length === 1 ? "" : "s"} loaded`;
+        if (bpmBenchmarkTracks.length > 0) {
+          await loadCurrentBpmBenchmarkState();
+        }
+      } catch (error) {
+        bpmBenchmarkTracks = [];
+        syncBpmBenchmarkTrackOptions();
+        bpmBenchmarkProgressLabel = `Benchmark catalog error: ${error.message}`;
+      }
+      refreshJammerUi();
+    }
+
+    function getDefaultBpmBenchmarkConfigs() {
+      return {
+        aubio: {
+          onsetThreshold: 0.18,
+          silenceDb: -70,
+          halfTimeBias: 0.56,
+          lowWeight: 0.72,
+          midWeight: 0.34,
+          highWeight: 0.28,
+          barSyncWeight: 0.28,
+          harmonicAnchorWeight: 0.16,
+        },
+        essentia: {
+          rhythmWeight: 0.5,
+          tickWeight: 0.22,
+          lowEnvelopeWeight: 0.18,
+          midEnvelopeWeight: 0.12,
+          mixedEnvelopeWeight: 0.1,
+          halfTimeBias: 0.72,
+          sectionSyncWeight: 0.22,
+          harmonicAnchorWeight: 0.16,
+        },
+      };
+    }
+
+    function getBenchmarkModuleSuggestionKeys(entry, moduleKey) {
+      const moduleRun = entry?.latestRun?.[moduleKey];
+      if (!moduleRun?.config || !moduleRun?.suggestedConfig) {
+        return [];
+      }
+      return Object.keys(moduleRun.suggestedConfig).filter((key) => moduleRun.suggestedConfig[key] !== moduleRun.config[key]);
+    }
+
+    function getBenchmarkTargetDelta(knownBpm) {
+      return Math.max(1, Number(knownBpm || 0) * 0.01);
+    }
+
+    function isBenchmarkModuleTargetMet(moduleRun, knownBpm) {
+      if (!moduleRun || !knownBpm) {
+        return false;
+      }
+      return Math.abs(Number(moduleRun.delta || 0)) <= getBenchmarkTargetDelta(knownBpm)
+        && Number(moduleRun.score || 0) >= 95;
+    }
+
+    function compareBenchmarkRuns(left, right, moduleKey) {
+      const leftRun = left?.[moduleKey] || {};
+      const rightRun = right?.[moduleKey] || {};
+      const leftScore = Number(leftRun.score || 0);
+      const rightScore = Number(rightRun.score || 0);
+      if (leftScore !== rightScore) {
+        return rightScore - leftScore;
+      }
+      const leftDelta = Math.abs(Number(leftRun.delta || Number.POSITIVE_INFINITY));
+      const rightDelta = Math.abs(Number(rightRun.delta || Number.POSITIVE_INFINITY));
+      if (leftDelta !== rightDelta) {
+        return leftDelta - rightDelta;
+      }
+      return new Date(right?.savedAt || 0).getTime() - new Date(left?.savedAt || 0).getTime();
+    }
+
+    async function executeBpmBenchmarkTrack(track, {
+      moduleKeys = ["aubio", "essentia"],
+      applySuggestions = {},
+      progressMapper = (value) => value,
+      progressLabelPrefix = track?.name || "Benchmark",
+    } = {}) {
+      const previousState = (await loadBpmBenchmarkState(track)) || {};
+      const configs = {
+        ...getDefaultBpmBenchmarkConfigs(),
+        ...(previousState.configs || {}),
+      };
+
+      if (applySuggestions.aubio && previousState.latestRun?.aubio?.suggestedConfig) {
+        configs.aubio = { ...configs.aubio, ...previousState.latestRun.aubio.suggestedConfig };
+      }
+      if (applySuggestions.essentia && previousState.latestRun?.essentia?.suggestedConfig) {
+        configs.essentia = { ...configs.essentia, ...previousState.latestRun.essentia.suggestedConfig };
+      }
+
+      const referenceAnalysis = await analyzeAndStoreSong({
+        track: {
+          name: track.name,
+          url: track.url,
+        },
+        audioContext,
+        offlineSongAnalyzer,
+        onProgress: ({ progress = 0, label = "Analyzing full file" }) => {
+          bpmBenchmarkProgress = Math.max(
+            bpmBenchmarkProgress,
+            Math.round(progressMapper(0.1 + (clamp(progress, 0, 1) * 0.35)) * 100),
+          );
+          bpmBenchmarkProgressLabel = `${progressLabelPrefix} - ${label}`;
+          refreshJammerUi();
+        },
+      });
+
+      const benchmarkResult = await bpmBenchmarkAnalyzer.analyzeTrack({
+        name: track.name,
+        url: track.url,
+        knownBpm: track.knownBpm,
+      }, audioContext, offlineSongAnalyzer, {
+        referenceAnalysis,
+        aubioConfig: moduleKeys.includes("aubio")
+          ? configs.aubio
+          : (previousState.latestRun?.aubio?.config || configs.aubio),
+        essentiaConfig: moduleKeys.includes("essentia")
+          ? configs.essentia
+          : (previousState.latestRun?.essentia?.config || configs.essentia),
+        onProgress: ({ progress = 0, label = "Benchmarking detectors" }) => {
+          bpmBenchmarkProgress = Math.max(
+            bpmBenchmarkProgress,
+            Math.round(progressMapper(0.48 + (clamp(progress, 0, 1) * 0.48)) * 100),
+          );
+          bpmBenchmarkProgressLabel = `${progressLabelPrefix} - ${label}`;
+          refreshJammerUi();
+        },
+      });
+
+      const mergedRun = {
+        ...benchmarkResult,
+        reference: benchmarkResult.reference || {
+          tempo: referenceAnalysis.tempo || 0,
+          totalBars: referenceAnalysis.totalBars || 0,
+          phraseBars: referenceAnalysis.phraseBars || 0,
+          confidence: referenceAnalysis.confidence || 0,
+        },
+        modulesTested: moduleKeys,
+      };
+
+      await saveBpmBenchmarkState(track, {
+        configs: {
+          aubio: mergedRun.aubio.config,
+          essentia: mergedRun.essentia.config,
+        },
+      });
+
+      return appendBpmBenchmarkRun(track, {
+        modulesTested: moduleKeys,
+        knownBpm: track.knownBpm,
+        reference: mergedRun.reference,
+        referenceTempo: mergedRun.reference?.tempo || 0,
+        aubio: mergedRun.aubio,
+        essentia: mergedRun.essentia,
+        configs: {
+          aubio: mergedRun.aubio.config,
+          essentia: mergedRun.essentia.config,
+        },
+      });
+    }
+
+    async function runBpmBenchmark({
+      moduleKeys = ["aubio", "essentia"],
+      applySuggestions = {},
+      trackIds = bpmBenchmarkTrackIds,
+    } = {}) {
+      const selectedTracks = (Array.isArray(trackIds) ? trackIds : [])
+        .map((fileId) => getBpmBenchmarkTrackById(fileId))
+        .filter(Boolean);
+      if (!selectedTracks.length) {
+        bpmBenchmarkProgress = 0;
+        bpmBenchmarkProgressLabel = "Choose one or more BPM benchmark files first";
+        refreshJammerUi();
+        return;
+      }
+
+      bpmBenchmarkRunning = true;
+      bpmBenchmarkProgress = 4;
+      bpmBenchmarkProgressLabel = "Opening benchmark file";
+      refreshJammerUi();
+
+      try {
+        await ensureVisualizer();
+        const updatedStates = [];
+        for (let index = 0; index < selectedTracks.length; index += 1) {
+          const track = selectedTracks[index];
+          const trackBaseProgress = index / selectedTracks.length;
+          const trackSpan = 1 / selectedTracks.length;
+          const mapProgress = (localProgress) => clamp(trackBaseProgress + (localProgress * trackSpan), 0, 1);
+          const savedState = await executeBpmBenchmarkTrack(track, {
+            moduleKeys,
+            applySuggestions,
+            progressMapper: mapProgress,
+            progressLabelPrefix: track.name,
+          });
+          updatedStates.push(savedState);
+        }
+
+        bpmBenchmarkState = updatedStates[0] || null;
+        bpmBenchmarkStates = updatedStates.filter(Boolean);
+        bpmBenchmarkSelectionSummary = buildBpmBenchmarkSelectionSummary(updatedStates, selectedTracks);
+        bpmBenchmarkProgress = 100;
+        bpmBenchmarkProgressLabel = "Benchmark complete";
+      } catch (error) {
+        bpmBenchmarkProgress = 0;
+        bpmBenchmarkProgressLabel = `Benchmark failed: ${error.message}`;
+      } finally {
+        bpmBenchmarkRunning = false;
+        refreshJammerUi();
+      }
+    }
+
+    async function evolveBpmBenchmarkModule({
+      moduleKey,
+      steps = 10,
+      trackIds = bpmBenchmarkTrackIds,
+    } = {}) {
+      if (!moduleKey) {
+        return;
+      }
+
+      const selectedTracks = (Array.isArray(trackIds) ? trackIds : [])
+        .map((fileId) => getBpmBenchmarkTrackById(fileId))
+        .filter(Boolean);
+      if (!selectedTracks.length) {
+        bpmBenchmarkProgress = 0;
+        bpmBenchmarkProgressLabel = `Choose one or more BPM benchmark files before evolving ${moduleKey}`;
+        refreshJammerUi();
+        return;
+      }
+
+      bpmBenchmarkRunning = true;
+      bpmBenchmarkProgress = 2;
+      bpmBenchmarkProgressLabel = `Evolving ${moduleKey}`;
+      refreshJammerUi();
+
+      try {
+        await ensureVisualizer();
+        const updatedStates = [];
+        for (let trackIndex = 0; trackIndex < selectedTracks.length; trackIndex += 1) {
+          const track = selectedTracks[trackIndex];
+          const trackBase = trackIndex / selectedTracks.length;
+          const trackSpan = 1 / selectedTracks.length;
+          let bestRunEntry = null;
+
+          for (let stepIndex = 0; stepIndex < steps; stepIndex += 1) {
+            const currentState = (await loadBpmBenchmarkState(track)) || {};
+            const moduleRun = currentState?.latestRun?.[moduleKey] || null;
+            const shouldApply = Boolean(moduleRun && getBenchmarkModuleSuggestionKeys(currentState, moduleKey).length > 0);
+            const localBase = stepIndex / steps;
+            const localSpan = 1 / steps;
+            const mapProgress = (localProgress) => clamp(
+              trackBase + ((localBase + (clamp(localProgress, 0, 1) * localSpan)) * trackSpan),
+              0,
+              1,
+            );
+
+            const savedState = await executeBpmBenchmarkTrack(track, {
+              moduleKeys: [moduleKey],
+              applySuggestions: { [moduleKey]: shouldApply },
+              progressMapper: mapProgress,
+              progressLabelPrefix: `${track.name} - ${moduleKey} evolve ${stepIndex + 1}/${steps}`,
+            });
+
+            const history = Array.isArray(savedState?.history) ? savedState.history : [];
+            const candidateBest = history
+              .filter((entry) => entry?.[moduleKey] && entry?.configs?.[moduleKey])
+              .sort((left, right) => compareBenchmarkRuns(left, right, moduleKey))[0] || null;
+            if (candidateBest) {
+              bestRunEntry = candidateBest;
+            }
+
+            const currentRun = savedState?.latestRun?.[moduleKey] || null;
+            if (isBenchmarkModuleTargetMet(currentRun, track.knownBpm)) {
+              bpmBenchmarkProgressLabel = `${track.name} - ${moduleKey} reached target in ${stepIndex + 1} steps`;
+              break;
+            }
+          }
+
+          let finalState = await loadBpmBenchmarkState(track);
+          if (bestRunEntry?.configs?.[moduleKey]) {
+            const mergedConfigs = {
+              ...(finalState?.configs || getDefaultBpmBenchmarkConfigs()),
+              [moduleKey]: {
+                ...(bestRunEntry.configs[moduleKey] || {}),
+              },
+            };
+            await saveBpmBenchmarkState(track, {
+              configs: mergedConfigs,
+              bestConfigs: {
+                ...(finalState?.bestConfigs || {}),
+                [moduleKey]: bestRunEntry.configs[moduleKey],
+              },
+              bestRuns: {
+                ...(finalState?.bestRuns || {}),
+                [moduleKey]: {
+                  savedAt: bestRunEntry.savedAt,
+                  score: bestRunEntry?.[moduleKey]?.score || 0,
+                  delta: bestRunEntry?.[moduleKey]?.delta || 0,
+                  tempo: bestRunEntry?.[moduleKey]?.tempo || 0,
+                },
+              },
+            });
+            await appendBpmBenchmarkRun(track, {
+              kind: "evolution-summary",
+              moduleKey,
+              note: `Evolve x10 kept best ${moduleKey} run ${bestRunEntry.savedAt || ""}`,
+              configs: mergedConfigs,
+            });
+            finalState = await loadBpmBenchmarkState(track);
+          }
+          updatedStates.push(finalState || null);
+        }
+
+        bpmBenchmarkState = updatedStates[0] || null;
+        bpmBenchmarkStates = updatedStates.filter(Boolean);
+        bpmBenchmarkSelectionSummary = buildBpmBenchmarkSelectionSummary(updatedStates, selectedTracks);
+        bpmBenchmarkProgress = 100;
+        bpmBenchmarkProgressLabel = `Evolution complete for ${moduleKey}`;
+      } catch (error) {
+        bpmBenchmarkProgress = 0;
+        bpmBenchmarkProgressLabel = `Evolution failed: ${error.message}`;
+      } finally {
+        bpmBenchmarkRunning = false;
+        refreshJammerUi();
+      }
+    }
+
+    async function applyBpmBenchmarkSuggestionsForFile({
+      fileId,
+      moduleKey,
+      suggestionKeys = [],
+      rerun = false,
+    } = {}) {
+      const track = getBpmBenchmarkTrackById(fileId);
+      if (!track || !moduleKey) {
+        return;
+      }
+
+      const entry = await loadBpmBenchmarkState(track);
+      const latestModuleRun = entry?.latestRun?.[moduleKey];
+      const currentConfig = entry?.configs?.[moduleKey];
+      const suggestedConfig = latestModuleRun?.suggestedConfig;
+      if (!latestModuleRun || !currentConfig || !suggestedConfig) {
+        return;
+      }
+
+      const keysToApply = Array.isArray(suggestionKeys) ? suggestionKeys.filter(Boolean) : [];
+      if (keysToApply.length === 0) {
+        bpmBenchmarkProgressLabel = `No ${moduleKey} suggestions selected for ${track.name}`;
+        refreshJammerUi();
+        return;
+      }
+
+      const nextModuleConfig = { ...currentConfig };
+      keysToApply.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(suggestedConfig, key)) {
+          nextModuleConfig[key] = suggestedConfig[key];
+        }
+      });
+
+      const nextConfigs = {
+        ...(entry.configs || getDefaultBpmBenchmarkConfigs()),
+        [moduleKey]: nextModuleConfig,
+      };
+
+      await saveBpmBenchmarkState(track, {
+        configs: nextConfigs,
+      });
+      await appendBpmBenchmarkRun(track, {
+        kind: "config-update",
+        moduleKey,
+        appliedSuggestionKeys: keysToApply,
+        configs: nextConfigs,
+        note: `Applied ${moduleKey} suggestions: ${keysToApply.join(", ")}`,
+      });
+
+      if (rerun) {
+        await runBpmBenchmark({
+          moduleKeys: [moduleKey],
+          trackIds: [fileId],
+        });
+        return;
+      }
+
+      await loadCurrentBpmBenchmarkState();
+      bpmBenchmarkProgressLabel = `Applied ${moduleKey} suggestions on ${track.name}`;
+      refreshJammerUi();
+    }
+
+    function getSelectedCalibrationTrack() {
+      return getTrackBySongId(detectorCalibrationTrackId) || getCurrentPlayerTrack();
+    }
+
+    function toggleDetectorCalibrationPanel(forceCollapsed) {
+      detectorCalibrationCollapsed = getNextCollapsedState(detectorCalibrationCollapsed, forceCollapsed);
+      syncCollapsedPanelUi({
+        button: jammerCalibrationToggleButton,
+        body: jammerCalibrationPanelBody,
+        collapsed: detectorCalibrationCollapsed,
+        expandLabel: "Expand detector calibration",
+        collapseLabel: "Collapse detector calibration",
+      });
+
+      persistSetting("detectorCalibrationCollapsed", detectorCalibrationCollapsed);
+      refreshJammerUi();
+    }
+
+    function syncJammerMainPanelState() {
+      syncCollapsedPanelUi({
+        button: jammerMainPanelToggleButton,
+        body: jammerMainPanelBody,
+        collapsed: jammerMainPanelCollapsed,
+        expandLabel: "Expand JamPal drummer",
+        collapseLabel: "Collapse JamPal drummer",
+      });
+    }
+
+    function toggleJammerMainPanel(forceCollapsed) {
+      jammerMainPanelCollapsed = getNextCollapsedState(jammerMainPanelCollapsed, forceCollapsed);
+      syncJammerMainPanelState();
+      persistSetting("jammerMainPanelCollapsed", jammerMainPanelCollapsed);
+      refreshJammerUi();
+    }
+
+    function toggleBpmBenchmarkPanel(forceCollapsed) {
+      const nextCollapsed = typeof forceCollapsed === "boolean"
+        ? forceCollapsed
+        : !bpmBenchmarkCollapsed;
+
+      if (!nextCollapsed && bpmBenchmarkTracks.length === 0) {
+        loadBpmBenchmarkCatalogFromServer().catch((error) => {
+          bpmBenchmarkProgressLabel = `Benchmark catalog unavailable: ${error.message}`;
+          refreshJammerUi();
+        });
+      }
+
+      bpmBenchmarkCollapsed = getNextCollapsedState(bpmBenchmarkCollapsed, forceCollapsed);
+      syncCollapsedPanelUi({
+        button: jammerBpmBenchmarkToggleButton,
+        body: jammerBpmBenchmarkPanelBody,
+        collapsed: bpmBenchmarkCollapsed,
+        expandLabel: "Expand BPM benchmark",
+        collapseLabel: "Collapse BPM benchmark",
+      });
+
+      persistSetting("bpmBenchmarkCollapsed", bpmBenchmarkCollapsed);
+      refreshJammerUi();
+    }
+
+    function syncDetectionPanelState() {
+      syncCollapsedPanelUi({
+        button: jammerDetectionPanelToggleButton,
+        body: jammerDetectionPanelBody,
+        collapsed: detectionPanelCollapsed,
+        expandLabel: "Expand detection",
+        collapseLabel: "Collapse detection",
+      });
+    }
+
+    function toggleDetectionPanel(forceCollapsed) {
+      detectionPanelCollapsed = getNextCollapsedState(detectionPanelCollapsed, forceCollapsed);
+      syncDetectionPanelState();
+      persistSetting("detectionPanelCollapsed", detectionPanelCollapsed);
+      refreshJammerUi();
+    }
+
+    function syncDetectionExperimentControls() {
+      if (!jammerDetectionExperimentPluginSelect) {
+        return;
+      }
+
+      if (jammerDetectionExperimentPresetSelect) {
+        const currentValue = detectionExperimentLastPresetId || "";
+        jammerDetectionExperimentPresetSelect.innerHTML = '<option value="">Current setup only</option>';
+        detectionExperimentPresets.forEach((preset) => {
+          const option = document.createElement("option");
+          option.value = preset.id;
+          const presetPlugin = preset.pluginMode === "aubio" ? "Aubio" : "Essentia";
+          option.textContent = `${preset.name || "Unnamed setup"} - ${presetPlugin}`;
+          jammerDetectionExperimentPresetSelect.appendChild(option);
+        });
+        jammerDetectionExperimentPresetSelect.value = detectionExperimentPresets.some((preset) => preset.id === currentValue)
+          ? currentValue
+          : "";
+      }
+      if (jammerDetectionExperimentPresetName) {
+        const selectedPreset = detectionExperimentPresets.find((preset) => preset.id === detectionExperimentLastPresetId);
+        jammerDetectionExperimentPresetName.value = selectedPreset?.name || "";
+      }
+      if (jammerDetectionExperimentRenamePresetButton) {
+        jammerDetectionExperimentRenamePresetButton.disabled = !detectionExperimentLastPresetId;
+      }
+      if (jammerDetectionExperimentLoadPresetButton) {
+        jammerDetectionExperimentLoadPresetButton.disabled = !detectionExperimentLastPresetId;
+      }
+      if (jammerDetectionExperimentDeletePresetButton) {
+        jammerDetectionExperimentDeletePresetButton.disabled = !detectionExperimentLastPresetId;
+      }
+
+      jammerDetectionExperimentPluginSelect.value = detectionExperimentConfig.pluginMode;
+      jammerDetectionExperimentNormalizeEnabled.checked = detectionExperimentConfig.normalizeEnabled;
+      jammerDetectionExperimentNormalizeTarget.value = String(detectionExperimentConfig.normalizeTargetPeak);
+      jammerDetectionExperimentLowBandMin.value = String(detectionExperimentConfig.lowBandMinHz);
+      jammerDetectionExperimentLowCutoff.value = String(detectionExperimentConfig.lowCutoffHz);
+      jammerDetectionExperimentMidCutoff.value = String(detectionExperimentConfig.midCutoffHz);
+      jammerDetectionExperimentRawEnabled.checked = detectionExperimentConfig.rawEnabled !== false;
+      jammerDetectionExperimentLowEnabled.checked = detectionExperimentConfig.lowEnabled !== false;
+      jammerDetectionExperimentMidEnabled.checked = detectionExperimentConfig.midEnabled !== false;
+      jammerDetectionExperimentHighEnabled.checked = detectionExperimentConfig.highEnabled !== false;
+      jammerDetectionExperimentTonalEnabled.checked = detectionExperimentConfig.tonalEnabled !== false;
+      jammerDetectionExperimentRawWeight.value = String(detectionExperimentConfig.rawWeight ?? 0.18);
+      jammerDetectionExperimentLowWeight.value = String(detectionExperimentConfig.lowWeight);
+      jammerDetectionExperimentMidWeight.value = String(detectionExperimentConfig.midWeight);
+      jammerDetectionExperimentHighWeight.value = String(detectionExperimentConfig.highWeight);
+      jammerDetectionExperimentTonalWeight.value = String(detectionExperimentConfig.tonalWeight);
+      jammerDetectionExperimentOnsetThreshold.value = String(detectionExperimentConfig.onsetThreshold);
+      jammerDetectionExperimentTempoMin.value = String(detectionExperimentConfig.bpmMin);
+      jammerDetectionExperimentTempoMax.value = String(detectionExperimentConfig.bpmMax);
+      jammerDetectionExperimentAubioTransientBias.value = String(detectionExperimentConfig.aubioSettings.transientBias);
+      jammerDetectionExperimentAubioLowBias.value = String(detectionExperimentConfig.aubioSettings.lowPulseBias);
+      jammerDetectionExperimentEssentiaTickBias.value = String(detectionExperimentConfig.essentiaSettings.stableTickBias);
+      jammerDetectionExperimentEssentiaHarmonicBias.value = String(detectionExperimentConfig.essentiaSettings.harmonicAnchorWeight);
+      if (jammerDetectionExperimentSoloButton) {
+        const soloEnabled = detectionExperimentConfig.soloEnabled === true;
+        jammerDetectionExperimentSoloButton.classList.toggle("active", soloEnabled);
+        jammerDetectionExperimentSoloButton.setAttribute("aria-pressed", String(soloEnabled));
+        jammerDetectionExperimentSoloButton.textContent = soloEnabled ? "SOLO On" : "SOLO";
+      }
+      const chartWindowIndex = DETECTION_EXPERIMENT_CHART_WINDOWS.indexOf(Number(detectionExperimentConfig.chartWindowSeconds || 8));
+      if (jammerDetectionExperimentWindowLabel) {
+        jammerDetectionExperimentWindowLabel.textContent = `${Number(detectionExperimentConfig.chartWindowSeconds || 8).toFixed(1)} s`;
+      }
+      if (jammerDetectionExperimentWindowDownButton) {
+        jammerDetectionExperimentWindowDownButton.disabled = chartWindowIndex <= 0;
+      }
+      if (jammerDetectionExperimentWindowUpButton) {
+        jammerDetectionExperimentWindowUpButton.disabled = chartWindowIndex >= DETECTION_EXPERIMENT_CHART_WINDOWS.length - 1;
+      }
+    }
+
+    function updateDetectionExperimentConfig(patch = {}) {
+      const activePluginMode = getDetectionExperimentPluginMode(detectionExperimentConfig.pluginMode);
+      detectionExperimentConfig = detectionExperimentEngine.setConfig(
+        normalizeDetectionExperimentConfig(activePluginMode, mergeDetectionExperimentConfig(detectionExperimentConfig, patch))
+      );
+      detectionExperimentPluginConfigs = {
+        ...detectionExperimentPluginConfigs,
+        [activePluginMode]: cloneDetectionExperimentValue(detectionExperimentConfig),
+      };
+      applyDetectionExperimentToDetectorPipeline();
+      persistDetectionExperimentSettings();
+      syncDetectionExperimentControls();
+      updateDetectionExperimentSoloRouting();
+      refreshJammerUi();
+    }
+
+    function applyDetectionExperimentToDetectorPipeline() {
+      const sharedState = getDetectionExperimentCurrentSharedState();
+      essentiaListener.setTuningConfig?.(getDetectionExperimentConfigForPlugin("essentia", sharedState));
+      aubioListener.setTuningConfig?.(getDetectionExperimentConfigForPlugin("aubio", sharedState));
+      detectionSummary = reactiveDrummerController.updateDetectionSummary({ essentiaSummary, aubioSummary });
+      updateDetectorCalibrationMeasurement();
+    }
+
+    function selectDetectionExperimentPluginMode(pluginMode = "essentia") {
+      const normalizedPluginMode = getDetectionExperimentPluginMode(pluginMode);
+      const currentPluginMode = getDetectionExperimentPluginMode(detectionExperimentConfig.pluginMode);
+      detectionExperimentPluginConfigs = {
+        ...detectionExperimentPluginConfigs,
+        [currentPluginMode]: cloneDetectionExperimentValue(detectionExperimentConfig),
+      };
+      detectionExperimentConfig = detectionExperimentEngine.setConfig(
+        getDetectionExperimentConfigForPlugin(normalizedPluginMode)
+      );
+      applyDetectionExperimentToDetectorPipeline();
+      persistDetectionExperimentSettings();
+      syncDetectionExperimentControls();
+      updateDetectionExperimentSoloRouting();
+      refreshJammerUi();
+    }
+
+    function saveDetectionExperimentPreset() {
+      const rawName = String(jammerDetectionExperimentPresetName?.value || "").trim();
+      const presetName = rawName || `Setup ${detectionExperimentPresets.length + 1}`;
+      const existingId = jammerDetectionExperimentPresetSelect?.value || "";
+      const presetId = existingId || `exp-${Date.now()}`;
+      const preset = {
+        id: presetId,
+        name: presetName,
+        pluginMode: detectionExperimentConfig.pluginMode,
+        updatedAt: new Date().toISOString(),
+        config: JSON.parse(JSON.stringify(detectionExperimentConfig)),
+      };
+      const nextPresets = detectionExperimentPresets.filter((entry) => entry.id !== presetId);
+      nextPresets.unshift(preset);
+      detectionExperimentPresets = nextPresets.slice(0, 24);
+      detectionExperimentLastPresetId = presetId;
+      persistSetting("detectionExperimentPresets", detectionExperimentPresets);
+      persistSetting("detectionExperimentLastPresetId", detectionExperimentLastPresetId);
+      syncDetectionExperimentControls();
+      refreshJammerUi();
+      log(`Detection experiment setup saved: ${presetName}`);
+    }
+
+    function loadDetectionExperimentPreset(presetId = detectionExperimentLastPresetId) {
+      const preset = detectionExperimentPresets.find((entry) => entry.id === presetId);
+      if (!preset?.config) {
+        return;
+      }
+      detectionExperimentLastPresetId = preset.id;
+      persistSetting("detectionExperimentLastPresetId", detectionExperimentLastPresetId);
+      const presetPluginMode = getDetectionExperimentPluginMode(preset.pluginMode || preset.config.pluginMode);
+      const sharedState = getDetectionExperimentCurrentSharedState();
+      detectionExperimentConfig = detectionExperimentEngine.setConfig(
+        getDetectionExperimentConfigForPlugin(presetPluginMode, sharedState)
+      );
+      updateDetectionExperimentConfig(preset.config);
+      log(`Detection experiment setup loaded: ${preset.name}`);
+    }
+
+    function deleteDetectionExperimentPreset(presetId = detectionExperimentLastPresetId) {
+      if (!presetId) {
+        return;
+      }
+      const removedPreset = detectionExperimentPresets.find((entry) => entry.id === presetId);
+      detectionExperimentPresets = detectionExperimentPresets.filter((entry) => entry.id !== presetId);
+      detectionExperimentLastPresetId = "";
+      persistSetting("detectionExperimentPresets", detectionExperimentPresets);
+      persistSetting("detectionExperimentLastPresetId", detectionExperimentLastPresetId);
+      syncDetectionExperimentControls();
+      refreshJammerUi();
+      log(`Detection experiment setup removed: ${removedPreset?.name || "Setup"}`);
+    }
+
+    function renameDetectionExperimentPreset(presetId = detectionExperimentLastPresetId, nextName = "") {
+      if (!presetId) {
+        return;
+      }
+      const trimmedName = String(nextName || "").trim();
+      if (!trimmedName) {
+        log("Choose a preset name before renaming.");
+        return;
+      }
+      let renamedPreset = null;
+      detectionExperimentPresets = detectionExperimentPresets.map((entry) => {
+        if (entry.id !== presetId) {
+          return entry;
+        }
+        renamedPreset = {
+          ...entry,
+          name: trimmedName,
+          updatedAt: new Date().toISOString(),
+        };
+        return renamedPreset;
+      });
+      if (!renamedPreset) {
+        return;
+      }
+      detectionExperimentLastPresetId = presetId;
+      persistSetting("detectionExperimentPresets", detectionExperimentPresets);
+      persistSetting("detectionExperimentLastPresetId", detectionExperimentLastPresetId);
+      syncDetectionExperimentControls();
+      refreshJammerUi();
+      log(`Detection experiment setup renamed: ${trimmedName}`);
+    }
+
+    function adjustDetectionExperimentChartWindow(direction = 1) {
+      const currentSeconds = Number(detectionExperimentConfig.chartWindowSeconds || 8);
+      const currentIndex = Math.max(0, DETECTION_EXPERIMENT_CHART_WINDOWS.indexOf(currentSeconds));
+      const nextIndex = Math.max(0, Math.min(DETECTION_EXPERIMENT_CHART_WINDOWS.length - 1, currentIndex + direction));
+      const nextSeconds = DETECTION_EXPERIMENT_CHART_WINDOWS[nextIndex];
+      if (nextSeconds === currentSeconds) {
+        syncDetectionExperimentControls();
+        return;
+      }
+      updateDetectionExperimentConfig({ chartWindowSeconds: nextSeconds });
+    }
+
+    function toggleDetectionExperimentPanel(forceCollapsed) {
+      detectionExperimentCollapsed = getNextCollapsedState(detectionExperimentCollapsed, forceCollapsed);
+      syncCollapsedPanelUi({
+        button: jammerDetectionExperimentToggleButton,
+        body: jammerDetectionExperimentPanelBody,
+        collapsed: detectionExperimentCollapsed,
+        expandLabel: "Expand detection experiment",
+        collapseLabel: "Collapse detection experiment",
+      });
+
+      persistSetting("detectionExperimentCollapsed", detectionExperimentCollapsed);
+      refreshJammerUi();
+    }
+
+    function syncStagePanelState() {
+      syncCollapsedPanelUi({
+        button: stagePanelToggleButton,
+        body: stagePanelBody,
+        collapsed: stagePanelCollapsed,
+        expandLabel: "Expand live visual stage",
+        collapseLabel: "Collapse live visual stage",
+      });
+    }
+
+    function toggleStagePanel(forceCollapsed) {
+      stagePanelCollapsed = getNextCollapsedState(stagePanelCollapsed, forceCollapsed);
+      syncStagePanelState();
+      persistSetting("stagePanelCollapsed", stagePanelCollapsed);
+    }
+
+    function toggleModuleContributionsPanel(forceCollapsed) {
+      moduleContributionsCollapsed = getNextCollapsedState(moduleContributionsCollapsed, forceCollapsed);
+      syncCollapsedPanelUi({
+        button: jammerModuleContributionsToggleButton,
+        body: jammerModuleContributionsPanelBody,
+        collapsed: moduleContributionsCollapsed,
+        expandLabel: "Expand module contributions",
+        collapseLabel: "Collapse module contributions",
+      });
+
+      persistSetting("moduleContributionsCollapsed", moduleContributionsCollapsed);
+      refreshJammerUi();
+    }
+
+    function syncWiringPanelState() {
+      syncCollapsedPanelUi({
+        button: wiringRefs.wiringPanelToggleButton,
+        body: wiringRefs.wiringPanelBody,
+        collapsed: wiringPanelCollapsed,
+        expandLabel: "Expand wiring",
+        collapseLabel: "Collapse wiring",
+      });
+    }
+
+    function toggleWiringPanel(forceCollapsed) {
+      wiringPanelCollapsed = getNextCollapsedState(wiringPanelCollapsed, forceCollapsed);
+      syncWiringPanelState();
+      persistSetting("wiringPanelCollapsed", wiringPanelCollapsed);
+      updateWiringPanel();
+    }
+
+    function syncCalibrationTrackOptions() {
+      if (!jammerCalibrationTrackSelect) {
+        return;
+      }
+
+      jammerCalibrationTrackSelect.innerHTML = "";
+      if (playerPlaylist.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Choose a player track";
+        jammerCalibrationTrackSelect.appendChild(option);
+        detectorCalibrationTrackId = "";
+        return;
+      }
+
+      playerPlaylist.forEach((track, index) => {
+        const option = document.createElement("option");
+        option.value = buildTrackSongId(track);
+        option.textContent = `${index + 1}. ${track.name}`;
+        jammerCalibrationTrackSelect.appendChild(option);
+      });
+
+      if (!getTrackBySongId(detectorCalibrationTrackId)) {
+        detectorCalibrationTrackId = buildTrackSongId(getCurrentPlayerTrack() || playerPlaylist[0]);
+      }
+      jammerCalibrationTrackSelect.value = detectorCalibrationTrackId;
+    }
+
+    function resetDetectorCalibrationProgress(label = "Idle") {
+      const next = createDetectorCalibrationProgressState(label);
+      detectorCalibrationProgress = next.progress;
+      detectorCalibrationProgressLabel = next.label;
+    }
+
+    function resetDetectorCalibrationTest({
+      mode = "comparison",
+      songId = "",
+      runType = "comparison",
+      targetModule = "",
+    } = {}) {
+      detectorCalibrationTest = {
+        ...createDetectorCalibrationTestState({ mode, songId }),
+        runType,
+        targetModule,
+      };
+    }
+
+    async function startNextQueuedCalibrationTest() {
+      if (detectorCalibrationQueueRunning || detectorCalibrationTest.active || detectorCalibrationQueue.length === 0) {
+        return;
+      }
+
+      detectorCalibrationQueueRunning = true;
+      const nextRun = detectorCalibrationQueue.shift();
+      try {
+        await startDetectorCalibrationTest(nextRun);
+      } finally {
+        detectorCalibrationQueueRunning = false;
+      }
+    }
+
+    async function loadDetectorCalibrationHistoryForTrack(track = getSelectedCalibrationTrack()) {
+      if (!track) {
+        detectorCalibrationHistory = [];
+        refreshJammerUi();
+        return [];
+      }
+      detectorCalibrationHistory = await loadDetectorCalibrationHistory(buildTrackSongId(track));
+      refreshJammerUi();
+      return detectorCalibrationHistory;
+    }
+
+    async function finalizeDetectorCalibrationTest() {
+      const hasModuleSamples = ["aubio", "essentia"].some((moduleKey) => Number(detectorCalibrationTest.moduleStats?.[moduleKey]?.samples || 0) > 0);
+      if (!currentSongAnalysis || (!detectorCalibrationTest.samples && !hasModuleSamples) || !detectorCalibrationTest.songId) {
+        return;
+      }
+
+      const suggestionConfig = getDetectorCalibrationSuggestionConfig({ analysis: currentSongAnalysis, test: detectorCalibrationTest });
+      const score = computeDetectorCalibrationScore({ analysis: currentSongAnalysis, test: detectorCalibrationTest, detectionSummary });
+      const trackName = currentSongAnalysis.name || getSelectedCalibrationTrack()?.name || "Track";
+      if (detectorCalibrationTest.runType === "comparison") {
+        detectorCalibrationHistory = await saveDetectorCalibrationRun(detectorCalibrationTest.songId, {
+          kind: "comparison",
+          runType: detectorCalibrationTest.runType,
+          trackName,
+          detectorMode: detectorCalibrationTest.mode,
+          timingModel: adaptiveTiming.getSnapshot().timingModel,
+          suggestedDetectorMode: suggestionConfig.detectorMode,
+          suggestedTimingModel: suggestionConfig.timingModel,
+          score,
+          samples: detectorCalibrationTest.samples,
+          averages: getDetectorCalibrationAverages(detectorCalibrationTest),
+        });
+      }
+      const moduleKeys = detectorCalibrationTest.runType === "module" && detectorCalibrationTest.targetModule
+        ? [detectorCalibrationTest.targetModule]
+        : ["aubio", "essentia"];
+      for (const moduleKey of moduleKeys) {
+        const moduleState = detectorCalibrationTest.moduleStats?.[moduleKey];
+        if (!moduleState?.samples) {
+          continue;
+        }
+        const moduleSuggestion = getDetectorCalibrationModuleSuggestionConfig({
+          analysis: currentSongAnalysis,
+          moduleState,
+          moduleKey,
+        });
+        const moduleScore = computeDetectorCalibrationModuleScore({
+          analysis: currentSongAnalysis,
+          moduleState,
+          moduleKey,
+          detectionSummary,
+        });
+        detectorCalibrationHistory = await saveDetectorCalibrationRun(detectorCalibrationTest.songId, {
+          kind: "module",
+          runType: detectorCalibrationTest.runType,
+          moduleKey,
+          targetModule: detectorCalibrationTest.targetModule || moduleKey,
+          trackName,
+          detectorMode: detectorCalibrationTest.mode,
+          timingModel: adaptiveTiming.getSnapshot().timingModel,
+          suggestedDetectorMode: moduleSuggestion.detectorMode,
+          suggestedTimingModel: moduleSuggestion.timingModel,
+          suggestedTweaks: moduleSuggestion.tweaks,
+          score: moduleScore,
+          samples: moduleState.samples,
+          averages: getDetectorCalibrationModuleAverages(moduleState),
+        });
+      }
+      detectorCalibrationTest.savedToHistory = true;
+      refreshJammerUi();
+    }
+
+    function completeDetectorCalibrationPlayback(reason = "ended") {
+      if (!detectorCalibrationTest.active) {
+        if (reason !== "ended") {
+          detectorCalibrationPlaybackTrackId = "";
+        }
+        return;
+      }
+
+      detectorCalibrationTest.active = false;
+      detectorCalibrationTest.completedAt = Date.now();
+      songAnalysisStatus = detectorCalibrationTest.runType === "comparison"
+        ? "Playback comparison complete - Aubio and Essentia rated separately"
+        : `Playback test complete - ${getDetectorModeLabel(detectorCalibrationTest.targetModule || detectorCalibrationTest.mode)}`;
+
+      if (!detectorCalibrationTest.savedToHistory
+        && (detectorCalibrationTest.samples > 0
+          || Number(detectorCalibrationTest.moduleStats?.aubio?.samples || 0) > 0
+          || Number(detectorCalibrationTest.moduleStats?.essentia?.samples || 0) > 0)) {
+        void finalizeDetectorCalibrationTest()
+          .catch((error) => {
+            log(`Calibration history save error: ${error.message}`);
+          })
+          .finally(() => {
+            if (reason === "ended") {
+              void startNextQueuedCalibrationTest();
+            }
+          });
+      } else if (reason === "ended") {
+        void startNextQueuedCalibrationTest();
+      }
+
+      if (reason !== "ended") {
+        detectorCalibrationPlaybackTrackId = "";
+      }
+
+      refreshJammerUi();
+    }
+
+    function updateDetectorCalibrationMeasurement() {
+      if (!detectorCalibrationTest.active || !currentSongAnalysis) {
+        return;
+      }
+
+      const selectedTrack = getSelectedCalibrationTrack();
+      if (!selectedTrack || buildTrackSongId(selectedTrack) !== detectorCalibrationTest.songId) {
+        completeDetectorCalibrationPlayback("track-change");
+        return;
+      }
+
+      if (!isDetectionActive() || !isPlayerPlaying() || activeInputMode !== "player") {
+        if (detectorCalibrationTest.samples > 0
+          || Number(detectorCalibrationTest.moduleStats?.aubio?.samples || 0) > 0
+          || Number(detectorCalibrationTest.moduleStats?.essentia?.samples || 0) > 0) {
+          completeDetectorCalibrationPlayback("input-stop");
+        }
+        return;
+      }
+
+      const referenceTempo = Number(currentSongAnalysis.referenceGrid?.tempo || currentSongAnalysis.tempo || 0);
+      if (referenceTempo <= 0) {
+        return;
+      }
+
+      const aubioTempo = Number(detectionSummary.aubioTempo || aubioSummary?.tempo || 0);
+      const essentiaTempo = Number(detectionSummary.essentiaStableTempo || detectionSummary.essentiaTempo || essentiaSummary?.stableTempo || essentiaSummary?.tempo || 0);
+      const aubioConfidence = Number(detectionSummary.aubioConfidence || aubioSummary?.confidence || 0);
+      const essentiaConfidence = Math.max(
+        Number(detectionSummary.essentiaStableConfidence || 0),
+        Number(detectionSummary.essentiaConfidence || 0),
+        Number(essentiaSummary?.stableConfidence || 0),
+        Number(essentiaSummary?.confidence || 0),
+      );
+      const essentiaAnchorConfidence = Number(detectionSummary.essentiaAnchorConfidence || essentiaSummary?.barAnchorConfidence || 0);
+      const aubioPulse = Boolean(detectionSummary.aubioBeatPulse || aubioSummary?.beatPulse);
+      const essentiaPulse = Boolean(detectionSummary.downbeatPulse || essentiaSummary?.barStart);
+      const allowAubio = detectorCalibrationTest.runType === "comparison" || detectorCalibrationTest.targetModule === "aubio";
+      const allowEssentia = detectorCalibrationTest.runType === "comparison" || detectorCalibrationTest.targetModule === "essentia";
+      const aubioDelta = aubioTempo > 0 ? aubioTempo - referenceTempo : 0;
+      const essentiaDelta = essentiaTempo > 0 ? essentiaTempo - referenceTempo : 0;
+      const aubioEvidence = allowAubio && (aubioTempo > 0 || aubioConfidence >= 8 || aubioPulse);
+      const essentiaEvidence = allowEssentia && (essentiaTempo > 0 || essentiaConfidence >= 8 || essentiaPulse || essentiaAnchorConfidence >= 8);
+      const sampleCandidates = [
+        aubioEvidence ? { key: "aubio", tempo: aubioTempo, delta: aubioDelta } : null,
+        essentiaEvidence ? { key: "essentia", tempo: essentiaTempo, delta: essentiaDelta } : null,
+      ].filter(Boolean);
+      if (sampleCandidates.length > 0) {
+        const bestCandidate = sampleCandidates.slice().sort((left, right) => Math.abs(left.delta) - Math.abs(right.delta))[0];
+        const derivedAgreement = sampleCandidates.length === 2
+          ? clamp(100 - (Math.abs(aubioTempo - essentiaTempo) * 4), 0, 100)
+          : Math.max(
+            allowAubio ? aubioConfidence : 0,
+            allowEssentia ? essentiaConfidence : 0,
+          );
+        const derivedAnchor = Number(detectionSummary.barAnchorConfidence || 0)
+          || Math.max(
+            allowAubio ? Math.min(100,
+              (aubioConfidence * 0.55)
+              + (aubioPulse ? 25 : 0)
+              + (Number(detectionSummary.tempoAgreement || 0) * 0.2)) : 0,
+            allowEssentia ? essentiaAnchorConfidence : 0,
+          );
+        const derivedStability = Math.max(
+          Number(detectionSummary.stability || 0) * 100,
+          derivedAgreement * 0.78,
+        );
+        detectorCalibrationTest.samples += 1;
+        detectorCalibrationTest.tempoDeltaTotal += bestCandidate.delta;
+        detectorCalibrationTest.aubioTempoDeltaTotal += aubioDelta;
+        detectorCalibrationTest.essentiaTempoDeltaTotal += essentiaDelta;
+        detectorCalibrationTest.anchorTotal += derivedAnchor;
+        detectorCalibrationTest.agreementTotal += derivedAgreement;
+        detectorCalibrationTest.stabilityTotal += derivedStability;
+        detectorCalibrationTest.leaderCounts[bestCandidate.key] += 1;
+      }
+
+      if (aubioEvidence) {
+        const aubioState = detectorCalibrationTest.moduleStats.aubio;
+        aubioState.samples += 1;
+        if (aubioTempo > 0) {
+          aubioState.tempoHitCount += 1;
+        }
+        aubioState.tempoDeltaTotal += aubioDelta;
+        aubioState.confidenceTotal += aubioConfidence;
+        aubioState.anchorTotal += Math.min(100,
+          (aubioConfidence * 0.55)
+          + (aubioPulse ? 25 : 0)
+          + (Number(detectionSummary.tempoAgreement || 0) * 0.2));
+        aubioState.agreementTotal += Number(detectionSummary.tempoAgreement || 0);
+        aubioState.stabilityTotal += Number(detectionSummary.stability || 0) * 100;
+        aubioState.beatPulseCount += aubioPulse ? 1 : 0;
+      }
+
+      if (essentiaEvidence) {
+        const essentiaState = detectorCalibrationTest.moduleStats.essentia;
+        essentiaState.samples += 1;
+        if (essentiaTempo > 0) {
+          essentiaState.tempoHitCount += 1;
+        }
+        essentiaState.tempoDeltaTotal += essentiaDelta;
+        essentiaState.confidenceTotal += essentiaConfidence;
+        essentiaState.anchorTotal += essentiaAnchorConfidence;
+        essentiaState.agreementTotal += Number(detectionSummary.tempoAgreement || 0);
+        essentiaState.stabilityTotal += Number(detectionSummary.stability || 0) * 100;
+        essentiaState.beatPulseCount += essentiaPulse ? 1 : 0;
+      }
+    }
+
+
+    async function loadCurrentSongAnalysisFromDb(track = getSelectedCalibrationTrack()) {
+      if (!track) {
+        currentSongAnalysis = null;
+        detectorCalibrationHistory = [];
+        songAnalysisStatus = "No analysis yet";
+        resetDetectorCalibrationProgress("Idle");
+        refreshJammerUi();
+        return null;
+      }
+
+      const songId = buildTrackSongId(track);
+      const saved = await loadSongAnalysisForTrack(track);
+      if (!saved) {
+        currentSongAnalysis = null;
+        detectorCalibrationHistory = await loadDetectorCalibrationHistory(songId);
+        songAnalysisStatus = "Not analyzed yet";
+        resetDetectorCalibrationProgress("Ready to scan");
+        refreshJammerUi();
+        return null;
+      }
+
+      currentSongAnalysis = {
+        ...saved,
+        recommendations: [],
+      };
+      detectorCalibrationHistory = await loadDetectorCalibrationHistory(songId);
+      songAnalysisStatus = `Cached for ${saved.name || track.name}`;
+      resetDetectorCalibrationProgress("Reference loaded");
+      refreshJammerUi();
+      return currentSongAnalysis;
+    }
+
+    async function analyzeCurrentPlayerTrack() {
+      const track = getSelectedCalibrationTrack();
+      if (!track) {
+        log("Load a player track before starting a full-song analysis");
+        return;
+      }
+
+      resetDetectorCalibrationTest({ mode: "comparison", songId: buildTrackSongId(track) });
+      songAnalysisRunning = true;
+      songAnalysisStatus = `Analyzing ${track.name}...`;
+      detectorCalibrationProgress = 4;
+      detectorCalibrationProgressLabel = "Opening file";
+      refreshJammerUi();
+
+      try {
+        await ensureVisualizer();
+        detectorCalibrationProgress = 12;
+        detectorCalibrationProgressLabel = "Decoding audio";
+        refreshJammerUi();
+        detectorCalibrationProgress = 18;
+        detectorCalibrationProgressLabel = "Running full-song analysis";
+        refreshJammerUi();
+        const saved = await analyzeAndStoreSong({
+          track,
+          audioContext,
+          offlineSongAnalyzer,
+          onProgress: ({ progress, label }) => {
+            detectorCalibrationProgress = Math.max(detectorCalibrationProgress, Math.round(clamp(progress, 0, 1) * 100));
+            detectorCalibrationProgressLabel = label || "Analyzing";
+            refreshJammerUi();
+          },
+        });
+        currentSongAnalysis = {
+          ...saved,
+          recommendations: [],
+        };
+        detectorCalibrationHistory = await loadDetectorCalibrationHistory(saved.songId || buildTrackSongId(track));
+        songAnalysisStatus = `Analyzed ${track.name}`;
+        detectorCalibrationProgress = 100;
+        detectorCalibrationProgressLabel = "Reference ready";
+        refreshJammerUi();
+        log(`Song analysis ready: ${track.name} - ${saved.tempo} BPM - ${saved.totalBars} bars`);
+      } catch (error) {
+        songAnalysisStatus = `Analysis failed: ${error.message}`;
+        detectorCalibrationProgress = 0;
+        detectorCalibrationProgressLabel = "Analysis failed";
+        refreshJammerUi();
+        log(`Song analysis error: ${error.message}`);
+      } finally {
+        songAnalysisRunning = false;
+        refreshJammerUi();
+      }
+    }
+
+    async function startDetectorCalibrationTest({ detectorMode = null, runType = "comparison", targetModule = "" } = {}) {
+      const track = getSelectedCalibrationTrack();
+      if (!track) {
+        log("Choose a player track before starting the playback test");
+        return;
+      }
+
+      if (!currentSongAnalysis || currentSongAnalysis.songId !== buildTrackSongId(track)) {
+        log("Analyze the full file first so the playback test has a reference");
+        return;
+      }
+
+      jammerEngine.setEnabled(false);
+      toneDrumBusSummary = toneDrumBus.stopPattern();
+      const nextDetectorMode = runType === "module"
+        ? (detectorMode || targetModule || jammerDetectorModeSelect.value || "fusion")
+        : (adaptiveTiming.getSnapshot().detectorMode || jammerDetectorModeSelect.value || "fusion");
+      if (runType === "module") {
+        adaptiveTiming.setDetectorMode(nextDetectorMode);
+        persistSetting("jammerDetectorMode", adaptiveTiming.getSnapshot().detectorMode);
+      }
+      detectionEnabled = true;
+      persistSetting("jammerDetectionEnabled", true);
+      await ensureVisualizer();
+      await ensureEssentiaListener();
+      await ensureAubioListener();
+
+      const selectedSongId = buildTrackSongId(track);
+      const targetIndex = Math.max(0, playerPlaylist.findIndex((entry) => buildTrackSongId(entry) === selectedSongId));
+      if (targetIndex !== playerTrackIndex || !playerAudio.src) {
+        await loadPlayerTrack(targetIndex, { autoplay: false, resumeTime: 0 });
+      }
+
+      playerAudio.currentTime = 0;
+      syncEssentiaSource();
+      syncAubioSource();
+      detectorCalibrationPlaybackTrackId = selectedSongId;
+      resetDetectorCalibrationTest({
+        mode: runType === "comparison" ? "comparison" : nextDetectorMode,
+        songId: selectedSongId,
+        runType,
+        targetModule,
+      });
+      detectorCalibrationTest.active = true;
+      detectorCalibrationTest.startedAt = Date.now();
+      songAnalysisStatus = runType === "module" && targetModule
+        ? `Playback test running on ${track.name} with ${getDetectorModeLabel(targetModule)}`
+        : `Playback comparison running on ${track.name} with Aubio and Essentia side by side`;
+      refreshJammerUi();
+      await playPlayer();
+    }
+
+    async function applyModuleCalibrationSuggestions(moduleKey, options = {}) {
+      if (!currentSongAnalysis || !detectorCalibrationTest.moduleStats?.[moduleKey]?.samples) {
+        log(`Run a playback test before applying ${moduleKey} suggestions`);
+        return;
+      }
+      const suggestionConfig = getDetectorCalibrationModuleSuggestionConfig({
+        analysis: currentSongAnalysis,
+        moduleState: detectorCalibrationTest.moduleStats[moduleKey],
+        moduleKey,
+      });
+      if (options.forceDetectorMode) {
+        jammerDetectorModeSelect.value = suggestionConfig.detectorMode;
+        adaptiveTiming.setDetectorMode(suggestionConfig.detectorMode);
+        persistSetting("jammerDetectorMode", suggestionConfig.detectorMode);
+      }
+      jammerTimingModelSelect.value = suggestionConfig.timingModel;
+      adaptiveTiming.setTimingModel(suggestionConfig.timingModel);
+      persistSetting("jammerTimingModel", suggestionConfig.timingModel);
+      songAnalysisStatus = `Applied ${moduleKey} suggestions${options.forceDetectorMode ? ` with ${getDetectorModeLabel(suggestionConfig.detectorMode)}` : ""} + ${suggestionConfig.timingModel === "particle" ? "Particle Grid" : "Kalman PLL"}`;
+      refreshJammerUi();
+    }
+
+    async function repeatModuleCalibrationTest(moduleKey, options = {}) {
+      const suggestionConfig = getDetectorCalibrationModuleSuggestionConfig({
+        analysis: currentSongAnalysis,
+        moduleState: detectorCalibrationTest.moduleStats?.[moduleKey],
+        moduleKey,
+      });
+      if (options.applySuggestions) {
+        await applyModuleCalibrationSuggestions(moduleKey, { forceDetectorMode: true });
+      }
+      await startDetectorCalibrationTest({
+        detectorMode: suggestionConfig.detectorMode,
+        runType: "module",
+        targetModule: moduleKey,
+      });
+    }
+
+    async function repeatSelectedCalibrationTests({ applyAubio = false, applyEssentia = false } = {}) {
+      const selectedModules = [
+        applyAubio ? "aubio" : null,
+        applyEssentia ? "essentia" : null,
+      ].filter(Boolean);
+
+      if (!selectedModules.length) {
+        await startDetectorCalibrationTest({ runType: "comparison" });
+        return;
+      }
+
+      if (selectedModules.length === 1) {
+        await repeatModuleCalibrationTest(selectedModules[0], { applySuggestions: true });
+        return;
+      }
+
+      for (const moduleKey of selectedModules) {
+        await applyModuleCalibrationSuggestions(moduleKey, { forceDetectorMode: false });
+      }
+      detectorCalibrationQueue = selectedModules.map((moduleKey) => ({
+        detectorMode: getDetectorCalibrationModuleSuggestionConfig({
+          analysis: currentSongAnalysis,
+          moduleState: detectorCalibrationTest.moduleStats?.[moduleKey],
+          moduleKey,
+        }).detectorMode,
+        runType: "module",
+        targetModule: moduleKey,
+      }));
+      songAnalysisStatus = "Queued Aubio and Essentia retests";
+      refreshJammerUi();
+      await startNextQueuedCalibrationTest();
+    }
+
     function getCurrentLabConfig() {
       return {
         labBpm: jammerLabBpmInput.value,
@@ -1923,6 +3966,7 @@
       jammerStrategiesOpen = typeof forceOpen === "boolean" ? forceOpen : !jammerStrategiesOpen;
       jammerStrategyToggleButton.classList.toggle("active", jammerStrategiesOpen);
       jammerStrategyPanel.classList.toggle("hidden", !jammerStrategiesOpen);
+      persistSetting("jammerStrategiesOpen", jammerStrategiesOpen);
     }
 
     function renderReactiveStrategies() {
@@ -1994,9 +4038,21 @@
       });
     }
 
+    function syncJammerLabPanelState() {
+      jammerLabToggleButton?.classList.toggle("active", jammerLabOpen);
+      syncCollapsedPanelUi({
+        button: jammerLabPanelToggleButton,
+        body: jammerLabPanelBody,
+        collapsed: !jammerLabOpen,
+        expandLabel: "Expand drummer lab",
+        collapseLabel: "Collapse drummer lab",
+      });
+    }
+
     function toggleJammerLab(forceOpen) {
       jammerLabOpen = typeof forceOpen === "boolean" ? forceOpen : !jammerLabOpen;
-      jammerLabToggleButton.classList.toggle("active", jammerLabOpen);
+      syncJammerLabPanelState();
+      persistSetting("jammerLabOpen", jammerLabOpen);
     }
 
     async function persistJammerLabSettings() {
@@ -2110,10 +4166,24 @@
 
     function refreshJammerRuntimeFields() {
       jammerRuntimeView.refreshRuntimeFields();
+      updateWiringPanel();
+    }
+
+    function updateWiringPanel() {
+      wiringPanelView.updateWiringPanel();
     }
 
     function refreshJammerUi() {
       const snapshot = jammerEngine.getStatusSnapshot();
+      if (detectorCalibrationTest.active && (!isPlayerPlaying() || activeInputMode !== "player")) {
+        completeDetectorCalibrationPlayback("input-stop");
+      }
+      if (currentSongAnalysis) {
+        currentSongAnalysis = {
+          ...currentSongAnalysis,
+          recommendations: buildDetectorCalibrationRecommendations({ analysis: currentSongAnalysis, test: detectorCalibrationTest, detectionSummary }),
+        };
+      }
       refreshJammerRuntimeFields();
       jammerArchitectureList.innerHTML = "";
 
@@ -2208,6 +4278,7 @@
         essentia: essentiaSummary,
         aubio: aubioSummary,
       });
+      updateDetectorCalibrationMeasurement();
       jammerEngine.setListenerState(detectionSummary);
       refreshJammerUi();
     }
@@ -2235,6 +4306,20 @@
         essentia: essentiaSummary,
         aubio: aubioSummary,
       });
+      updateDetectorCalibrationMeasurement();
+    }
+
+    function updateDetectionExperimentAnalysis() {
+      if (!audioContext || !analyser || activeInputMode === "none") {
+        detectionExperimentSnapshot = detectionExperimentEngine.clear();
+        return;
+      }
+
+      detectionExperimentSnapshot = detectionExperimentEngine.analyzeFrame({
+        analyser,
+        sampleRate: audioContext.sampleRate,
+        sourceMode: activeInputMode,
+      });
     }
 
     function updateEssentiaAnalysis() {
@@ -2242,6 +4327,7 @@
       essentiaSummary = analysis.essentiaSummary;
       aubioSummary = analysis.aubioSummary;
       detectionSummary = analysis.detectionSummary;
+      updateDetectorCalibrationMeasurement();
 
       if (!essentiaSummary.installed || !essentiaSummary.ready || !isDetectionActive()) {
         return;
@@ -2435,7 +4521,10 @@
         createTrackFromUrl(track.name, track.url, manifest.label || "Default library")
       );
 
-      await setPlayerPlaylist(tracks, manifest.label || "Default library");
+      await setPlayerPlaylist(tracks, manifest.label || "Default library", {
+        kind: "default-library",
+        label: manifest.label || "Default library",
+      });
       persistSetting("playerSourceKind", "default-library");
       return true;
     }
@@ -2443,14 +4532,25 @@
     async function setPlayerPlaylist(tracks, playlistLabel, asset = null) {
       playerPlaylist = tracks;
       playerTrackIndex = Math.max(0, Math.min(Number(appSettings?.playerTrackIndex || 0), Math.max(0, tracks.length - 1)));
+      currentSongAnalysis = null;
+      resetDetectorCalibrationTest();
+      songAnalysisStatus = tracks.length > 0 ? "Not analyzed yet" : "No analysis yet";
       playerPlaylistLabel.textContent = playlistLabel || "Playlist";
       populatePlayerTrackSelect();
+      syncCalibrationTrackOptions();
       refreshPlayerUI();
-      persistSetting("playerSourceKind", asset?.kind || "");
+      refreshJammerUi();
+      if (asset?.kind) {
+        persistSetting("playerSourceKind", asset.kind);
+      }
 
-      if (asset) {
+      if (asset && asset.kind !== "default-library") {
         await savePlayerSourceAsset(asset);
       }
+
+      void seedKnownSongReferencesForTracks(tracks).catch((error) => {
+        log(`Song reference seed error: ${error.message}`);
+      });
     }
 
     async function ensurePlayerAudioGraph() {
@@ -2494,6 +4594,140 @@
       bassFilter.gain.value = Number(playerBassSlider.value);
       midFilter.gain.value = Number(playerMidSlider.value);
       trebleFilter.gain.value = Number(playerTrebleSlider.value);
+      syncPlayerOutputGain();
+    }
+
+    function syncPlayerOutputGain() {
+      if (!playerOutputNode) {
+        return;
+      }
+      const shouldMuteForExperiment = detectionExperimentConfig?.soloEnabled === true && activeInputMode === "player";
+      playerOutputNode.gain.value = shouldMuteForExperiment ? 0 : Number(playerVolumeSlider.value || 82) / 100;
+    }
+
+    function ensureDetectionExperimentSoloGraph() {
+      if (!audioContext) {
+        return false;
+      }
+      if (detectionExperimentSoloOutputNode) {
+        return true;
+      }
+
+      detectionExperimentSoloOutputNode = audioContext.createGain();
+      detectionExperimentSoloOutputNode.gain.value = 0;
+
+      detectionExperimentSoloLowHighpass = audioContext.createBiquadFilter();
+      detectionExperimentSoloLowHighpass.type = "highpass";
+      detectionExperimentSoloLowLowpass = audioContext.createBiquadFilter();
+      detectionExperimentSoloLowLowpass.type = "lowpass";
+
+      detectionExperimentSoloMidHighpass = audioContext.createBiquadFilter();
+      detectionExperimentSoloMidHighpass.type = "highpass";
+      detectionExperimentSoloMidLowpass = audioContext.createBiquadFilter();
+      detectionExperimentSoloMidLowpass.type = "lowpass";
+
+      detectionExperimentSoloHighHighpass = audioContext.createBiquadFilter();
+      detectionExperimentSoloHighHighpass.type = "highpass";
+
+      detectionExperimentSoloLowGain = audioContext.createGain();
+      detectionExperimentSoloMidGain = audioContext.createGain();
+      detectionExperimentSoloHighGain = audioContext.createGain();
+
+      detectionExperimentSoloLowHighpass.connect(detectionExperimentSoloLowLowpass);
+      detectionExperimentSoloLowLowpass.connect(detectionExperimentSoloLowGain);
+      detectionExperimentSoloLowGain.connect(detectionExperimentSoloOutputNode);
+
+      detectionExperimentSoloMidHighpass.connect(detectionExperimentSoloMidLowpass);
+      detectionExperimentSoloMidLowpass.connect(detectionExperimentSoloMidGain);
+      detectionExperimentSoloMidGain.connect(detectionExperimentSoloOutputNode);
+
+      detectionExperimentSoloHighHighpass.connect(detectionExperimentSoloHighGain);
+      detectionExperimentSoloHighGain.connect(detectionExperimentSoloOutputNode);
+
+      detectionExperimentSoloOutputNode.connect(audioContext.destination);
+      return true;
+    }
+
+    function disconnectDetectionExperimentSoloSource() {
+      if (!detectionExperimentSoloSourceNode || !detectionExperimentSoloSourceConnected) {
+        return;
+      }
+
+      [
+        detectionExperimentSoloLowHighpass,
+        detectionExperimentSoloMidHighpass,
+        detectionExperimentSoloHighHighpass,
+      ].forEach((target) => {
+        if (!target) {
+          return;
+        }
+        try {
+          detectionExperimentSoloSourceNode.disconnect(target);
+        } catch (_) {}
+      });
+
+      detectionExperimentSoloSourceConnected = false;
+      detectionExperimentSoloSourceNode = null;
+    }
+
+    function updateDetectionExperimentSoloGraphParams() {
+      if (!ensureDetectionExperimentSoloGraph()) {
+        return;
+      }
+
+      const lowBandMinHz = Math.max(20, Math.min(Number(detectionExperimentConfig.lowBandMinHz || 35), Number(detectionExperimentConfig.lowCutoffHz || 140) - 5));
+      const lowCutoffHz = Math.max(lowBandMinHz + 5, Number(detectionExperimentConfig.lowCutoffHz || 140));
+      const midCutoffHz = Math.max(lowCutoffHz + 20, Number(detectionExperimentConfig.midCutoffHz || 2400));
+
+      detectionExperimentSoloLowHighpass.frequency.value = lowBandMinHz;
+      detectionExperimentSoloLowLowpass.frequency.value = lowCutoffHz;
+      detectionExperimentSoloMidHighpass.frequency.value = lowCutoffHz;
+      detectionExperimentSoloMidLowpass.frequency.value = midCutoffHz;
+      detectionExperimentSoloHighHighpass.frequency.value = midCutoffHz;
+
+      const laneWeights = [
+        detectionExperimentConfig.lowEnabled !== false ? Math.max(0, Number(detectionExperimentConfig.lowWeight || 0)) : 0,
+        detectionExperimentConfig.midEnabled !== false ? Math.max(0, Number(detectionExperimentConfig.midWeight || 0)) : 0,
+        detectionExperimentConfig.highEnabled !== false ? Math.max(0, Number(detectionExperimentConfig.highWeight || 0)) : 0,
+      ];
+      const totalWeight = laneWeights.reduce((sum, value) => sum + value, 0);
+      const normalize = totalWeight > 0 ? 1 / totalWeight : 0;
+
+      detectionExperimentSoloLowGain.gain.value = laneWeights[0] * normalize;
+      detectionExperimentSoloMidGain.gain.value = laneWeights[1] * normalize;
+      detectionExperimentSoloHighGain.gain.value = laneWeights[2] * normalize;
+      detectionExperimentSoloOutputNode.gain.value = detectionExperimentConfig.soloEnabled === true && totalWeight > 0 ? 1 : 0;
+    }
+
+    function updateDetectionExperimentSoloRouting() {
+      updateDetectionExperimentSoloGraphParams();
+      syncPlayerOutputGain();
+
+      const shouldSolo = detectionExperimentConfig?.soloEnabled === true && activeInputMode !== "none" && activeAudioNode;
+      if (!shouldSolo) {
+        disconnectDetectionExperimentSoloSource();
+        if (detectionExperimentSoloOutputNode) {
+          detectionExperimentSoloOutputNode.gain.value = 0;
+        }
+        return;
+      }
+
+      if (!ensureDetectionExperimentSoloGraph()) {
+        return;
+      }
+
+      if (detectionExperimentSoloSourceNode !== activeAudioNode || !detectionExperimentSoloSourceConnected) {
+        disconnectDetectionExperimentSoloSource();
+        activeAudioNode.connect(detectionExperimentSoloLowHighpass);
+        activeAudioNode.connect(detectionExperimentSoloMidHighpass);
+        activeAudioNode.connect(detectionExperimentSoloHighHighpass);
+        detectionExperimentSoloSourceNode = activeAudioNode;
+        detectionExperimentSoloSourceConnected = true;
+      }
+
+      if (audioContext?.state === "suspended") {
+        audioContext.resume().catch(() => {});
+      }
     }
 
     async function restorePlayerSourceFromDb() {
@@ -2593,6 +4827,8 @@
       suppressPlayerTrackChange = true;
       playerTrackSelect.value = String(playerTrackIndex);
       suppressPlayerTrackChange = false;
+      detectorCalibrationTrackId = buildTrackSongId(track);
+      syncCalibrationTrackOptions();
       persistPlayerState();
       if (!isMicrophoneActive() || activeInputMode === "player" || autoplay) {
         setActiveAudioInput(playerVisualizerNode, playerAnalyser, "player");
@@ -2602,6 +4838,7 @@
         updateMeterStatus(isPlayerPlaying() ? "Player" : "Ready");
       }
       updatePlayerStatus("Loaded");
+      await loadCurrentSongAnalysisFromDb(track);
       log(`Player ready: ${track.name}`);
 
       if (autoplay) {
@@ -2660,12 +4897,11 @@
       log("Player paused");
     }
 
-    async function skipPlayerTrack(offset) {
+    async function skipPlayerTrack(offset, shouldAutoplay = isPlayerPlaying()) {
       if (playerPlaylist.length === 0) {
         return;
       }
 
-      const shouldAutoplay = isPlayerPlaying();
       const nextIndex = (playerTrackIndex + offset + playerPlaylist.length) % playerPlaylist.length;
       await loadPlayerTrack(nextIndex, { autoplay: shouldAutoplay });
     }
@@ -2678,12 +4914,18 @@
       playerAudio.load();
       playerPlaylist = [];
       playerTrackIndex = 0;
+      currentSongAnalysis = null;
+      detectorCalibrationTrackId = "";
+      resetDetectorCalibrationTest();
+      songAnalysisStatus = "No analysis yet";
       await savePlayerSourceAsset(null);
       persistSetting("playerSourceKind", "");
       persistSetting("playerTrackIndex", "0");
       persistSetting("playerCurrentTime", "0");
       populatePlayerTrackSelect();
+      syncCalibrationTrackOptions();
       refreshPlayerUI();
+      refreshJammerUi();
       syncMicButtons();
       updateMeterStatus(isMicrophoneActive() ? "Listening" : "Idle");
       log("Player library cleared");
@@ -2752,6 +4994,7 @@
     }
 
     function showPanel(panelId, shouldPersist = true) {
+      activePanel = panelId;
       studioPanel.classList.toggle("active", panelId === "studio");
       jammerPanel.classList.toggle("active", panelId === "jammer");
       settingsPanel.classList.toggle("active", panelId === "settings");
@@ -2764,6 +5007,7 @@
       if (shouldPersist) {
         persistSetting("activeTab", panelId);
       }
+      updateWiringPanel();
     }
 
     function renderSkinOptions() {
@@ -2959,6 +5203,7 @@
         paintVisualizerStandby();
       }
       updateMeter();
+      updateDetectionExperimentAnalysis();
       updateEssentiaAnalysis();
       refreshJammerRuntimeFields();
     }
@@ -3002,6 +5247,7 @@
         stopRecordingButton.disabled = false;
         updateStageMeta();
         log(`Recording started at ${fps} FPS, ${Math.round(bitrate / 1000000)} Mbps${mimeType ? ` (${mimeType})` : ""}`);
+        updateWiringPanel();
       } catch (error) {
         log(`Recording error: ${error.message}`);
       }
@@ -3040,6 +5286,7 @@
 
       startRecordingButton.disabled = !micStream;
       stopRecordingButton.disabled = true;
+      updateWiringPanel();
     }
 
     async function selectPreset(index, blendTime = 2.7) {
@@ -3105,6 +5352,8 @@
         fpsSelect,
         formatSelect,
         jammerDeckPresetSelect,
+        jammerDetectorModeSelect,
+        jammerModuleContributionsToggleButton,
         jammerDetectionToggleButton,
         jammerDrummerSelect,
         jammerEnabledInput,
@@ -3119,6 +5368,7 @@
         jammerLabHatBrightness,
         jammerLabJamStopButton,
         jammerLabJamToggleButton,
+        jammerLabPanelToggleButton,
         jammerLabKickDecay,
         jammerLabKickPitch,
         jammerLabNotes,
@@ -3128,8 +5378,67 @@
         jammerLabToggleButton,
         jammerLoadCurrentLabButton,
         jammerLoadDeckPresetButton,
+        jammerMainPanelBody,
+        jammerMainPanelToggleButton,
         jammerOpenLibraryButton,
         jammerPlayToggleButton,
+        jammerCalibrationTrackSelect,
+        jammerCalibrationToggleButton,
+        jammerCalibrationPanelBody,
+        jammerCalibrationRunTestButton,
+        jammerCalibrationApplyAubioCheckbox,
+        jammerCalibrationRetestAubioButton,
+        jammerCalibrationApplyEssentiaCheckbox,
+        jammerCalibrationRetestEssentiaButton,
+        jammerCalibrationRepeatSelectedButton,
+        jammerBpmBenchmarkToggleButton,
+        jammerBpmBenchmarkPanelBody,
+        jammerBpmBenchmarkTrackSelect,
+        jammerBpmBenchmarkReloadButton,
+        jammerBpmBenchmarkRunButton,
+        jammerBpmBenchmarkApplyAubioCheckbox,
+        jammerBpmBenchmarkRetestAubioButton,
+        jammerBpmBenchmarkEvolveAubioButton,
+        jammerBpmBenchmarkApplyEssentiaCheckbox,
+        jammerBpmBenchmarkRetestEssentiaButton,
+        jammerBpmBenchmarkEvolveEssentiaButton,
+        jammerBpmBenchmarkRepeatSelectedButton,
+        jammerDetectionPanelToggleButton,
+        jammerDetectionExperimentToggleButton,
+        jammerDetectionExperimentPluginSelect,
+        jammerDetectionExperimentPresetSelect,
+        jammerDetectionExperimentPresetName,
+        jammerDetectionExperimentSavePresetButton,
+        jammerDetectionExperimentRenamePresetButton,
+        jammerDetectionExperimentLoadPresetButton,
+        jammerDetectionExperimentDeletePresetButton,
+        jammerDetectionExperimentNormalizeEnabled,
+        jammerDetectionExperimentNormalizeTarget,
+        jammerDetectionExperimentLowBandMin,
+        jammerDetectionExperimentLowCutoff,
+        jammerDetectionExperimentMidCutoff,
+        jammerDetectionExperimentRawEnabled,
+        jammerDetectionExperimentLowEnabled,
+        jammerDetectionExperimentMidEnabled,
+        jammerDetectionExperimentHighEnabled,
+        jammerDetectionExperimentTonalEnabled,
+        jammerDetectionExperimentSoloButton,
+        jammerDetectionExperimentRawWeight,
+        jammerDetectionExperimentLowWeight,
+        jammerDetectionExperimentMidWeight,
+        jammerDetectionExperimentHighWeight,
+        jammerDetectionExperimentTonalWeight,
+        jammerDetectionExperimentOnsetThreshold,
+        jammerDetectionExperimentTempoMin,
+        jammerDetectionExperimentTempoMax,
+        jammerDetectionExperimentAubioTransientBias,
+        jammerDetectionExperimentAubioLowBias,
+        jammerDetectionExperimentEssentiaTickBias,
+        jammerDetectionExperimentEssentiaHarmonicBias,
+        jammerDetectionExperimentWindowDownButton,
+        jammerDetectionExperimentWindowLabel,
+        jammerDetectionExperimentWindowUpButton,
+        jammerSongAnalyzeButton,
         jammerStrategyToggleButton,
         jammerCloseLibraryButton,
         jammerSaveDeckPresetButton,
@@ -3149,12 +5458,15 @@
         settingsPanel,
         settingsTabButton,
         stageShell,
+        stagePanelToggleButton,
         startMicButton,
         startRecordingButton,
         stopMicButton,
         stopRecordingButton,
         studioHomeButton,
         visualizerToggleButton,
+        wiringPanelBody: wiringRefs.wiringPanelBody,
+        wiringPanelToggleButton: wiringRefs.wiringPanelToggleButton,
       },
       state: {
         getAppSettings: () => appSettings,
@@ -3164,6 +5476,23 @@
         getJammerLabState: () => jammerLabState,
         getLoopMonitorTimer: () => loopMonitorTimer,
         getPlayerPlaylist: () => playerPlaylist,
+        getBpmBenchmarkState: () => bpmBenchmarkState,
+        getBpmBenchmarkStates: () => bpmBenchmarkStates,
+        getBpmBenchmarkRunning: () => bpmBenchmarkRunning,
+        getBpmBenchmarkProgress: () => bpmBenchmarkProgress,
+        getBpmBenchmarkProgressLabel: () => bpmBenchmarkProgressLabel,
+        getBpmBenchmarkTracks: () => bpmBenchmarkTracks,
+        getBpmBenchmarkTrackIds: () => bpmBenchmarkTrackIds,
+        getBpmBenchmarkSelectionSummary: () => bpmBenchmarkSelectionSummary,
+        getBpmBenchmarkCollapsed: () => bpmBenchmarkCollapsed,
+        getModuleContributionsCollapsed: () => moduleContributionsCollapsed,
+        getDetectionExperimentConfig: () => detectionExperimentConfig,
+        getDetectionExperimentPresets: () => detectionExperimentPresets,
+        getDetectionExperimentCollapsed: () => detectionExperimentCollapsed,
+        getDetectorCalibrationCollapsed: () => detectorCalibrationCollapsed,
+        getWiringPanelCollapsed: () => wiringPanelCollapsed,
+        getStagePanelCollapsed: () => stagePanelCollapsed,
+        getSongAnalysisRunning: () => songAnalysisRunning,
         getPresetIndex: () => presetIndex,
         getPresetKeys: () => presetKeys,
         getStageExpanded: () => stageExpanded,
@@ -3172,6 +5501,13 @@
         getVisualizerEnabled: () => visualizerEnabled,
       },
       actions: {
+        analyzeCurrentPlayerTrack,
+        applyModuleCalibrationSuggestions,
+        applyBpmBenchmarkSuggestionsForFile,
+        evolveBpmBenchmarkModule,
+        loadBpmBenchmarkCatalogFromServer,
+        loadCurrentBpmBenchmarkState,
+        loadCurrentSongAnalysisFromDb,
         applyDeckPreset,
         applyLabConfigToUi,
         applyStandbyMeterState,
@@ -3203,14 +5539,19 @@
         requestMicrophonePermission,
         requestStageFullscreen,
         restartPresetCycle,
+        runBpmBenchmark,
         restorePlayerSourceFromDb,
         selectPreset,
         selectRandomPreset,
         setAppSettings: (value) => { appSettings = value; },
+        setBpmBenchmarkTrackIds: (value) => { bpmBenchmarkTrackIds = Array.isArray(value) ? value : []; },
         setDetectionEnabled: (value) => { detectionEnabled = value; },
+        setDetectionExperimentLastPresetId: (value) => { detectionExperimentLastPresetId = value || ""; },
+        setDetectorCalibrationTrackId: (value) => { detectorCalibrationTrackId = value; },
         setJammerLabState: (value) => { jammerLabState = value; },
         setJammerResearchCatalog: (value) => { jammerResearchCatalog = value; },
         setLoopMonitorTimer: (value) => { loopMonitorTimer = value; },
+        setSongAnalysisRunning: (value) => { songAnalysisRunning = value; },
         setReactiveBehaviorStrategies: (value) => { reactiveBehaviorStrategies = value; },
         setSkin,
         setStageFullscreenActive: (value) => { stageFullscreenActive = value; },
@@ -3220,6 +5561,9 @@
         setVisualizerEnabled,
         showPanel,
         startAutonomousDrummerLoop,
+        startDetectorCalibrationTest,
+        repeatModuleCalibrationTest,
+        repeatSelectedCalibrationTests,
         startLabJam,
         startMicrophone,
         startRecording,
@@ -3227,7 +5571,17 @@
         stopLabJam,
         stopMicrophone,
         stopRecording,
+        toggleBpmBenchmarkPanel,
+        toggleJammerMainPanel,
+        toggleDetectionPanel,
+        toggleModuleContributionsPanel,
+        toggleDetectionExperimentPanel,
+        adjustDetectionExperimentChartWindow,
+        toggleDetectorCalibrationPanel,
+        toggleWiringPanel,
+        toggleStagePanel,
         syncAubioSource,
+        syncDetectionExperimentControls,
         syncEssentiaSource,
         syncJammerControlsFromEngine,
         syncJammerPlayback,
@@ -3239,7 +5593,14 @@
         toggleStageExpanded,
         updateDetectionSummary: () => {
           detectionSummary = reactiveDrummerController.updateDetectionSummary({ essentiaSummary, aubioSummary });
+          updateDetectorCalibrationMeasurement();
         },
+        updateDetectionExperimentConfig,
+        selectDetectionExperimentPluginMode,
+        saveDetectionExperimentPreset,
+        renameDetectionExperimentPreset,
+        loadDetectionExperimentPreset,
+        deleteDetectionExperimentPreset,
         updateJammerSourceState,
         updateResolution,
         updateStageLoopMonitor,
@@ -3262,6 +5623,21 @@
       },
       helpers: {},
     };
+
+    syncDetectionExperimentControls();
+    syncJammerMainPanelState();
+    syncDetectionPanelState();
+    syncWiringPanelState();
+    syncStagePanelState();
+    detectionExperimentPluginConfigs = createDetectionExperimentPluginConfigSet(
+      detectionExperimentPluginConfigs,
+      detectionExperimentConfig
+    );
+    detectionExperimentConfig = detectionExperimentEngine.setConfig(
+      getDetectionExperimentConfigForPlugin(detectionExperimentConfig.pluginMode)
+    );
+    applyDetectionExperimentToDetectorPipeline();
+    updateWiringPanel();
 
     bindAppEvents(appBootstrapContext);
     initializeRecorderApp(appBootstrapContext).catch((error) => {

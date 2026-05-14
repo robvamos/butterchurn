@@ -225,6 +225,9 @@ class RhythmConvergenceEngine {
     lowBand = 0,
     lowOnset = 0,
     preprocessFlux = 0,
+    harmonicChange = 0,
+    harmonicStability = 0,
+    harmonicAnchorHint = 0,
   } = {}) {
     const now = getNow();
 
@@ -488,6 +491,18 @@ class RhythmConvergenceEngine {
       0,
       100
     ));
+    const harmonicSupport = clamp(
+      (harmonicAnchorHint * 0.5)
+      + (harmonicChange * 0.22)
+      + (harmonicStability * 0.28),
+      0,
+      100
+    );
+    const anchoredBarConfidence = Math.round(clamp(
+      barAnchorConfidence + (harmonicSupport * 0.12),
+      0,
+      100
+    ));
     const grooveConvergence = Math.round(clamp(
       (tempoAgreement * 24)
       + (stability * 22)
@@ -496,7 +511,7 @@ class RhythmConvergenceEngine {
       0,
       100
     ));
-    const phraseBars = grooveConvergence >= 56 && barAnchorConfidence >= 52
+    const phraseBars = grooveConvergence >= 56 && anchoredBarConfidence >= 52
       ? nearestPhraseBars(phraseBarsHint || 4)
       : 4;
     const nextBeatTime = beatIntervalMs > 0
@@ -512,9 +527,9 @@ class RhythmConvergenceEngine {
     this.barPosition = phase > 0 ? (phase - 1) + beatProgress : 0;
 
     let pllState = "Searching";
-    if (this.lockStrength >= 0.78 && barAnchorConfidence >= 76 && stability >= 0.72) {
+    if (this.lockStrength >= 0.78 && anchoredBarConfidence >= 76 && stability >= 0.72) {
       pllState = "Locked";
-    } else if (this.lockStrength >= 0.52 && barAnchorConfidence >= 56 && stability >= 0.46) {
+    } else if (this.lockStrength >= 0.52 && anchoredBarConfidence >= 56 && stability >= 0.46) {
       pllState = "Converging";
     } else if (this.anchorPulseCount > 0 || tempo > 0) {
       pllState = "Acquiring";
@@ -531,12 +546,12 @@ class RhythmConvergenceEngine {
       beatInBar: phase,
       phase,
       barStart,
-      downbeatPulse: barStart && (barAnchorConfidence >= 36 || predictedBeatsAhead > 0),
+      downbeatPulse: barStart && (anchoredBarConfidence >= 36 || predictedBeatsAhead > 0),
       anchorPulseCount: Math.min(this.anchorPulseCount, 8),
       nextBeatTime,
       nextBarTime,
       stability,
-      barAnchorConfidence,
+      barAnchorConfidence: anchoredBarConfidence,
       grooveConvergence,
       phraseBars,
       fastTempo: fastWindow.tempo,

@@ -1,3 +1,9 @@
+import {
+  computeBandSnapshot,
+  computePitchClassProfile,
+  profileDistance,
+} from "./audioPreprocessing.js";
+
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
@@ -31,45 +37,6 @@ function safeDelete(value) {
   if (value?.delete) {
     value.delete();
   }
-}
-
-function averageRange(buffer, start, end) {
-  const safeStart = Math.max(0, Math.min(buffer.length, start));
-  const safeEnd = Math.max(safeStart + 1, Math.min(buffer.length, end));
-  let sum = 0;
-  for (let index = safeStart; index < safeEnd; index += 1) {
-    sum += buffer[index];
-  }
-  return sum / (safeEnd - safeStart);
-}
-
-function computeBandSnapshot(frequencyBuffer, sampleRate, previousSpectrum) {
-  const nyquist = sampleRate / 2;
-  const hzPerBin = nyquist / Math.max(1, frequencyBuffer.length);
-  const lowEnd = Math.max(1, Math.round(150 / hzPerBin));
-  const midEnd = Math.max(lowEnd + 1, Math.round(2000 / hzPerBin));
-  const highEnd = Math.max(midEnd + 1, Math.round(10000 / hzPerBin));
-
-  const low = clamp(averageRange(frequencyBuffer, 1, lowEnd) / 255, 0, 1);
-  const mid = clamp(averageRange(frequencyBuffer, lowEnd, midEnd) / 255, 0, 1);
-  const high = clamp(averageRange(frequencyBuffer, midEnd, highEnd) / 255, 0, 1);
-
-  let positiveFlux = 0;
-  for (let index = 0; index < frequencyBuffer.length; index += 1) {
-    const current = frequencyBuffer[index] / 255;
-    const delta = current - previousSpectrum[index];
-    if (delta > 0) {
-      positiveFlux += delta;
-    }
-    previousSpectrum[index] = current;
-  }
-
-  return {
-    low,
-    mid,
-    high,
-    flux: clamp(positiveFlux / Math.max(8, frequencyBuffer.length * 0.22), 0, 1),
-  };
 }
 
 function shouldSuppressReference(sourceMode) {
@@ -115,6 +82,35 @@ class EssentiaListener {
     this.longWindowTempo = 0;
     this.longWindowConfidence = 0;
     this.longWindowTicks = [];
+    this.harmonicProfile = new Float32Array(12);
+    this.harmonicCommittedProfile = new Float32Array(12);
+    this.harmonicRoot = "?";
+    this.harmonicChange = 0;
+    this.harmonicStability = 0;
+    this.harmonicAnchorHint = 0;
+    this.lastHarmonicAt = 0;
+    this.harmonicCadenceMs = 3200;
+    this.tuningConfig = {
+      normalizeEnabled: true,
+      normalizeTargetPeak: 0.94,
+      lowCutoffHz: 140,
+      midCutoffHz: 2400,
+      rawEnabled: true,
+      lowEnabled: true,
+      midEnabled: true,
+      highEnabled: true,
+      tonalEnabled: true,
+      rawWeight: 0.18,
+      lowWeight: 0.48,
+      midWeight: 0.2,
+      highWeight: 0.16,
+      tonalWeight: 0.16,
+      onsetThreshold: 0.085,
+      essentiaSettings: {
+        stableTickBias: 0.46,
+        harmonicAnchorWeight: 0.26,
+      },
+    };
     this.snapshot = {
       installed: this.installed,
       ready: false,
@@ -127,6 +123,10 @@ class EssentiaListener {
       stableConfidence: 0,
       confidence: 0,
       barAnchorConfidence: 0,
+      harmonicChange: 0,
+      harmonicStability: 0,
+      harmonicAnchorHint: 0,
+      harmonicRoot: "?",
       phraseBars: 4,
       beatPositions: [],
       zcr: 0,
@@ -160,6 +160,19 @@ class EssentiaListener {
 
   getSnapshot() {
     return { ...this.snapshot };
+  }
+
+  setTuningConfig(nextConfig = {}) {
+    const current = this.tuningConfig || {};
+    this.tuningConfig = {
+      ...current,
+      ...nextConfig,
+      essentiaSettings: {
+        ...(current.essentiaSettings || {}),
+        ...(nextConfig.essentiaSettings || {}),
+      },
+    };
+    return { ...this.tuningConfig };
   }
 
   async resolveWasmModule() {
@@ -267,6 +280,13 @@ class EssentiaListener {
     this.spectralFlux = 0;
     this.noiseFloor = 0;
     this.normalizationGain = 1;
+    this.harmonicProfile = new Float32Array(12);
+    this.harmonicCommittedProfile = new Float32Array(12);
+    this.harmonicRoot = "?";
+    this.harmonicChange = 0;
+    this.harmonicStability = 0;
+    this.harmonicAnchorHint = 0;
+    this.lastHarmonicAt = 0;
     this.snapshot = {
       ...this.snapshot,
       sourceMode: "none",
@@ -277,6 +297,10 @@ class EssentiaListener {
       stableConfidence: 0,
       confidence: 0,
       barAnchorConfidence: 0,
+      harmonicChange: 0,
+      harmonicStability: 0,
+      harmonicAnchorHint: 0,
+      harmonicRoot: "?",
       phraseBars: 4,
       beatPositions: [],
       zcr: 0,
@@ -301,6 +325,41 @@ class EssentiaListener {
     return this.getSnapshot();
   }
 
+  updateHarmonicState(now, tempo = 0, phraseBars = 4, barAnchorConfidence = 0) {
+    const harmonicSnapshot = computePitchClassProfile(this.frequencyBuffer, this.sampleRate, { scaleMode: "byte" });
+    for (let index = 0; index < this.harmonicProfile.length; index += 1) {
+      this.harmonicProfile[index] = (this.harmonicProfile[index] * 0.78) + (harmonicSnapshot.profile[index] * 0.22);
+    }
+
+    const barsMs = tempo > 0 ? (60000 / tempo) * 4 : 2200;
+    const structuralSpanBars = phraseBars >= 6 ? 4 : phraseBars >= 4 ? 4 : 2;
+    this.harmonicCadenceMs = clamp(barsMs * structuralSpanBars, 3200, 12000);
+    const harmonicReady = barAnchorConfidence >= 42 || harmonicSnapshot.energy >= 0.14;
+
+    if ((!this.lastHarmonicAt || (now - this.lastHarmonicAt) >= this.harmonicCadenceMs) && harmonicReady) {
+      const novelty = profileDistance(this.harmonicProfile, this.harmonicCommittedProfile);
+      this.harmonicChange = (this.harmonicChange * 0.5) + (novelty * 0.5);
+      this.harmonicStability = clamp(1 - novelty, 0, 1);
+      this.harmonicAnchorHint = clamp(
+        (this.harmonicChange * 0.62)
+        + ((harmonicSnapshot.energy || 0) * 0.24)
+        + ((1 - this.spectralFlux) * 0.14),
+        0,
+        1
+      );
+      this.harmonicRoot = harmonicSnapshot.root;
+      this.harmonicCommittedProfile = Float32Array.from(this.harmonicProfile);
+      this.lastHarmonicAt = now;
+    } else {
+      this.harmonicChange *= 0.985;
+      this.harmonicStability = clamp((this.harmonicStability * 0.92) + 0.08, 0, 1);
+      this.harmonicAnchorHint *= 0.985;
+      if (harmonicSnapshot.root !== "?") {
+        this.harmonicRoot = harmonicSnapshot.root;
+      }
+    }
+  }
+
   pushHistoryFrame() {
     const maxSamples = Math.max(this.analysisFrameBuffer.length, Math.round(this.sampleRate * this.longWindowSeconds));
     for (let index = 0; index < this.analysisFrameBuffer.length; index += 1) {
@@ -317,13 +376,18 @@ class EssentiaListener {
     }
 
     this.analyser.getByteFrequencyData(this.frequencyBuffer);
-    const bandSnapshot = computeBandSnapshot(this.frequencyBuffer, this.sampleRate, this.previousSpectrum);
+    const tuning = this.tuningConfig || {};
+    const bandSnapshot = computeBandSnapshot(this.frequencyBuffer, this.sampleRate, this.previousSpectrum, {
+      scaleMode: "byte",
+      lowCutoffHz: tuning.lowCutoffHz,
+      midCutoffHz: tuning.midCutoffHz,
+    });
     const reference = shouldSuppressReference(this.sourceMode) && this.referenceProvider
       ? this.referenceProvider()
       : null;
-    const lowBand = clamp(bandSnapshot.low - ((reference?.low || 0) * 0.88), 0, 1);
-    const midBand = clamp(bandSnapshot.mid - ((reference?.mid || 0) * 0.72), 0, 1);
-    const highBand = clamp(bandSnapshot.high - ((reference?.high || 0) * 0.64), 0, 1);
+    const lowBand = tuning.lowEnabled === false ? 0 : clamp(bandSnapshot.low - ((reference?.low || 0) * 0.88), 0, 1);
+    const midBand = tuning.midEnabled === false ? 0 : clamp(bandSnapshot.mid - ((reference?.mid || 0) * 0.72), 0, 1);
+    const highBand = tuning.highEnabled === false ? 0 : clamp(bandSnapshot.high - ((reference?.high || 0) * 0.64), 0, 1);
     const flux = clamp(bandSnapshot.flux - ((reference?.flux || 0) * 0.72), 0, 1);
     this.spectralFlux = (this.spectralFlux * 0.66) + (flux * 0.34);
 
@@ -460,10 +524,14 @@ class EssentiaListener {
     const monoRms = Math.sqrt(
       this.frameBuffer.reduce((sum, value) => sum + (value * value), 0) / Math.max(1, this.frameBuffer.length)
     );
-    const targetRms = 0.18;
+    const tuning = this.tuningConfig || {};
+    const normalizeTargetPeak = clamp(Number(tuning.normalizeTargetPeak || 0.94), 0.4, 1);
+    const targetRms = 0.08 + (normalizeTargetPeak * 0.12);
     const gain = clamp(targetRms / Math.max(0.0001, monoRms), 0.85, 4);
     this.normalizationGain = (this.normalizationGain * 0.7) + (gain * 0.3);
-    const safeGain = peak > 0 ? Math.min(this.normalizationGain, 0.98 / peak) : this.normalizationGain;
+    const safeGain = tuning.normalizeEnabled === false
+      ? 1
+      : peak > 0 ? Math.min(this.normalizationGain, normalizeTargetPeak / peak) : this.normalizationGain;
 
     for (let index = 0; index < this.frameBuffer.length; index += 1) {
       this.analysisFrameBuffer[index] = clamp(this.frameBuffer[index] * safeGain, -1, 1);
@@ -491,14 +559,27 @@ class EssentiaListener {
       this.onsetPeak = Math.max(onsetRaw, this.onsetPeak * 0.97);
       const normalizedOnset = (onsetRaw - (this.onsetBaseline * 1.02))
         / Math.max(0.0001, this.onsetPeak - this.onsetBaseline);
+      const lowWeight = clamp(Number(tuning.lowWeight || 0.48), 0, 1.5);
+      const midWeight = clamp(Number(tuning.midWeight || 0.2), 0, 1.5);
+      const highWeight = clamp(Number(tuning.highWeight || 0.16), 0, 1.5);
+      const tonalWeight = tuning.tonalEnabled === false ? 0 : clamp(Number(tuning.tonalWeight || 0.16), 0, 1.5);
+      const rawWeight = tuning.rawEnabled === false ? 0 : clamp(Number(tuning.rawWeight || 0.18), 0, 1.5);
+      const laneWeightTotal = Math.max(0.0001, rawWeight + lowWeight + midWeight + highWeight + tonalWeight);
+      const stableTickBias = clamp(Number(tuning.essentiaSettings?.stableTickBias || 0.46), 0, 1.5);
+      const rawAmplitudeCue = tuning.rawEnabled === false ? 0 : clamp(monoRms * 4.8, 0, 1);
       onsetScore = clamp(
-        (normalizedOnset * 0.45)
-        + (this.spectralFlux * 0.2)
-        + (this.lowOnset * 0.2)
-        + (this.highOnset * 0.15),
+        (normalizedOnset * (0.28 + (stableTickBias * 0.18)))
+        + (rawAmplitudeCue * (rawWeight / laneWeightTotal) * 0.18)
+        + (this.spectralFlux * 0.16)
+        + (this.lowOnset * (lowWeight / laneWeightTotal) * 0.34)
+        + (this.midOnset * (midWeight / laneWeightTotal) * 0.12)
+        + (this.highOnset * (highWeight / laneWeightTotal) * 0.1),
         0,
         1
       );
+      if (onsetScore < Number(tuning.onsetThreshold || 0.085)) {
+        onsetScore *= 0.45;
+      }
       this.registerOnset(now, onsetScore);
 
       safeDelete(windowed);
@@ -521,9 +602,11 @@ class EssentiaListener {
     const confidence = Math.max(
       tempoState.confidence,
       this.longWindowConfidence,
-      Math.round(clamp((normalizedEnergy * 0.3) + (onsetScore * 0.4) + (this.spectralFlux * 0.3), 0, 1) * 100),
+      Math.round(clamp((normalizedEnergy * 0.25) + (clamp(monoRms * 4.8, 0, 1) * 0.1) + (onsetScore * 0.38) + (this.spectralFlux * 0.27), 0, 1) * 100),
     );
-    const barAnchorConfidence = Math.max(
+    const phraseBars = this.estimatePhraseBars(tempoState, onsetScore, energy);
+    const harmonicWeight = clamp(Number(tuning.essentiaSettings?.harmonicAnchorWeight || 0.26), 0, 1.5);
+    const baseBarAnchorConfidence = Math.max(
       0,
       Math.min(
         100,
@@ -531,14 +614,23 @@ class EssentiaListener {
           (tempoState.stability || 0) * 38
           + (tempoState.density || 0) * 10
           + (this.longWindowConfidence / 100) * 16
-          + this.lowOnset * 18
-          + this.lowEnvelope * 12
+          + this.lowOnset * (12 + (clamp(Number(tuning.lowWeight || 0.48), 0, 1.5) * 10))
+          + this.lowEnvelope * (8 + (clamp(Number(tuning.lowWeight || 0.48), 0, 1.5) * 6))
           + this.spectralFlux * 10
           + normalizedEnergy * 8
         ),
       ),
     );
-    const phraseBars = this.estimatePhraseBars(tempoState, onsetScore, energy);
+    this.updateHarmonicState(
+      now,
+      blendedTempo || this.longWindowTempo || tempoState.tempo || 0,
+      phraseBars,
+      baseBarAnchorConfidence
+    );
+    const barAnchorConfidence = Math.max(
+      0,
+      Math.min(100, Math.round(baseBarAnchorConfidence + (this.harmonicAnchorHint * (6 + (harmonicWeight * 8))))),
+    );
 
     this.snapshot = {
       installed: this.installed,
@@ -552,6 +644,10 @@ class EssentiaListener {
       stableConfidence: this.longWindowConfidence,
       confidence,
       barAnchorConfidence,
+      harmonicChange: Math.round(this.harmonicChange * 100),
+      harmonicStability: Math.round(this.harmonicStability * 100),
+      harmonicAnchorHint: Math.round(this.harmonicAnchorHint * 100),
+      harmonicRoot: this.harmonicRoot,
       phraseBars,
       beatPositions: this.longWindowTicks,
       zcr,
@@ -570,7 +666,7 @@ class EssentiaListener {
       },
       statusLabel: "Listening",
       summary: blendedTempo > 0
-        ? `Essentia.js hears about ${blendedTempo} BPM, anchor ${barAnchorConfidence}% and a phrase around ${phraseBars} bars on the ${this.sourceMode} route. Low band ${Math.round(this.lowEnvelope * 100)}%, high band ${Math.round(this.highEnvelope * 100)}%${reference ? ", with drummer reference masked out" : ""}.`
+        ? `Essentia.js hears about ${blendedTempo} BPM, anchor ${barAnchorConfidence}% and a phrase around ${phraseBars} bars on the ${this.sourceMode} route. Harmonic root ${this.harmonicRoot}, change ${Math.round(this.harmonicChange * 100)}%. Low band ${Math.round(this.lowEnvelope * 100)}%, high band ${Math.round(this.highEnvelope * 100)}%${reference ? ", with drummer reference masked out" : ""}.`
         : `Essentia.js is listening to the ${this.sourceMode} route and building tempo confidence through low, mid and high rhythm bands${reference ? " while suppressing the drummer reference" : ""}.`,
     };
 

@@ -41,6 +41,9 @@ function bindAppEvents(context) {
   refs.visualizerToggleButton.addEventListener("click", () => {
     actions.setVisualizerEnabled(!state.getVisualizerEnabled());
   });
+  refs.stagePanelToggleButton?.addEventListener("click", () => {
+    actions.toggleStagePanel();
+  });
   refs.presetSelect.addEventListener("change", () => {
     if (refs.presetSelect.value !== "") {
       actions.selectPreset(Number(refs.presetSelect.value));
@@ -119,6 +122,27 @@ function bindAppEvents(context) {
     actions.refreshJammerUi();
     actions.updateStageLoopMonitor();
     actions.log(`Detection timing model: ${snapshot.timingModel === "particle" ? "Particle Grid" : "Kalman PLL"}`);
+  });
+  refs.jammerDetectorModeSelect.addEventListener("change", () => {
+    const snapshot = services.adaptiveTiming.setDetectorMode(refs.jammerDetectorModeSelect.value);
+    actions.persistSetting("jammerDetectorMode", snapshot.detectorMode);
+    actions.updateDetectionSummary();
+    services.jammerEngine.setListenerState(state.getDetectionSummary());
+    actions.refreshJammerUi();
+    actions.updateStageLoopMonitor();
+    actions.log(`Detection source model: ${snapshot.detectorMode}`);
+  });
+  refs.jammerModuleContributionsToggleButton?.addEventListener("click", () => {
+    actions.toggleModuleContributionsPanel();
+  });
+  refs.jammerCalibrationTrackSelect.addEventListener("change", () => {
+    actions.setDetectorCalibrationTrackId(refs.jammerCalibrationTrackSelect.value);
+    actions.loadCurrentSongAnalysisFromDb().catch((error) => {
+      actions.log(`Calibration track load error: ${error.message}`);
+    });
+  });
+  refs.jammerCalibrationToggleButton?.addEventListener("click", () => {
+    actions.toggleDetectorCalibrationPanel();
   });
   refs.jammerPlayToggleButton.addEventListener("click", async () => {
     const nextEnabled = !services.jammerEngine.state.enabled;
@@ -218,8 +242,262 @@ function bindAppEvents(context) {
   refs.jammerLabToggleButton.addEventListener("click", () => {
     actions.toggleJammerLab();
   });
+  refs.jammerLabPanelToggleButton?.addEventListener("click", () => {
+    actions.toggleJammerLab();
+  });
+  refs.jammerMainPanelToggleButton?.addEventListener("click", () => {
+    actions.toggleJammerMainPanel();
+  });
   refs.jammerStrategyToggleButton.addEventListener("click", () => {
     actions.toggleJammerStrategies();
+  });
+  refs.jammerSongAnalyzeButton.addEventListener("click", () => {
+    actions.analyzeCurrentPlayerTrack().catch((error) => {
+      actions.log(`Song analysis error: ${error.message}`);
+    });
+  });
+  refs.jammerCalibrationRunTestButton.addEventListener("click", () => {
+    actions.startDetectorCalibrationTest().catch((error) => {
+      actions.log(`Playback calibration error: ${error.message}`);
+    });
+  });
+  refs.jammerCalibrationRetestAubioButton.addEventListener("click", () => {
+    actions.repeatModuleCalibrationTest("aubio", {
+      applySuggestions: refs.jammerCalibrationApplyAubioCheckbox.checked,
+    }).catch((error) => {
+      actions.log(`Aubio calibration retest error: ${error.message}`);
+    });
+  });
+  refs.jammerCalibrationRetestEssentiaButton.addEventListener("click", () => {
+    actions.repeatModuleCalibrationTest("essentia", {
+      applySuggestions: refs.jammerCalibrationApplyEssentiaCheckbox.checked,
+    }).catch((error) => {
+      actions.log(`Essentia calibration retest error: ${error.message}`);
+    });
+  });
+  refs.jammerCalibrationRepeatSelectedButton.addEventListener("click", () => {
+    actions.repeatSelectedCalibrationTests({
+      applyAubio: refs.jammerCalibrationApplyAubioCheckbox.checked,
+      applyEssentia: refs.jammerCalibrationApplyEssentiaCheckbox.checked,
+    }).catch((error) => {
+      actions.log(`Calibration repeat error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkTrackSelect.addEventListener("change", () => {
+    actions.setBpmBenchmarkTrackIds(Array.from(refs.jammerBpmBenchmarkTrackSelect.selectedOptions).map((option) => option.value).filter(Boolean));
+    actions.loadCurrentBpmBenchmarkState().catch((error) => {
+      actions.log(`BPM benchmark load error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkReloadButton?.addEventListener("click", () => {
+    actions.loadBpmBenchmarkCatalogFromServer().catch((error) => {
+      actions.log(`BPM benchmark catalog reload error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkToggleButton?.addEventListener("click", () => {
+    actions.toggleBpmBenchmarkPanel();
+  });
+  refs.jammerDetectionPanelToggleButton?.addEventListener("click", () => {
+    actions.toggleDetectionPanel();
+  });
+  refs.jammerDetectionExperimentToggleButton?.addEventListener("click", () => {
+    actions.toggleDetectionExperimentPanel();
+  });
+  refs.jammerDetectionExperimentWindowDownButton?.addEventListener("click", () => {
+    actions.adjustDetectionExperimentChartWindow(-1);
+  });
+  refs.jammerDetectionExperimentWindowUpButton?.addEventListener("click", () => {
+    actions.adjustDetectionExperimentChartWindow(1);
+  });
+  refs.jammerDetectionExperimentSoloButton?.addEventListener("click", () => {
+    actions.updateDetectionExperimentConfig({
+      soloEnabled: !(state.getDetectionExperimentConfig?.()?.soloEnabled === true),
+    });
+  });
+  refs.jammerDetectionExperimentPresetSelect?.addEventListener("change", () => {
+    const presetId = refs.jammerDetectionExperimentPresetSelect.value || "";
+    actions.setDetectionExperimentLastPresetId?.(presetId);
+    actions.persistSetting("detectionExperimentLastPresetId", presetId);
+    if (refs.jammerDetectionExperimentPresetName) {
+      const selectedPreset = state.getDetectionExperimentPresets?.().find((preset) => preset.id === presetId);
+      refs.jammerDetectionExperimentPresetName.value = selectedPreset?.name || "";
+    }
+    refs.jammerDetectionExperimentRenamePresetButton && (refs.jammerDetectionExperimentRenamePresetButton.disabled = !presetId);
+    refs.jammerDetectionExperimentLoadPresetButton && (refs.jammerDetectionExperimentLoadPresetButton.disabled = !presetId);
+    refs.jammerDetectionExperimentDeletePresetButton && (refs.jammerDetectionExperimentDeletePresetButton.disabled = !presetId);
+  });
+  refs.jammerDetectionExperimentSavePresetButton?.addEventListener("click", () => {
+    actions.saveDetectionExperimentPreset();
+  });
+  refs.jammerDetectionExperimentRenamePresetButton?.addEventListener("click", () => {
+    actions.renameDetectionExperimentPreset?.(refs.jammerDetectionExperimentPresetSelect?.value || "", refs.jammerDetectionExperimentPresetName?.value || "");
+  });
+  refs.jammerDetectionExperimentLoadPresetButton?.addEventListener("click", () => {
+    actions.loadDetectionExperimentPreset(refs.jammerDetectionExperimentPresetSelect?.value || "");
+  });
+  refs.jammerDetectionExperimentDeletePresetButton?.addEventListener("click", () => {
+    actions.deleteDetectionExperimentPreset(refs.jammerDetectionExperimentPresetSelect?.value || "");
+  });
+  refs.jammerDetectionExperimentPluginSelect?.addEventListener("change", () => {
+    actions.selectDetectionExperimentPluginMode?.(refs.jammerDetectionExperimentPluginSelect.value || "essentia");
+  });
+  refs.wiringPanelToggleButton?.addEventListener("click", () => {
+    actions.toggleWiringPanel();
+  });
+  const experimentFields = [
+    refs.jammerDetectionExperimentNormalizeEnabled,
+    refs.jammerDetectionExperimentNormalizeTarget,
+    refs.jammerDetectionExperimentLowBandMin,
+    refs.jammerDetectionExperimentLowCutoff,
+    refs.jammerDetectionExperimentMidCutoff,
+    refs.jammerDetectionExperimentRawEnabled,
+    refs.jammerDetectionExperimentLowEnabled,
+    refs.jammerDetectionExperimentMidEnabled,
+    refs.jammerDetectionExperimentHighEnabled,
+    refs.jammerDetectionExperimentTonalEnabled,
+    refs.jammerDetectionExperimentRawWeight,
+    refs.jammerDetectionExperimentLowWeight,
+    refs.jammerDetectionExperimentMidWeight,
+    refs.jammerDetectionExperimentHighWeight,
+    refs.jammerDetectionExperimentTonalWeight,
+    refs.jammerDetectionExperimentOnsetThreshold,
+    refs.jammerDetectionExperimentTempoMin,
+    refs.jammerDetectionExperimentTempoMax,
+    refs.jammerDetectionExperimentAubioTransientBias,
+    refs.jammerDetectionExperimentAubioLowBias,
+    refs.jammerDetectionExperimentEssentiaTickBias,
+    refs.jammerDetectionExperimentEssentiaHarmonicBias,
+  ].filter(Boolean);
+  const syncDetectionExperimentConfigFromUi = () => {
+    actions.updateDetectionExperimentConfig({
+      normalizeEnabled: refs.jammerDetectionExperimentNormalizeEnabled.checked,
+      normalizeTargetPeak: Number(refs.jammerDetectionExperimentNormalizeTarget.value || 0.94),
+      lowBandMinHz: Number(refs.jammerDetectionExperimentLowBandMin.value || 35),
+      lowCutoffHz: Number(refs.jammerDetectionExperimentLowCutoff.value || 140),
+      midCutoffHz: Number(refs.jammerDetectionExperimentMidCutoff.value || 2400),
+      rawEnabled: refs.jammerDetectionExperimentRawEnabled.checked,
+      lowEnabled: refs.jammerDetectionExperimentLowEnabled.checked,
+      midEnabled: refs.jammerDetectionExperimentMidEnabled.checked,
+      highEnabled: refs.jammerDetectionExperimentHighEnabled.checked,
+      tonalEnabled: refs.jammerDetectionExperimentTonalEnabled.checked,
+      rawWeight: Number(refs.jammerDetectionExperimentRawWeight.value || 0.18),
+      lowWeight: Number(refs.jammerDetectionExperimentLowWeight.value || 0.48),
+      midWeight: Number(refs.jammerDetectionExperimentMidWeight.value || 0.2),
+      highWeight: Number(refs.jammerDetectionExperimentHighWeight.value || 0.16),
+      tonalWeight: Number(refs.jammerDetectionExperimentTonalWeight.value || 0.16),
+      onsetThreshold: Number(refs.jammerDetectionExperimentOnsetThreshold.value || 0.085),
+      bpmMin: Number(refs.jammerDetectionExperimentTempoMin.value || 70),
+      bpmMax: Number(refs.jammerDetectionExperimentTempoMax.value || 180),
+      aubioSettings: {
+        transientBias: Number(refs.jammerDetectionExperimentAubioTransientBias.value || 0.64),
+        lowPulseBias: Number(refs.jammerDetectionExperimentAubioLowBias.value || 0.42),
+      },
+      essentiaSettings: {
+        stableTickBias: Number(refs.jammerDetectionExperimentEssentiaTickBias.value || 0.46),
+        harmonicAnchorWeight: Number(refs.jammerDetectionExperimentEssentiaHarmonicBias.value || 0.26),
+      },
+    });
+  };
+  experimentFields.forEach((field) => {
+    const eventName = field.type === "checkbox" || field.tagName === "SELECT" ? "change" : "input";
+    field.addEventListener(eventName, syncDetectionExperimentConfigFromUi);
+  });
+  refs.jammerBpmBenchmarkRunButton.addEventListener("click", () => {
+    actions.runBpmBenchmark().catch((error) => {
+      actions.log(`BPM benchmark error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkRetestAubioButton.addEventListener("click", () => {
+    actions.runBpmBenchmark({
+      moduleKeys: ["aubio"],
+      applySuggestions: { aubio: refs.jammerBpmBenchmarkApplyAubioCheckbox.checked },
+    }).catch((error) => {
+      actions.log(`Aubio benchmark retest error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkEvolveAubioButton?.addEventListener("click", () => {
+    actions.evolveBpmBenchmarkModule({
+      moduleKey: "aubio",
+      steps: 10,
+      trackIds: state.getBpmBenchmarkTrackIds(),
+    }).catch((error) => {
+      actions.log(`Aubio benchmark evolve error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkRetestEssentiaButton.addEventListener("click", () => {
+    actions.runBpmBenchmark({
+      moduleKeys: ["essentia"],
+      applySuggestions: { essentia: refs.jammerBpmBenchmarkApplyEssentiaCheckbox.checked },
+    }).catch((error) => {
+      actions.log(`Essentia benchmark retest error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkEvolveEssentiaButton?.addEventListener("click", () => {
+    actions.evolveBpmBenchmarkModule({
+      moduleKey: "essentia",
+      steps: 10,
+      trackIds: state.getBpmBenchmarkTrackIds(),
+    }).catch((error) => {
+      actions.log(`Essentia benchmark evolve error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkRepeatSelectedButton.addEventListener("click", () => {
+    actions.runBpmBenchmark({
+      moduleKeys: [
+        ...(refs.jammerBpmBenchmarkApplyAubioCheckbox.checked ? ["aubio"] : []),
+        ...(refs.jammerBpmBenchmarkApplyEssentiaCheckbox.checked ? ["essentia"] : []),
+      ].length > 0
+        ? [
+          ...(refs.jammerBpmBenchmarkApplyAubioCheckbox.checked ? ["aubio"] : []),
+          ...(refs.jammerBpmBenchmarkApplyEssentiaCheckbox.checked ? ["essentia"] : []),
+        ]
+        : ["aubio", "essentia"],
+      applySuggestions: {
+        aubio: refs.jammerBpmBenchmarkApplyAubioCheckbox.checked,
+        essentia: refs.jammerBpmBenchmarkApplyEssentiaCheckbox.checked,
+      },
+    }).catch((error) => {
+      actions.log(`BPM benchmark repeat error: ${error.message}`);
+    });
+  });
+  refs.jammerBpmBenchmarkResults?.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-bpm-action]");
+    if (!button) {
+      return;
+    }
+
+    const fileId = button.dataset.bpmFileId || "";
+    const moduleKey = button.dataset.moduleKey || "";
+    const rerun = button.dataset.bpmAction === "apply-retest";
+    const evolve = button.dataset.bpmAction === "evolve-x10";
+    if (!fileId || !moduleKey) {
+      return;
+    }
+
+    const scopeSelector = `[data-bpm-file-id="${fileId}"][data-module-key="${moduleKey}"] input[data-suggestion-key]:checked`;
+    const suggestionKeys = Array.from(refs.jammerBpmBenchmarkResults.querySelectorAll(scopeSelector))
+      .map((input) => input.dataset.suggestionKey)
+      .filter(Boolean);
+
+    if (evolve) {
+      actions.evolveBpmBenchmarkModule({
+        moduleKey,
+        steps: 10,
+        trackIds: [fileId],
+      }).catch((error) => {
+        actions.log(`BPM benchmark evolve error: ${error.message}`);
+      });
+      return;
+    }
+
+    actions.applyBpmBenchmarkSuggestionsForFile({
+      fileId,
+      moduleKey,
+      suggestionKeys,
+      rerun,
+    }).catch((error) => {
+      actions.log(`BPM benchmark apply error: ${error.message}`);
+    });
   });
   [
     refs.jammerLabBpmInput,
@@ -366,6 +644,10 @@ async function initializeRecorderApp(context) {
     services,
   } = context;
 
+  const bpmBenchmarkCatalogPromise = actions.loadBpmBenchmarkCatalogFromServer().catch((error) => {
+    actions.log(`BPM benchmark catalog unavailable: ${error.message}`);
+  });
+
   actions.renderSkinOptions();
   actions.setStageInlineWidth(`${Math.round(refs.stageShell.getBoundingClientRect().width)}px`);
   actions.placeJammerRuntimePanels();
@@ -393,6 +675,14 @@ async function initializeRecorderApp(context) {
     await actions.loadDefaultLibraryPlaylist().catch((error) => {
       actions.log(`Default library unavailable: ${error.message}`);
     });
+  }
+  await bpmBenchmarkCatalogPromise;
+  if (state.getBpmBenchmarkTracks().length === 0) {
+    window.setTimeout(() => {
+      actions.loadBpmBenchmarkCatalogFromServer().catch((error) => {
+        actions.log(`BPM benchmark catalog retry failed: ${error.message}`);
+      });
+    }, 1200);
   }
   actions.showPanel(state.getAppSettings().activeTab || "studio", false);
   actions.restartPresetCycle();

@@ -5,6 +5,9 @@ export function createAudioInputController({
   callbacks,
   helpers,
 }) {
+  let micPending = false;
+  let micRequestVersion = 0;
+
   function setMicPermissionButtonVisible(visible) {
     refs.requestMicPermissionButton.classList.toggle("hidden", !visible);
   }
@@ -32,12 +35,24 @@ export function createAudioInputController({
   function syncMicButtons() {
     const micActive = isMicrophoneActive();
     const playerLocked = isPlayerPlaying();
-    refs.startMicButton.disabled = playerLocked || micActive;
-    refs.stopMicButton.disabled = playerLocked || !micActive;
+    refs.startMicButton.disabled = playerLocked || micActive || micPending;
+    refs.stopMicButton.disabled = playerLocked || (!micActive && !micPending);
     refs.startRecordingButton.disabled = playerLocked || !micActive;
     if (playerLocked) {
       callbacks.updateMeterStatus("Player");
     }
+    callbacks.updateJammerSourceState();
+  }
+
+  function forceIdleMicButtons() {
+    if (isPlayerPlaying() || isMicrophoneActive() || micPending) {
+      syncMicButtons();
+      return;
+    }
+
+    refs.startMicButton.disabled = false;
+    refs.stopMicButton.disabled = true;
+    refs.startRecordingButton.disabled = true;
     callbacks.updateJammerSourceState();
   }
 
@@ -58,6 +73,7 @@ export function createAudioInputController({
     }
     callbacks.syncEssentiaSource();
     callbacks.syncAubioSource();
+    callbacks.syncDetectionExperimentSolo?.();
     callbacks.refreshMeterRoute();
     callbacks.updateJammerSourceState();
   }
@@ -80,6 +96,8 @@ export function createAudioInputController({
     refs.meterFill.style.width = "0%";
     callbacks.syncEssentiaSource();
     callbacks.syncAubioSource();
+    callbacks.syncDetectionExperimentSolo?.();
+    callbacks.clearDetectionExperiment?.();
     callbacks.refreshMeterRoute();
     callbacks.updateJammerSourceState();
   }
@@ -206,8 +224,15 @@ export function createAudioInputController({
   }
 
   async function startMicrophone() {
+    const requestVersion = micRequestVersion + 1;
+    micRequestVersion = requestVersion;
+    micPending = true;
+    syncMicButtons();
+
     try {
       if (isPlayerPlaying()) {
+        micPending = false;
+        syncMicButtons();
         callbacks.log("Pause the player before enabling the microphone");
         return;
       }
@@ -232,6 +257,10 @@ export function createAudioInputController({
       }
 
       const micStream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (requestVersion !== micRequestVersion) {
+        micStream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       const micSource = state.audioContext.createMediaStreamSource(micStream);
       const gainNode = state.audioContext.createGain();
       gainNode.gain.value = 1.25;
@@ -249,6 +278,7 @@ export function createAudioInputController({
 
       callbacks.startRenderLoop();
       callbacks.updateMeterStatus("Listening");
+      micPending = false;
       syncMicButtons();
       callbacks.refreshJammerUi();
 
@@ -256,39 +286,32 @@ export function createAudioInputController({
       callbacks.restartPresetCycle();
       callbacks.log("Microphone connected");
     } catch (error) {
+      micPending = false;
+      syncMicButtons();
       callbacks.log(`Microphone error: ${error.message}`);
     }
   }
 
   function stopMicrophone() {
+    micRequestVersion += 1;
+    micPending = false;
     const state = getState();
     const activeMicNode = state.gainNode;
+    const micSource = state.micSource;
+    const gainNode = state.gainNode;
+    const currentAnalyser = state.analyser;
+    const micStream = state.micStream;
     const hadMicRoute = state.activeInputMode === "microphone" || state.activeAudioNode === activeMicNode;
 
     if (callbacks.isRecorderRecording()) {
       callbacks.stopRecording();
     }
 
-    if (state.micSource) {
-      state.micSource.disconnect();
-    }
-
-    if (state.gainNode) {
-      state.gainNode.disconnect();
-    }
-
-    if (state.analyser) {
-      state.analyser.disconnect();
-    }
-
-    if (state.micStream) {
-      state.micStream.getTracks().forEach((track) => track.stop());
-    }
-
     const nextState = {
       micStream: null,
       micSource: null,
       gainNode: null,
+      analyser: null,
     };
     if (hadMicRoute) {
       if (state.visualizer && state.activeAudioNode) {
@@ -297,15 +320,31 @@ export function createAudioInputController({
       nextState.activeAudioNode = null;
       nextState.activeInputMode = "none";
     }
-    nextState.analyser = hadMicRoute && state.activeInputMode !== "player"
-      ? null
-      : (state.activeInputMode === "player" ? state.playerAnalyser : null);
     setState(nextState);
+
+    if (micSource) {
+      micSource.disconnect();
+    }
+
+    if (gainNode) {
+      gainNode.disconnect();
+    }
+
+    if (currentAnalyser) {
+      currentAnalyser.disconnect();
+    }
+
+    if (micStream) {
+      micStream.getTracks().forEach((track) => track.stop());
+    }
 
     callbacks.syncEssentiaSource();
     callbacks.syncAubioSource();
+    callbacks.syncDetectionExperimentSolo?.();
+    callbacks.clearDetectionExperiment?.();
     refs.stopRecordingButton.disabled = true;
     syncMicButtons();
+    forceIdleMicButtons();
     callbacks.applyStandbyMeterState();
     callbacks.restartPresetCycle();
     if (getState().activeInputMode !== "player") {
