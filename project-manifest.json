@@ -1,0 +1,38 @@
+{
+  "name": "AudioReactor",
+  "slug": "audioreactor",
+  "path": "F:/_CODEX/AudioReactor/butterchurn",
+  "status": "active",
+  "version": "0.1.0",
+  "summary": "Audio-reactive visualization and experimentation project built around Butterchurn and related tools.",
+  "description": "Audio-reactive visualization and experimentation project built around Butterchurn and related tools.",
+  "local_agents": "F:/_CODEX/AudioReactor/butterchurn/AGENTS.md",
+  "project_card": "F:/_CODEX/AI-WORKSPACE/codex-knowledge-hub/projects/audioreactor.yaml",
+  "hub_root": "F:/_CODEX/AI-WORKSPACE/codex-knowledge-hub",
+  "capabilities": [
+    "audio-reactive-visualization",
+    "music-visualizer-engine",
+    "audio-reactive-recording",
+    "visual-experimentation"
+  ],
+  "interfaces": [],
+  "reusable_skills": [
+    "project-bootstrap",
+    "sviluppo-conoscenza"
+  ],
+  "dependencies_on_projects": [],
+  "sync_watch": {
+    "poll_interval_seconds": 5,
+    "paths": [
+      "project-manifest.json",
+      "pyproject.toml",
+      "package.json",
+      "interfaces"
+    ]
+  },
+  "notes": [
+    "Bootstrapped with the project-bootstrap skill.",
+    "Onboarded into AI-WORKSPACE."
+  ],
+  "last_updated": "2026-05-26T00:11:55.986078+00:00"
+}
