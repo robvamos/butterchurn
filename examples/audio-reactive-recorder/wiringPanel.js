@@ -23,7 +23,7 @@ export function renderWiringPanel() {
         <div class="jammer-detection-headline-block">
           <div class="section-title">Wiring</div>
           <div id="wiringPanelStatus" class="jammer-panel-status">Idle</div>
-          <div class="hint">Live map of the audio path: input, preprocessing, detector lanes, grid building, phase alignment, structure, and drummer output.</div>
+          <div class="hint">Live map of the audio path: input, shared preprocessing, open-source detector lanes, adaptive grid building, phase alignment, structure memory, and drummer output.</div>
         </div>
         <button
           id="wiringPanelToggleButton"
@@ -43,11 +43,11 @@ export function renderWiringPanel() {
         <div class="wiring-flow-grid">
           ${renderNode("wiringInputNode", "Input")}
           <div class="wiring-flow-arrow" aria-hidden="true">→</div>
-          ${renderNode("wiringPreprocessNode", "Preprocess")}
+          ${renderNode("wiringPreprocessNode", "Shared Preprocess")}
           <div class="wiring-flow-arrow" aria-hidden="true">→</div>
-          ${renderNode("wiringPluginNode", "Plugin Lanes")}
+          ${renderNode("wiringPluginNode", "Beat Lanes")}
           <div class="wiring-flow-arrow" aria-hidden="true">→</div>
-          ${renderNode("wiringGridNode", "Grid + Phase")}
+          ${renderNode("wiringGridNode", "Adaptive Grid")}
         </div>
 
         <div class="wiring-detail-grid">
@@ -63,30 +63,30 @@ export function renderWiringPanel() {
           <div class="wiring-detail-section">
             <div class="wiring-chip-section-title">Preprocessing</div>
             <div class="wiring-branch-grid">
-              ${renderNode("wiringNormalizeNode", "Normalize")}
+              ${renderNode("wiringNormalizeNode", "Shared lane")}
               ${renderNode("wiringSignalCountNode", "Signals")}
-              ${renderNode("wiringSignalWeightsNode", "Weights")}
+              ${renderNode("wiringSignalWeightsNode", "Weights + raw")}
             </div>
             <div class="wiring-summary compact" id="wiringSignalSummary">No preprocessing signals active yet.</div>
           </div>
 
           <div class="wiring-detail-section">
-            <div class="wiring-chip-section-title">Plugin Lanes</div>
+            <div class="wiring-chip-section-title">Detector Lanes</div>
             <div class="wiring-branch-grid">
-              ${renderNode("wiringAubioNode", "Aubio")}
-              ${renderNode("wiringEssentiaNode", "Essentia")}
-              ${renderNode("wiringFusionNode", "Fusion")}
+              ${renderNode("wiringAubioNode", "Aubio fast")}
+              ${renderNode("wiringEssentiaNode", "Essentia deep")}
+              ${renderNode("wiringFusionNode", "Grid brain")}
             </div>
           </div>
 
           <div class="wiring-detail-section">
             <div class="wiring-chip-section-title">Grid + Structure</div>
             <div class="wiring-branch-grid">
-              ${renderNode("wiringClockNode", "Clock Model")}
-              ${renderNode("wiringPhaseNode", "Phase")}
-              ${renderNode("wiringStructureNode", "Song Form")}
+              ${renderNode("wiringClockNode", "Kalman / Particle")}
+              ${renderNode("wiringPhaseNode", "Beat + bar phase")}
+              ${renderNode("wiringStructureNode", "Song form")}
             </div>
-            <div class="wiring-summary compact" id="wiringClockSummary">Kalman or Particle takes detector evidence and stabilizes tempo, beat phase, and bar loop.</div>
+            <div class="wiring-summary compact" id="wiringClockSummary">JamPal builds a Mixxx-style adaptive beatgrid from detector evidence, then Kalman or Particle stabilizes tempo, beat phase, and bar loop.</div>
           </div>
         </div>
 
@@ -182,9 +182,9 @@ function getTimingModelLabel(model) {
 function getDetectorLabel(mode) {
   switch (mode) {
     case "aubio":
-      return "Aubio";
+      return "Aubio fast";
     case "essentia":
-      return "Essentia";
+      return "Essentia deep";
     default:
       return "Fusion";
   }
@@ -292,7 +292,7 @@ export function createWiringPanelView({ refs, getState }) {
     }
     if (refs.wiringSummary) {
       refs.wiringSummary.textContent = preprocessActive
-        ? `${sourceLabel} enters preprocessing, opens ${activeSignals.length} signal lanes (${signalSummary}), feeds ${detectorLabel.toLowerCase()} detection, then ${timingLabel.toLowerCase()} alignment builds tempo, beat phase, and the loop grid before the drummer reacts.`
+        ? `${sourceLabel} enters Web Audio preprocessing, opens ${activeSignals.length} signal lanes (${signalSummary}), feeds the ${detectorLabel.toLowerCase()} lane, then the JamPal adaptive grid core applies ${timingLabel.toLowerCase()} smoothing before the drummer reacts.`
         : "Studio idle. Open a source to watch the flow wake up.";
     }
 
@@ -310,7 +310,7 @@ export function createWiringPanelView({ refs, getState }) {
     setNode(refs.wiringSignalWeightsNode, activeSignals.length ? `Mix ${inputMixPercent}%` : "No weights", activeSignals.length ? "focus" : "idle");
     if (refs.wiringSignalSummary) {
       refs.wiringSignalSummary.textContent = activeSignals.length
-        ? `Signals in play: ${signalSummary}. Weights: ${getSignalWeightSummary(config)}. Low range ${Number(config.lowBandMinHz || 35)}-${Number(config.lowCutoffHz || 140)} Hz, mid/high split ${Number(config.midCutoffHz || 2400)} Hz.`
+        ? `Signals in play: ${signalSummary}. Weights: ${getSignalWeightSummary(config)}. Shared preprocessing is browser-side and can include raw amp, low, mid, high, and tonal lanes. Low range ${Number(config.lowBandMinHz || 35)}-${Number(config.lowCutoffHz || 140)} Hz, mid/high split ${Number(config.midCutoffHz || 2400)} Hz.`
         : "No preprocessing signals active yet.";
     }
 
@@ -326,8 +326,8 @@ export function createWiringPanelView({ refs, getState }) {
     setNode(refs.wiringStructureNode, structureLabel, state.songAnalysisRunning || state.currentSongAnalysis ? "active" : "idle");
     if (refs.wiringClockSummary) {
       refs.wiringClockSummary.textContent = preprocessActive
-        ? `${timingLabel} is used after plugin evidence is collected. It stabilizes tempo, beat phase, and bar loop before the drummer acts. Current grid ${Number(state.detectionSummary?.tempo || 0) > 0 ? `${Math.round(Number(state.detectionSummary.tempo))} BPM` : "waiting"}, lock ${lock}%, beat ${beatLabel}, loop ${loopLabel}.`
-        : "Kalman or Particle takes detector evidence and stabilizes tempo, beat phase, and bar loop.";
+        ? `JamPal's adaptive grid core is inspired by Mixxx-style beatgrid coordinates: local BPM, offset, and beat/bar phase. ${timingLabel} runs after detector evidence is collected, not inside preprocessing. Current grid ${Number(state.detectionSummary?.tempo || 0) > 0 ? `${Math.round(Number(state.detectionSummary.tempo))} BPM` : "waiting"}, lock ${lock}%, beat ${beatLabel}, loop ${loopLabel}. Offline truth can be refined separately through Essentia, librosa, and madmom-style analysis.`
+        : "JamPal builds an adaptive beatgrid from detector evidence, then Kalman or Particle stabilizes tempo, beat phase, and bar loop.";
     }
 
     setNode(refs.wiringFeedbackNode, feedbackLabel, state.jammerEnabled ? "active" : "idle");

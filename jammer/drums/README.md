@@ -22,6 +22,9 @@ Target signal chain:
   First Tone.js bridge with a starter kick/snare/hat placeholder kit.
 - `index.js`
   Catalog and factory entrypoint for the Jammer tab.
+- `OPEN_SOURCE_BEATGRID_WIRING.md`
+  Stored design note that maps the Cortex adaptive beatgrid brief onto JamPal's
+  realtime and offline wiring using open-source analysis tools.
 
 ## Planned implementation layers
 
