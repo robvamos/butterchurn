@@ -13,14 +13,27 @@
     "audio-reactive-visualization",
     "music-visualizer-engine",
     "audio-reactive-recording",
-    "visual-experimentation"
+    "visual-experimentation",
+    "milotalks-codex-task-consumer",
+    "local-agent-task-bus"
   ],
-  "interfaces": [],
+  "interfaces": [
+    {
+      "name": "milotalks-codex-consumer",
+      "path": "./interfaces/milotalks-codex-consumer.md",
+      "status": "draft",
+      "version": "0.1.0",
+      "producer": "knowledge",
+      "role": "consumer"
+    }
+  ],
   "reusable_skills": [
     "project-bootstrap",
     "sviluppo-conoscenza"
   ],
-  "dependencies_on_projects": [],
+  "dependencies_on_projects": [
+    "knowledge"
+  ],
   "sync_watch": {
     "poll_interval_seconds": 5,
     "paths": [
@@ -32,7 +45,8 @@
   },
   "notes": [
     "Bootstrapped with the project-bootstrap skill.",
-    "Onboarded into AI-WORKSPACE."
+    "Onboarded into AI-WORKSPACE.",
+    "Now exposes a local-first MiloTalks inbox/outbox bridge compatible with the Knowledge Codex connector."
   ],
-  "last_updated": "2026-05-26T00:11:55.986078+00:00"
+  "last_updated": "2026-05-30T10:45:00+00:00"
 }

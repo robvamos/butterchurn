@@ -231,6 +231,28 @@ function evaluateTempoFit({ tempo, duration, beatTimes = [], envelopeAnalysis })
   };
 }
 
+function computeAnchorScore(result = {}) {
+  const fitScore = clamp(Number(result.fitScore || 0), 0, 1);
+  const downbeat = clamp(Number(result.downbeatBias || 0) / 1.35, 0, 1);
+  const backbeat = clamp(Number(result.backbeatBias || 0) / 1.2, 0, 1);
+  const tickAlignment = clamp(Number(result.tickAlignment || 0), 0, 1);
+  const referenceScore = clamp(
+    Number(result.referenceFit?.score ?? result.referenceFit?.barScore ?? fitScore),
+    0,
+    1,
+  );
+
+  return clamp(
+    (fitScore * 0.3)
+    + (downbeat * 0.28)
+    + (tickAlignment * 0.22)
+    + (referenceScore * 0.14)
+    + (backbeat * 0.06),
+    0,
+    1,
+  );
+}
+
 function chooseBestTempo(candidates = [], envelopeAnalysis, duration) {
   const ranked = candidates
     .map((candidate) => {
@@ -282,7 +304,13 @@ function chooseBestTempo(candidates = [], envelopeAnalysis, duration) {
   };
 }
 
-function computeModuleScore({ knownBpm, detectedTempo, confidence, fitScore }) {
+function computeModuleScore({
+  knownBpm,
+  detectedTempo,
+  confidence,
+  fitScore,
+  anchorScore = fitScore,
+}) {
   if (!knownBpm || !detectedTempo) {
     return 0;
   }
@@ -290,7 +318,15 @@ function computeModuleScore({ knownBpm, detectedTempo, confidence, fitScore }) {
   const tempoScore = clamp(100 - (delta * 12), 0, 100);
   const confidenceScore = clamp(confidence, 0, 100);
   const structureScore = clamp((fitScore || 0) * 100, 0, 100);
-  return Math.round(clamp((tempoScore * 0.6) + (confidenceScore * 0.18) + (structureScore * 0.22), 1, 100));
+  const beatAnchorScore = clamp((anchorScore || 0) * 100, 0, 100);
+  return Math.round(clamp(
+    (tempoScore * 0.54)
+    + (confidenceScore * 0.16)
+    + (structureScore * 0.15)
+    + (beatAnchorScore * 0.15),
+    1,
+    100,
+  ));
 }
 
 function evaluateReferenceAlignment(tempo, duration, referenceAnalysis) {
@@ -409,6 +445,16 @@ function buildAubioSuggestions(result, knownBpm, config) {
       nextConfig.silenceDb = clamp((config.silenceDb || -70) + 6, -80, -42);
       nextConfig.barSyncWeight = clamp((config.barSyncWeight || 0.28) + 0.06, 0.05, 0.95);
     }
+
+    if ((result.anchorScore || 0) < 0.68 || (result.tickAlignment || 0) < 0.72 || (result.downbeatBias || 0) < 1.08) {
+      suggestions.push("L'uno di battuta non è ancora abbastanza saldo: rinforziamo la memoria di bar line e lasciamo più spazio agli indizi low-mid che guidano il downbeat.");
+      suggestions.push("Diamo più peso alla sincronizzazione di battuta e all'anchor armonico, così i transienti veloci contano meno del vero punto di ingresso bar.");
+      nextConfig.barSyncWeight = clamp((config.barSyncWeight || 0.28) + 0.08, 0.05, 0.95);
+      nextConfig.harmonicAnchorWeight = clamp((config.harmonicAnchorWeight || 0.16) + 0.07, 0.02, 0.9);
+      nextConfig.lowWeight = clamp((config.lowWeight || 0.72) + 0.05, 0.25, 1.15);
+      nextConfig.midWeight = clamp((config.midWeight || 0.34) + 0.04, 0.08, 0.95);
+      nextConfig.highWeight = clamp((config.highWeight || 0.28) - 0.04, 0.04, 0.5);
+    }
   }
 
   if (suggestions.length === 0 || (delta <= 2 && score >= 80 && result.confidence >= 70)) {
@@ -477,6 +523,16 @@ function buildEssentiaSuggestions(result, knownBpm, config) {
       nextConfig.tickWeight = clamp((config.tickWeight || 0.22) + 0.06, 0.08, 0.6);
       nextConfig.lowEnvelopeWeight = clamp((config.lowEnvelopeWeight || 0.18) + 0.05, 0.06, 0.6);
       nextConfig.sectionSyncWeight = clamp((config.sectionSyncWeight || 0.22) + 0.06, 0.04, 0.95);
+    }
+
+    if ((result.anchorScore || 0) < 0.7 || (result.tickAlignment || 0) < 0.74 || (result.downbeatBias || 0) < 1.08) {
+      suggestions.push("Il beat 1 resta incerto: conviene far pesare di più tick, low band e memoria di sezione così la bar line emerge meglio.");
+      suggestions.push("Aumentiamo anche le ancore armoniche, utili quando il cambio di accordo coincide con l'ingresso della battuta.");
+      nextConfig.tickWeight = clamp((config.tickWeight || 0.22) + 0.06, 0.08, 0.6);
+      nextConfig.lowEnvelopeWeight = clamp((config.lowEnvelopeWeight || 0.18) + 0.05, 0.06, 0.6);
+      nextConfig.sectionSyncWeight = clamp((config.sectionSyncWeight || 0.22) + 0.07, 0.04, 0.95);
+      nextConfig.harmonicAnchorWeight = clamp((config.harmonicAnchorWeight || 0.16) + 0.08, 0.02, 0.9);
+      nextConfig.mixedEnvelopeWeight = clamp((config.mixedEnvelopeWeight || 0.1) - 0.03, 0.02, 0.35);
     }
   }
 
@@ -596,12 +652,14 @@ class BpmBenchmarkAnalyzer {
       detectedTempo: aubioResult.tempo,
       confidence: aubioResult.confidence,
       fitScore: aubioResult.fitScore,
+      anchorScore: aubioResult.anchorScore,
     });
     essentiaResult.score = computeModuleScore({
       knownBpm,
       detectedTempo: essentiaResult.tempo,
       confidence: essentiaResult.confidence,
       fitScore: essentiaResult.fitScore,
+      anchorScore: essentiaResult.anchorScore,
     });
 
     const aubioSuggestions = buildAubioSuggestions(aubioResult, knownBpm, aubioConfig);
@@ -711,6 +769,11 @@ class BpmBenchmarkAnalyzer {
       tempo: best?.tempo || directTempo || beatTempo.tempo || lowTempo.tempo || 0,
       confidence: Math.round(clamp(best?.confidence || average(confidenceSamples) || 0, 0, 100)),
       fitScore: best?.fitScore || 0,
+      downbeatBias: best?.downbeatBias || 0,
+      backbeatBias: best?.backbeatBias || 0,
+      tickAlignment: best?.tickAlignment || 0,
+      referenceFit: best?.referenceFit || null,
+      anchorScore: computeAnchorScore(best || {}),
       beatCount: beatTimes.length,
       onsetCount: onsetHits.length,
       candidates: ranked.slice(0, 4).map((candidate) => ({
@@ -769,6 +832,11 @@ class BpmBenchmarkAnalyzer {
       tempo: best?.tempo || rhythmTempo || tickTempo.tempo || lowTempo.tempo || 0,
       confidence: Math.round(clamp(best?.confidence || rhythmConfidence || 0, 0, 100)),
       fitScore: best?.fitScore || 0,
+      downbeatBias: best?.downbeatBias || 0,
+      backbeatBias: best?.backbeatBias || 0,
+      tickAlignment: best?.tickAlignment || 0,
+      referenceFit: best?.referenceFit || null,
+      anchorScore: computeAnchorScore(best || {}),
       beatCount: ticks.length,
       onsetCount: 0,
       candidates: ranked.slice(0, 4).map((candidate) => ({

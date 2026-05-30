@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://audioreactor.local/schemas/codex-task-result.schema.json",
+  "title": "AudioReactor MiloTalks Codex Task Result",
+  "type": "object",
+  "required": [
+    "taskId",
+    "correlationId",
+    "projectId",
+    "status",
+    "summary",
+    "updatedAt"
+  ],
+  "properties": {
+    "taskId": { "type": "string", "minLength": 1 },
+    "correlationId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "const": "audioreactor" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "in_progress",
+        "blocked",
+        "needs_clarification",
+        "completed"
+      ]
+    },
+    "summary": { "type": "string", "minLength": 1 },
+    "details": { "type": "string" },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blockingReasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "references": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": true
+}

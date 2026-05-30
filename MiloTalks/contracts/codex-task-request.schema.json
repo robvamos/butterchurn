@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://audioreactor.local/schemas/codex-task-request.schema.json",
+  "title": "AudioReactor MiloTalks Codex Task Request",
+  "type": "object",
+  "required": [
+    "taskId",
+    "createdAt",
+    "projectId",
+    "repo",
+    "branch",
+    "requestedBy",
+    "userUtterance",
+    "goal",
+    "riskLevel",
+    "requiresConfirmation",
+    "deliveryMode",
+    "status",
+    "correlationId",
+    "replyChannel"
+  ],
+  "properties": {
+    "taskId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "projectId": { "type": "string", "const": "audioreactor" },
+    "repo": { "type": "string", "minLength": 1 },
+    "branch": { "type": "string", "minLength": 1 },
+    "requestedBy": { "type": "string", "minLength": 1 },
+    "sourceProject": { "type": "string" },
+    "userUtterance": { "type": "string", "minLength": 1 },
+    "goal": { "type": "string", "minLength": 1 },
+    "constraints": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "riskLevel": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "requiresConfirmation": { "type": "boolean" },
+    "deliveryMode": {
+      "type": "string",
+      "enum": ["summary", "patch", "branch", "pull_request"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "queued", "accepted"]
+    },
+    "replyChannel": { "type": "string", "minLength": 1 },
+    "correlationId": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}

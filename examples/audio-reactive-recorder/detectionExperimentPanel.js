@@ -96,6 +96,18 @@ export function renderDetectionExperimentPanel() {
           <div id="jammerDetectionExperimentSummary" class="jammer-detection-value">Waiting for a live source.</div>
         </div>
       </div>
+      <div class="jammer-detection-experiment-config-row">
+        <div class="jammer-detection-summary-stat jammer-detection-experiment-config-stat">
+          <div class="jammer-detection-label">Config Snapshot</div>
+          <div id="jammerDetectionExperimentConfigSummary" class="jammer-detection-value">Essentia | mix and sweep ready</div>
+        </div>
+      </div>
+      <div class="jammer-detection-experiment-config-row">
+        <div class="jammer-detection-summary-stat jammer-detection-experiment-config-stat">
+          <div class="jammer-detection-label">Understanding</div>
+          <div id="jammerDetectionExperimentEvaluationSummary" class="jammer-detection-value">BPM chase listening | beat 1 idle | phase map unknown</div>
+        </div>
+      </div>
       </div>
 
       <div class="jammer-detection-experiment-chart-grid top">
@@ -323,6 +335,8 @@ export function getDetectionExperimentRefs(root = document) {
     jammerDetectionExperimentWindowLabel: root.getElementById("jammerDetectionExperimentWindowLabel"),
     jammerDetectionExperimentWindowUpButton: root.getElementById("jammerDetectionExperimentWindowUpButton"),
     jammerDetectionExperimentSummary: root.getElementById("jammerDetectionExperimentSummary"),
+    jammerDetectionExperimentConfigSummary: root.getElementById("jammerDetectionExperimentConfigSummary"),
+    jammerDetectionExperimentEvaluationSummary: root.getElementById("jammerDetectionExperimentEvaluationSummary"),
     jammerDetectionExperimentFastTempo: root.getElementById("jammerDetectionExperimentFastTempo"),
     jammerDetectionExperimentMediumTempo: root.getElementById("jammerDetectionExperimentMediumTempo"),
     jammerDetectionExperimentLongTempo: root.getElementById("jammerDetectionExperimentLongTempo"),

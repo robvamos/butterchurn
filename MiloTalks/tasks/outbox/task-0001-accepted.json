@@ -1,0 +1,16 @@
+{
+  "taskId": "TASK-0001",
+  "correlationId": "task-0001",
+  "projectId": "audioreactor",
+  "status": "accepted",
+  "summary": "AudioReactor accepted the MiloTalks bridge task.",
+  "details": "Local inbox/outbox integration has been scaffolded and documented.",
+  "artifacts": [],
+  "blockingReasons": [],
+  "references": [
+    "MiloTalks/README.md",
+    "interfaces/milotalks-codex-consumer.md",
+    "project-manifest.json"
+  ],
+  "updatedAt": "2026-05-30T09:41:18.169Z"
+}

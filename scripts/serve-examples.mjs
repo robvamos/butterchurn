@@ -185,6 +185,14 @@ const server = http.createServer((req, res) => {
   const requestUrl = req.url || "/";
   const urlPath = decodeURIComponent(requestUrl.split("?")[0]);
 
+  if (urlPath === "/favicon.ico") {
+    res.writeHead(204, {
+      "Cache-Control": "no-store",
+    });
+    res.end();
+    return;
+  }
+
   if (urlPath === `${libraryPrefix}/index.json`) {
     getDefaultLibraryManifest()
       .then((manifest) => {

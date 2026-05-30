@@ -142,6 +142,19 @@ describe('JamPal Smoke Test', () => {
     expect(presetOptions.length).toBeGreaterThan(1);
     expect(presetOptions[0]).not.toBe('Loading presets...');
 
+    await page.click('#jammerTabButton');
+    await page.waitForFunction(
+      () => {
+        const select = document.querySelector('#jammerBpmBenchmarkTrackSelect');
+        return Boolean(select && select.options.length > 0 && select.options[0].textContent !== 'No BPM benchmark files');
+      }
+    );
+    const bpmBenchmarkOptions = await page.$$eval('#jammerBpmBenchmarkTrackSelect option', options =>
+      options.map(option => option.textContent)
+    );
+    expect(bpmBenchmarkOptions.length).toBeGreaterThan(0);
+    await page.click('#studioHomeButton');
+
     const logEl = await page.$('#log');
     expect(logEl).toBeTruthy();
 

@@ -1,0 +1,27 @@
+{
+  "taskId": "TASK-0001",
+  "createdAt": "2026-05-30T09:41:18.205Z",
+  "projectId": "audioreactor",
+  "repo": "https://github.com/robvamos/butterchurn",
+  "branch": "feature/audio-reactive-recorder-mvp",
+  "requestedBy": "milo",
+  "sourceProject": "knowledge",
+  "userUtterance": "Hey Milo, ask Codex to improve AudioReactor MP4 export.",
+  "goal": "Improve AudioReactor MP4 export flow without breaking the existing WebM recorder.",
+  "constraints": [
+    "Keep WebM stable",
+    "Update README_AUDIO_REACTIVE.md",
+    "Prefer local-first orchestration compatibility"
+  ],
+  "acceptanceCriteria": [
+    "Task file is created in the project inbox",
+    "The goal is explicit",
+    "The reply channel is declared"
+  ],
+  "riskLevel": "medium",
+  "requiresConfirmation": false,
+  "deliveryMode": "summary",
+  "status": "draft",
+  "replyChannel": "MiloTalks/tasks/outbox",
+  "correlationId": "task-0001"
+}

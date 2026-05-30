@@ -2568,6 +2568,21 @@
   grid-template-columns: repeat(4, minmax(108px, 1fr)) minmax(260px, 2fr);
 }
 
+.jammer-detection-experiment-config-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.jammer-detection-experiment-config-stat {
+  min-width: 0;
+}
+
+.jammer-detection-experiment-config-stat .jammer-detection-value {
+  white-space: normal;
+  line-height: 1.35;
+  font-size: 0.84rem;
+}
+
 .jammer-detection-experiment-grid.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

@@ -1101,6 +1101,12 @@ export function createJammerRuntimeView({ refs, getState, formatters }) {
       refs.jammerDetectionExperimentWindowLabel.textContent = `${Number(config.chartWindowSeconds || 8).toFixed(1)} s`;
     }
     refs.jammerDetectionExperimentSummary.textContent = experiment.summary || "Waiting for a live source.";
+    if (refs.jammerDetectionExperimentConfigSummary) {
+      refs.jammerDetectionExperimentConfigSummary.textContent = buildDetectionExperimentConfigSummary(config);
+    }
+    if (refs.jammerDetectionExperimentEvaluationSummary) {
+      refs.jammerDetectionExperimentEvaluationSummary.textContent = buildDetectionExperimentEvaluationSummary(state, experiment);
+    }
 
     refs.jammerDetectionExperimentRawMeta.textContent = `${Math.round(Number(experiment.rawLevel || 0) * 100)}%`;
     refs.jammerDetectionExperimentLowMeta.textContent = `${Math.round(Number(experiment.lowLevel || 0) * 100)}%`;
@@ -1117,6 +1123,79 @@ export function createJammerRuntimeView({ refs, getState, formatters }) {
     drawExperimentSeries(refs.jammerDetectionExperimentHighCanvas, getExperimentWindowSeries(experiment.charts?.high, frameSeconds, chartWindowSeconds), "#f6c255");
     drawExperimentSeries(refs.jammerDetectionExperimentTonalCanvas, getExperimentWindowSeries(experiment.charts?.tonal, frameSeconds, chartWindowSeconds), "#f28bff");
     drawExperimentSeries(refs.jammerDetectionExperimentWeightedCanvas, getExperimentWindowSeries(experiment.charts?.weighted, frameSeconds, chartWindowSeconds), "#ffffff");
+  }
+
+  function formatExperimentNumber(value, digits = 2) {
+    return Number(Number(value || 0).toFixed(digits));
+  }
+
+  function buildDetectionExperimentConfigSummary(config = {}) {
+    const pluginLabel = config.pluginMode === "aubio" ? "Aubio" : "Essentia";
+    const enabledSignals = [
+      config.rawEnabled ? "raw" : null,
+      config.lowEnabled ? "low" : null,
+      config.midEnabled ? "mid" : null,
+      config.highEnabled ? "high" : null,
+      config.tonalEnabled ? "tonal" : null,
+    ].filter(Boolean).join("/");
+
+    const mixLabel = `mix R${formatExperimentNumber(config.rawWeight)} L${formatExperimentNumber(config.lowWeight)} M${formatExperimentNumber(config.midWeight)} H${formatExperimentNumber(config.highWeight)} T${formatExperimentNumber(config.tonalWeight)}`;
+    const sweepLabel = `sweep ${Math.round(Number(config.lowBandMin || 0))}-${Math.round(Number(config.lowCutoff || 0))}-${Math.round(Number(config.midCutoff || 0))} Hz`;
+    const rangeLabel = `gate ${formatExperimentNumber(config.onsetThreshold, 3)} | bpm ${Math.round(Number(config.tempoMin || 0))}-${Math.round(Number(config.tempoMax || 0))}`;
+    const biasLabel = config.pluginMode === "aubio"
+      ? `bias tr ${formatExperimentNumber(config.aubioTransientBias)} | low ${formatExperimentNumber(config.aubioLowBias)}`
+      : `bias tick ${formatExperimentNumber(config.essentiaTickBias)} | harm ${formatExperimentNumber(config.essentiaHarmonicBias)}`;
+    const normalizeLabel = config.normalizeEnabled === false
+      ? "norm off"
+      : `norm ${formatExperimentNumber(config.normalizeTarget)}`;
+
+    return `${pluginLabel} | ${enabledSignals || "no lanes"} | ${mixLabel} | ${biasLabel} | ${rangeLabel} | ${sweepLabel} | ${normalizeLabel}`;
+  }
+
+  function describeExperimentLevel(score) {
+    const safeScore = Math.round(Number(score || 0));
+    if (safeScore >= 82) {
+      return "locked";
+    }
+    if (safeScore >= 64) {
+      return "strong";
+    }
+    if (safeScore >= 46) {
+      return "tracking";
+    }
+    if (safeScore >= 24) {
+      return "probing";
+    }
+    return "idle";
+  }
+
+  function buildDetectionExperimentEvaluationSummary(state, experiment = {}) {
+    const detection = state.detectionSummary || {};
+    const bpmScore = Math.max(
+      Number(experiment.confidence || 0),
+      Math.round(Number(detection.pllLock || 0)),
+    );
+    const beatOneScore = Math.max(
+      Number(detection.barAnchorConfidence || 0),
+      Math.round(Number(experiment.phaseConfidence || 0) * 0.82),
+    );
+    const structureScore = Math.max(
+      Number(detection.structureConfidence || 0),
+      Math.round(Number(detection.structureTransitionConfidence || 0) * 0.72),
+    );
+
+    const bpmLabel = `${describeExperimentLevel(bpmScore)} ${bpmScore}%`;
+    const beatOneLabel = `${describeExperimentLevel(beatOneScore)} ${beatOneScore}%`;
+
+    const sectionLabel = structureScore > 0
+      ? `${describeExperimentLevel(structureScore)} ${structureScore}% ${formatSectionLabel(detection.structureSection || "unknown")} -> ${formatSectionLabel(detection.structureNextSection || "unknown")}`
+      : "unknown";
+
+    const barsLabel = detection.structureExpectedLength
+      ? `${Number(detection.structureBarsIntoSection || 0)}/${Number(detection.structureExpectedLength || 0)}`
+      : "0/0";
+
+    return `BPM chase ${bpmLabel} | beat 1 ${beatOneLabel} | phase map ${sectionLabel}${sectionLabel !== "unknown" ? ` | bars ${barsLabel}` : ""}`;
   }
 
   function updateStageLoopMonitor() {

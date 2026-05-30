@@ -51,6 +51,28 @@ modern browsers for local development.
 - no MP4/H.264 export yet
 - the visual regression suite is slow on Windows and may take around 11 minutes
 
+## MiloTalks Integration
+
+This project now exposes a local-first bridge for `Knowledge` / `MiloTalks` task
+orchestration.
+
+Relevant paths:
+
+- `MiloTalks/tasks/inbox`
+- `MiloTalks/tasks/outbox`
+- `MiloTalks/contracts`
+- `interfaces/milotalks-codex-consumer.md`
+
+Helper commands:
+
+```bash
+node scripts/create-milo-task.mjs --goal "Improve JamPal export flow"
+node scripts/write-milo-result.mjs --taskId TASK-0001 --status in_progress --summary "Work started"
+```
+
+The bridge is file-based on purpose so Milo can hand off structured technical
+work to Codex without depending on HubMail or a remote queue.
+
 ## Roadmap
 
 1. Add audio input device selection.

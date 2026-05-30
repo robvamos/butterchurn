@@ -11,16 +11,34 @@ function buildBpmBenchmarkFileId(track) {
   return track.id || `${track.name}:${track.knownBpm || 0}:${track.size || 0}`;
 }
 
+function normalizeCandidateUrl(url) {
+  return typeof url === "string" ? url.trim() : "";
+}
+
+function getConfiguredManifestUrls(globalObject = globalThis) {
+  const explicitSingleUrl = normalizeCandidateUrl(globalObject?.__JAMPAL_BPM_BENCHMARK_MANIFEST_URL__);
+  const explicitUrlList = Array.isArray(globalObject?.__JAMPAL_BPM_BENCHMARK_MANIFEST_URLS__)
+    ? globalObject.__JAMPAL_BPM_BENCHMARK_MANIFEST_URLS__.map(normalizeCandidateUrl).filter(Boolean)
+    : [];
+
+  return explicitSingleUrl ? [explicitSingleUrl, ...explicitUrlList] : explicitUrlList;
+}
+
+function buildBpmBenchmarkManifestUrls(locationLike = globalThis?.location, globalObject = globalThis) {
+  const sameOriginPath = "/__jam-bpmtest__/index.json";
+  const sameOriginUrl = locationLike?.origin ? `${locationLike.origin}${sameOriginPath}` : sameOriginPath;
+
+  return Array.from(
+    new Set([
+      sameOriginPath,
+      sameOriginUrl,
+      ...getConfiguredManifestUrls(globalObject),
+    ].filter(Boolean))
+  );
+}
+
 async function loadBpmBenchmarkManifest() {
-  const origin = window.location.origin;
-  const localhost4174 = `${window.location.protocol}//localhost:4174/__jam-bpmtest__/index.json`;
-  const loopback4174 = `${window.location.protocol}//127.0.0.1:4174/__jam-bpmtest__/index.json`;
-  const candidateUrls = [
-    "/__jam-bpmtest__/index.json",
-    `${origin}/__jam-bpmtest__/index.json`,
-    localhost4174,
-    loopback4174,
-  ];
+  const candidateUrls = buildBpmBenchmarkManifestUrls(window.location, globalThis);
   const attempts = [];
 
   for (const url of candidateUrls) {
@@ -87,6 +105,7 @@ async function appendBpmBenchmarkRun(track, run) {
 export {
   appendBpmBenchmarkRun,
   buildBpmBenchmarkFileId,
+  buildBpmBenchmarkManifestUrls,
   loadBpmBenchmarkManifest,
   loadBpmBenchmarkState,
   saveBpmBenchmarkState,

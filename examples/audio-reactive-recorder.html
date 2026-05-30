@@ -961,6 +961,7 @@
     import { loadJammerLabState, saveJammerDeckPreset, saveJammerLabFavorite, saveJammerLabSettings } from "../src/jammerLabDb.js";
     import { loadDetectorCalibrationHistory, saveDetectorCalibrationRun } from "../src/detectorCalibrationDb.js";
     import { appendBpmBenchmarkRun, loadBpmBenchmarkManifest, loadBpmBenchmarkState, saveBpmBenchmarkState } from "../src/bpmBenchmarkService.js";
+    import { buildBenchmarkEvolutionConfig, chooseBestBenchmarkRun } from "../src/bpmBenchmarkLearning.js";
     import { analyzeAndStoreSong, buildSongAnalysisTrackId, loadSongAnalysisForTrack, seedKnownSongReferencesForTracks } from "../src/songAnalysisService.js";
     import Recorder from "../src/recorder.js";
     import { applySkin, defaultSkinId, getSkinById, skinCatalog } from "../src/skins.js";
@@ -2907,8 +2908,30 @@
 
           for (let stepIndex = 0; stepIndex < steps; stepIndex += 1) {
             const currentState = (await loadBpmBenchmarkState(track)) || {};
-            const moduleRun = currentState?.latestRun?.[moduleKey] || null;
-            const shouldApply = Boolean(moduleRun && getBenchmarkModuleSuggestionKeys(currentState, moduleKey).length > 0);
+            const evolutionPlan = buildBenchmarkEvolutionConfig(currentState, moduleKey);
+            const shouldApply = evolutionPlan.appliedKeys.length > 0;
+            if (shouldApply) {
+              await saveBpmBenchmarkState(track, {
+                configs: {
+                  ...(currentState.configs || getDefaultBpmBenchmarkConfigs()),
+                  [moduleKey]: evolutionPlan.nextConfig,
+                },
+                learning: {
+                  ...(currentState.learning || {}),
+                  [moduleKey]: {
+                    profile: evolutionPlan.graph.profile,
+                    topParameters: Object.entries(evolutionPlan.graph.parameterInfluence || {})
+                      .sort((left, right) => Number(right[1]?.netLift || 0) - Number(left[1]?.netLift || 0))
+                      .slice(0, 4)
+                      .map(([key, value]) => ({
+                        key,
+                        netLift: Math.round(Number(value?.netLift || 0) * 1000) / 1000,
+                      })),
+                    refinedAt: new Date().toISOString(),
+                  },
+                },
+              });
+            }
             const localBase = stepIndex / steps;
             const localSpan = 1 / steps;
             const mapProgress = (localProgress) => clamp(
@@ -2919,15 +2942,13 @@
 
             const savedState = await executeBpmBenchmarkTrack(track, {
               moduleKeys: [moduleKey],
-              applySuggestions: { [moduleKey]: shouldApply },
+              applySuggestions: { [moduleKey]: false },
               progressMapper: mapProgress,
               progressLabelPrefix: `${track.name} - ${moduleKey} evolve ${stepIndex + 1}/${steps}`,
             });
 
             const history = Array.isArray(savedState?.history) ? savedState.history : [];
-            const candidateBest = history
-              .filter((entry) => entry?.[moduleKey] && entry?.configs?.[moduleKey])
-              .sort((left, right) => compareBenchmarkRuns(left, right, moduleKey))[0] || null;
+            const candidateBest = chooseBestBenchmarkRun(history, moduleKey).bestEntry;
             if (candidateBest) {
               bestRunEntry = candidateBest;
             }
