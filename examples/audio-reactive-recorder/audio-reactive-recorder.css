@@ -185,6 +185,20 @@
       box-shadow: 0 0 0 3px rgba(108, 184, 255, 0.16);
     }
 
+    .suno-header-button {
+      width: auto;
+      min-width: 68px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .suno-header-text {
+      line-height: 1;
+    }
+
     .panel-section {
       display: none;
       gap: 14px;
@@ -361,6 +375,171 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .suno-panel,
+    .suno-layout,
+    .suno-library-column,
+    .suno-detail-column,
+    .suno-song-list,
+    .suno-story-beat-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .suno-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .suno-toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(140px, 180px) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .suno-layout {
+      grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.45fr);
+      align-items: start;
+    }
+
+    .suno-column-head,
+    .suno-story-head,
+    .suno-song-card-head,
+    .suno-story-beat-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .suno-song-list {
+      max-height: 68vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .suno-song-card {
+      width: 100%;
+      text-align: left;
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--field-border);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%), var(--panel-3);
+      color: var(--text);
+      padding: 12px;
+      cursor: pointer;
+    }
+
+    .suno-song-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(108, 184, 255, 0.18);
+      background: linear-gradient(180deg, rgba(108, 184, 255, 0.08), transparent 40%), var(--panel-3);
+    }
+
+    .suno-song-card-title {
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .suno-song-card-meta,
+    .suno-song-card-copy,
+    .suno-story-beat-anchor {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .suno-song-card-tags,
+    .suno-meta-chips,
+    .suno-story-beat-slots,
+    .suno-visual-language {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .suno-chip,
+    .suno-meta-chip,
+    .suno-visibility-badge,
+    .suno-visibility-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid var(--field-border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .suno-visibility-pill.is-public,
+    .suno-visibility-badge.is-public {
+      border-color: rgba(156, 230, 99, 0.38);
+      background: rgba(156, 230, 99, 0.12);
+      color: #c9f59e;
+    }
+
+    .suno-visibility-pill.is-private,
+    .suno-visibility-badge.is-private {
+      border-color: rgba(250, 204, 21, 0.38);
+      background: rgba(250, 204, 21, 0.12);
+      color: #ffe587;
+    }
+
+    .suno-audio-preview {
+      width: 100%;
+    }
+
+    .suno-prompt-card,
+    .suno-story-card {
+      border: 1px solid var(--field-border);
+      border-radius: 10px;
+      background: var(--panel-3);
+      padding: 12px;
+    }
+
+    .suno-prompt-card {
+      white-space: pre-wrap;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text);
+      max-height: 240px;
+      overflow: auto;
+    }
+
+    .suno-story-beat {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.12);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .suno-story-beat-time {
+      font-size: 11px;
+      color: var(--accent-strong);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .suno-story-beat-role {
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    @media (max-width: 980px) {
+      .suno-toolbar,
+      .suno-layout,
+      .suno-summary-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .wiring-chip-section {
@@ -2583,6 +2762,171 @@
   font-size: 0.84rem;
 }
 
+.jammer-detection-experiment-rich-summary {
+  display: grid;
+  gap: 6px;
+}
+
+.jammer-experiment-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.jammer-experiment-summary-section {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.jammer-experiment-summary-caption {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(177, 197, 235, 0.74);
+}
+
+.jammer-experiment-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(114, 160, 255, 0.22);
+  background: rgba(21, 31, 47, 0.9);
+  color: #edf4ff;
+  font-size: 0.76rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.jammer-experiment-pill.is-subtle {
+  color: rgba(223, 232, 255, 0.86);
+  border-color: rgba(114, 160, 255, 0.16);
+  background: rgba(15, 22, 34, 0.72);
+}
+
+.jammer-experiment-pill.is-lane {
+  background: linear-gradient(135deg, rgba(84, 150, 255, 0.22), rgba(42, 69, 116, 0.4));
+  border-color: rgba(113, 177, 255, 0.42);
+}
+
+.jammer-experiment-pill.is-idle {
+  background: rgba(52, 61, 82, 0.75);
+  border-color: rgba(124, 136, 168, 0.3);
+  color: rgba(225, 233, 247, 0.88);
+}
+
+.jammer-experiment-pill.is-probing {
+  background: rgba(113, 89, 34, 0.82);
+  border-color: rgba(223, 187, 98, 0.48);
+  color: #fff5dc;
+}
+
+.jammer-experiment-pill.is-tracking {
+  background: rgba(79, 107, 35, 0.84);
+  border-color: rgba(153, 216, 98, 0.44);
+  color: #f3ffe1;
+}
+
+.jammer-experiment-pill.is-strong {
+  background: rgba(28, 96, 86, 0.86);
+  border-color: rgba(96, 223, 188, 0.5);
+  color: #e9fffa;
+}
+
+.jammer-experiment-pill.is-locked {
+  background: rgba(27, 95, 138, 0.9);
+  border-color: rgba(114, 197, 255, 0.58);
+  color: #eff9ff;
+}
+
+.jammer-experiment-pill-key {
+  color: rgba(198, 214, 242, 0.82);
+}
+
+.jammer-experiment-pill-value {
+  font-weight: 700;
+}
+
+.jammer-experiment-eval-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.jammer-experiment-eval-card {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(114, 160, 255, 0.16);
+  background: rgba(12, 18, 29, 0.62);
+}
+
+.jammer-experiment-eval-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.jammer-experiment-eval-label {
+  font-size: 0.72rem;
+  color: rgba(206, 220, 246, 0.9);
+}
+
+.jammer-experiment-eval-score {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f4f8ff;
+}
+
+.jammer-experiment-eval-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.jammer-experiment-eval-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(119, 145, 186, 0.5), rgba(119, 145, 186, 0.8));
+}
+
+.jammer-experiment-eval-meter-fill.is-idle {
+  background: linear-gradient(90deg, rgba(120, 130, 152, 0.45), rgba(120, 130, 152, 0.82));
+}
+
+.jammer-experiment-eval-meter-fill.is-probing {
+  background: linear-gradient(90deg, rgba(184, 143, 55, 0.5), rgba(226, 189, 88, 0.9));
+}
+
+.jammer-experiment-eval-meter-fill.is-tracking {
+  background: linear-gradient(90deg, rgba(126, 162, 69, 0.52), rgba(169, 219, 96, 0.92));
+}
+
+.jammer-experiment-eval-meter-fill.is-strong {
+  background: linear-gradient(90deg, rgba(62, 158, 142, 0.54), rgba(95, 225, 188, 0.94));
+}
+
+.jammer-experiment-eval-meter-fill.is-locked {
+  background: linear-gradient(90deg, rgba(69, 132, 193, 0.56), rgba(118, 205, 255, 0.96));
+}
+
+.jammer-experiment-eval-meta {
+  font-size: 0.72rem;
+  color: rgba(193, 207, 234, 0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .jammer-detection-experiment-grid.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -2639,14 +2983,14 @@
 }
 
 .jammer-compact-action {
-  height: 32px;
-  padding: 0 12px;
+  height: 30px;
+  padding: 0 10px;
   border-radius: 10px;
   border: 1px solid rgba(114, 160, 255, 0.24);
   background: rgba(23, 33, 48, 0.9);
   color: #dfe8ff;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -2692,8 +3036,8 @@
 }
 
 .jammer-experiment-solo-button {
-  min-height: 32px;
-  padding: 0 12px;
+  min-height: 30px;
+  padding: 0 10px;
 }
 
 .jammer-experiment-solo-button.active {
@@ -2796,6 +3140,7 @@
 @media (max-width: 1080px) {
   .jammer-detection-experiment-topline.primary,
   .jammer-detection-experiment-topline.secondary,
+  .jammer-experiment-eval-grid,
   .jammer-detection-experiment-grid,
   .jammer-detection-experiment-chart-grid,
   .jammer-detection-experiment-controls.weights,

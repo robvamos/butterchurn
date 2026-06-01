@@ -6,6 +6,12 @@ function startBpmBenchmarkCatalogLoad(actions) {
   });
 }
 
+function startSunoProductionsLoad(actions) {
+  return actions.loadSunoProductionsCatalog().catch((error) => {
+    actions.log(`Suno productions unavailable: ${error.message}`);
+  });
+}
+
 async function loadInitialAppState(context) {
   const { state, actions, services } = context;
 
@@ -31,6 +37,7 @@ function renderInitialUi(context) {
   actions.renderJammerCatalog();
   actions.renderJammerResearchCatalog();
   actions.renderJammerLabState();
+  actions.renderSunoProductions();
   actions.refreshLabJamButtons();
   actions.updateStageLoopMonitor();
   actions.setLoopMonitorTimer(window.setInterval(actions.updateStageLoopMonitor, 120));
@@ -86,9 +93,11 @@ async function initializeRecorderApp(context) {
   const bpmBenchmarkCatalogPromise = startBpmBenchmarkCatalogLoad(actions);
 
   await loadInitialAppState(context);
+  const sunoProductionsPromise = startSunoProductionsLoad(actions);
   renderInitialUi(context);
   await restoreInitialSources(context);
   await bpmBenchmarkCatalogPromise;
+  await sunoProductionsPromise;
   scheduleBpmBenchmarkRetry(context);
   finalizeStartup(context);
 }

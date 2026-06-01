@@ -27,6 +27,9 @@
               <span class="jammer-header-toggle" aria-hidden="true"></span>
               <span class="jammer-header-text">JAM</span>
             </button>
+            <button id="sunoTabButton" class="tab-button settings-icon-button suno-header-button" type="button" data-tab="suno" aria-label="Open Suno productions" title="Suno Productions">
+              <span class="suno-header-text">SUNO</span>
+            </button>
             <button id="settingsTabButton" class="tab-button settings-icon-button" type="button" data-tab="settings" aria-label="Open settings" title="Settings">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M10.2 3.6h3.6l.42 2.1a6.9 6.9 0 0 1 1.45.6l1.82-1.14 2.54 2.54-1.14 1.82c.24.46.44.95.6 1.45l2.1.42v3.6l-2.1.42a6.9 6.9 0 0 1-.6 1.45l1.14 1.82-2.54 2.54-1.82-1.14c-.46.24-.95.44-1.45.6l-.42 2.1h-3.6l-.42-2.1a6.9 6.9 0 0 1-1.45-.6l-1.82 1.14-2.54-2.54 1.14-1.82a6.9 6.9 0 0 1-.6-1.45l-2.1-.42v-3.6l2.1-.42c.16-.5.36-.99.6-1.45L3.67 7.7 6.2 5.16l1.82 1.14c.46-.24.95-.44 1.45-.6l.73-2.1Z" stroke-width="1.35" stroke-linejoin="round"/>
@@ -183,6 +186,10 @@
             <div class="summary-note">Selections persist locally and reload with the last session state.</div>
           </div>
         </div>
+      </section>
+
+      <section id="sunoPanel" class="panel-section" data-panel="suno">
+        <div id="sunoProductionsMount"></div>
       </section>
 
       <section id="jammerPanel" class="panel-section" data-panel="jammer">
@@ -963,6 +970,7 @@
     import { appendBpmBenchmarkRun, loadBpmBenchmarkManifest, loadBpmBenchmarkState, saveBpmBenchmarkState } from "../src/bpmBenchmarkService.js";
     import { buildBenchmarkEvolutionConfig, chooseBestBenchmarkRun } from "../src/bpmBenchmarkLearning.js";
     import { analyzeAndStoreSong, buildSongAnalysisTrackId, loadSongAnalysisForTrack, seedKnownSongReferencesForTracks } from "../src/songAnalysisService.js";
+    import { loadSunoProductionsCatalog as loadSunoProductionsCatalogFromService, loadSunoProductionDetail as loadSunoProductionDetailFromService } from "../src/sunoProductionService.js";
     import Recorder from "../src/recorder.js";
     import { applySkin, defaultSkinId, getSkinById, skinCatalog } from "../src/skins.js";
     import { deleteAsset, loadAsset, loadSettings, saveAsset, saveSetting } from "../src/settingsDb.js";
@@ -998,6 +1006,7 @@
     import { getNextCollapsedState, syncCollapsedPanelUi } from "./audio-reactive-recorder/panelCollapse.js";
     import { createPlayerView } from "./audio-reactive-recorder/playerView.js";
     import { createReactiveDrummerController } from "./audio-reactive-recorder/reactiveDrummerController.js";
+    import { createSunoProductionsView, getSunoProductionsRefs, renderSunoProductionsPanel } from "./audio-reactive-recorder/sunoProductionsPanel.js";
     import { createJammerRuntimeView } from "./audio-reactive-recorder/jammerRuntimeView.js";
     import { createWiringPanelView, getWiringRefs, renderWiringPanel } from "./audio-reactive-recorder/wiringPanel.js";
 
@@ -1011,6 +1020,10 @@
     const jammerBpmBenchmarkMount = document.getElementById("jammerBpmBenchmarkMount");
     if (jammerBpmBenchmarkMount) {
       jammerBpmBenchmarkMount.innerHTML = renderBpmBenchmarkPanel();
+    }
+    const sunoProductionsMount = document.getElementById("sunoProductionsMount");
+    if (sunoProductionsMount) {
+      sunoProductionsMount.innerHTML = renderSunoProductionsPanel();
     }
     const jammerDetectionExperimentMount = document.getElementById("jammerDetectionExperimentMount");
     if (jammerDetectionExperimentMount) {
@@ -1033,6 +1046,7 @@
     const nextPresetButton = document.getElementById("nextPresetButton");
     const visualizerToggleButton = document.getElementById("visualizerToggleButton");
     const wiringRefs = getWiringRefs(document);
+    const sunoRefs = getSunoProductionsRefs(document);
     const cycleSecondsInput = document.getElementById("cycleSeconds");
     const autoCycleEnabledInput = document.getElementById("autoCycleEnabled");
     const startRecordingButton = document.getElementById("startRecordingButton");
@@ -1077,8 +1091,10 @@
     const requestMicPermissionButton = document.getElementById("requestMicPermissionButton");
     const skinGrid = document.getElementById("skinGrid");
     const jammerTabButton = document.getElementById("jammerTabButton");
+    const sunoTabButton = document.getElementById("sunoTabButton");
     const settingsTabButton = document.getElementById("settingsTabButton");
     const studioPanel = document.getElementById("studioPanel");
+    const sunoPanel = document.getElementById("sunoPanel");
     const jammerPanel = document.getElementById("jammerPanel");
     const settingsPanel = document.getElementById("settingsPanel");
     const jammerMainPanelToggleButton = document.getElementById("jammerMainPanelToggleButton");
@@ -1425,6 +1441,13 @@
     let activeSkinId = defaultSkinId;
     let activePanel = "studio";
     let appSettings;
+    let sunoProductionsCatalog = [];
+    let sunoSelectedSongId = "";
+    let sunoProductionDetail = null;
+    let sunoProductionsLoading = false;
+    let sunoProductionsError = "";
+    let sunoVisibilityFilter = "all";
+    let sunoSearchQuery = "";
     let stageResizeState = null;
     let stageExpanded = false;
     let stageInlineWidth = "";
@@ -1856,6 +1879,19 @@
       formatters: {
         formatShortDate,
       },
+    });
+
+    const sunoProductionsView = createSunoProductionsView({
+      refs: sunoRefs,
+      getState: () => ({
+        catalog: sunoProductionsCatalog,
+        detail: sunoProductionDetail,
+        error: sunoProductionsError,
+        loading: sunoProductionsLoading,
+        searchQuery: sunoSearchQuery,
+        selectedSongId: sunoSelectedSongId,
+        visibilityFilter: sunoVisibilityFilter,
+      }),
     });
 
     const playerView = createPlayerView({
@@ -2422,6 +2458,82 @@
       jammerLibraryPanel?.classList.toggle("active", jammerDeckLibraryOpen);
       syncWiringPanelState();
       syncStagePanelState();
+      sunoSearchQuery = settings.sunoSearchQuery || "";
+      sunoVisibilityFilter = settings.sunoVisibilityFilter || "all";
+      sunoSelectedSongId = settings.sunoSelectedSongId || "";
+      renderSunoProductions();
+    }
+
+    function setSunoSearchQuery(value) {
+      sunoSearchQuery = String(value || "");
+      persistSetting("sunoSearchQuery", sunoSearchQuery);
+    }
+
+    function setSunoVisibilityFilter(value) {
+      const nextValue = value === "public" || value === "private_or_unlisted" ? value : "all";
+      sunoVisibilityFilter = nextValue;
+      persistSetting("sunoVisibilityFilter", sunoVisibilityFilter);
+    }
+
+    function renderSunoProductions() {
+      sunoProductionsView.render();
+    }
+
+    async function selectSunoProduction(songId, { shouldPersist = true } = {}) {
+      const nextSongId = String(songId || "");
+      sunoSelectedSongId = nextSongId;
+      sunoProductionsLoading = true;
+      sunoProductionsError = "";
+      renderSunoProductions();
+
+      try {
+        sunoProductionDetail = nextSongId
+          ? await loadSunoProductionDetailFromService(nextSongId)
+          : null;
+        if (shouldPersist) {
+          persistSetting("sunoSelectedSongId", sunoSelectedSongId);
+        }
+      } catch (error) {
+        sunoProductionDetail = null;
+        sunoProductionsError = error.message || "Suno detail unavailable";
+      } finally {
+        sunoProductionsLoading = false;
+        renderSunoProductions();
+      }
+    }
+
+    async function loadSunoProductionsCatalog({ preserveSelection = true } = {}) {
+      sunoProductionsLoading = true;
+      sunoProductionsError = "";
+      renderSunoProductions();
+
+      try {
+        const manifest = await loadSunoProductionsCatalogFromService();
+        sunoProductionsCatalog = Array.isArray(manifest?.tracks) ? manifest.tracks : [];
+
+        const preferredSongId = preserveSelection
+          ? (sunoSelectedSongId || appSettings?.sunoSelectedSongId || "")
+          : "";
+        const hasPreferredSong = preferredSongId
+          && sunoProductionsCatalog.some((entry) => entry.songId === preferredSongId);
+        const nextSongId = hasPreferredSong ? preferredSongId : (sunoProductionsCatalog[0]?.songId || "");
+
+        sunoSelectedSongId = nextSongId;
+        if (nextSongId) {
+          sunoProductionDetail = await loadSunoProductionDetailFromService(nextSongId);
+          persistSetting("sunoSelectedSongId", nextSongId);
+        } else {
+          sunoProductionDetail = null;
+        }
+      } catch (error) {
+        sunoProductionsCatalog = [];
+        sunoSelectedSongId = "";
+        sunoProductionDetail = null;
+        sunoProductionsError = error.message || "Suno productions unavailable";
+      } finally {
+        sunoProductionsLoading = false;
+        renderSunoProductions();
+      }
     }
 
     function refreshAudioSummary() {
@@ -2989,6 +3101,9 @@
               moduleKey,
               note: `Evolve x10 kept best ${moduleKey} run ${bestRunEntry.savedAt || ""}`,
               configs: mergedConfigs,
+              reference: bestRunEntry.reference || null,
+              aubio: bestRunEntry.aubio || null,
+              essentia: bestRunEntry.essentia || null,
             });
             finalState = await loadBpmBenchmarkState(track);
           }
@@ -5017,9 +5132,11 @@
     function showPanel(panelId, shouldPersist = true) {
       activePanel = panelId;
       studioPanel.classList.toggle("active", panelId === "studio");
+      sunoPanel.classList.toggle("active", panelId === "suno");
       jammerPanel.classList.toggle("active", panelId === "jammer");
       settingsPanel.classList.toggle("active", panelId === "settings");
       jammerTabButton.classList.toggle("active", panelId === "jammer");
+      sunoTabButton.classList.toggle("active", panelId === "suno");
       settingsTabButton.classList.toggle("active", panelId === "settings");
       jammerRuntimeSection.hidden = panelId !== "jammer";
       jammerRuntimeSection.style.display = panelId === "jammer" ? "" : "none";
@@ -5469,6 +5586,12 @@
         jammerTimingModelSelect,
         jammerTabButton,
         jammerPanel,
+        sunoTabButton,
+        sunoPanel,
+        sunoRefreshButton: sunoRefs.sunoRefreshButton,
+        sunoSearchInput: sunoRefs.sunoSearchInput,
+        sunoVisibilityFilter: sunoRefs.sunoVisibilityFilter,
+        sunoSongList: sunoRefs.sunoSongList,
         jammerVolumeRange,
         nextPresetButton,
         presetSelect,
@@ -5514,11 +5637,17 @@
         getWiringPanelCollapsed: () => wiringPanelCollapsed,
         getStagePanelCollapsed: () => stagePanelCollapsed,
         getSongAnalysisRunning: () => songAnalysisRunning,
+        getSunoProductionsCatalog: () => sunoProductionsCatalog,
         getPresetIndex: () => presetIndex,
         getPresetKeys: () => presetKeys,
         getStageExpanded: () => stageExpanded,
         getStageFullscreenActive: () => stageFullscreenActive,
         getStageInlineWidth: () => stageInlineWidth,
+        getSunoProductionDetail: () => sunoProductionDetail,
+        getSunoProductionsLoading: () => sunoProductionsLoading,
+        getSunoSearchQuery: () => sunoSearchQuery,
+        getSunoSelectedSongId: () => sunoSelectedSongId,
+        getSunoVisibilityFilter: () => sunoVisibilityFilter,
         getVisualizerEnabled: () => visualizerEnabled,
       },
       actions: {
@@ -5527,6 +5656,7 @@
         applyBpmBenchmarkSuggestionsForFile,
         evolveBpmBenchmarkModule,
         loadBpmBenchmarkCatalogFromServer,
+        loadSunoProductionsCatalog,
         loadCurrentBpmBenchmarkState,
         loadCurrentSongAnalysisFromDb,
         applyDeckPreset,
@@ -5557,6 +5687,7 @@
         renderJammerResearchCatalog,
         renderReactiveStrategies,
         renderSkinOptions,
+        renderSunoProductions,
         requestMicrophonePermission,
         requestStageFullscreen,
         restartPresetCycle,
@@ -5573,6 +5704,8 @@
         setJammerResearchCatalog: (value) => { jammerResearchCatalog = value; },
         setLoopMonitorTimer: (value) => { loopMonitorTimer = value; },
         setSongAnalysisRunning: (value) => { songAnalysisRunning = value; },
+        setSunoSearchQuery,
+        setSunoVisibilityFilter,
         setReactiveBehaviorStrategies: (value) => { reactiveBehaviorStrategies = value; },
         setSkin,
         setStageFullscreenActive: (value) => { stageFullscreenActive = value; },
@@ -5619,6 +5752,7 @@
         updateDetectionExperimentConfig,
         selectDetectionExperimentPluginMode,
         saveDetectionExperimentPreset,
+        selectSunoProduction,
         renameDetectionExperimentPreset,
         loadDetectionExperimentPreset,
         deleteDetectionExperimentPreset,

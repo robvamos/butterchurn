@@ -131,6 +131,9 @@ describe('JamPal Smoke Test', () => {
     const jammerTabButton = await page.$('#jammerTabButton');
     expect(jammerTabButton).toBeTruthy();
 
+    const sunoTabButton = await page.$('#sunoTabButton');
+    expect(sunoTabButton).toBeTruthy();
+
     const skinGrid = await page.$('#skinGrid');
     expect(skinGrid).toBeTruthy();
 
@@ -153,6 +156,24 @@ describe('JamPal Smoke Test', () => {
       options.map(option => option.textContent)
     );
     expect(bpmBenchmarkOptions.length).toBeGreaterThan(0);
+    await page.click('#sunoTabButton');
+    await page.waitForFunction(
+      () => {
+        const cards = document.querySelectorAll('#sunoSongList .suno-song-card');
+        const status = document.querySelector('#sunoCatalogStatus');
+        return Boolean(status && status.textContent && status.textContent.includes('ready') && cards.length > 0);
+      }
+    );
+    const sunoSnapshot = await page.evaluate(() => ({
+      active: document.querySelector('#sunoPanel').classList.contains('active'),
+      songs: document.querySelectorAll('#sunoSongList .suno-song-card').length,
+      title: document.querySelector('#sunoDetailTitle').textContent,
+      scenes: document.querySelector('#sunoSceneCount').textContent,
+    }));
+    expect(sunoSnapshot.active).toBe(true);
+    expect(sunoSnapshot.songs).toBeGreaterThan(0);
+    expect(sunoSnapshot.title).not.toBe('Choose a song');
+    expect(sunoSnapshot.scenes).not.toBe('0 scenes');
     await page.click('#studioHomeButton');
 
     const logEl = await page.$('#log');

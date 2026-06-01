@@ -12,6 +12,10 @@ function bindShellEvents(context) {
     event.stopPropagation();
     actions.showPanel(refs.jammerPanel.classList.contains("active") ? "studio" : "jammer");
   });
+  refs.sunoTabButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    actions.showPanel(refs.sunoPanel.classList.contains("active") ? "studio" : "suno");
+  });
   refs.settingsTabButton.addEventListener("click", (event) => {
     event.stopPropagation();
     actions.showPanel(refs.settingsPanel.classList.contains("active") ? "studio" : "settings");
@@ -68,6 +72,34 @@ function bindShellEvents(context) {
   });
   refs.refreshDevicesButton.addEventListener("click", actions.loadAudioDevices);
   refs.requestMicPermissionButton.addEventListener("click", actions.requestMicrophonePermission);
+}
+
+function bindSunoControls(context) {
+  const { refs, actions } = context;
+
+  refs.sunoRefreshButton?.addEventListener("click", () => {
+    actions.loadSunoProductionsCatalog({ preserveSelection: true }).catch((error) => {
+      actions.log(`Suno refresh error: ${error.message}`);
+    });
+  });
+  refs.sunoSearchInput?.addEventListener("input", () => {
+    actions.setSunoSearchQuery(refs.sunoSearchInput.value);
+    actions.renderSunoProductions();
+  });
+  refs.sunoVisibilityFilter?.addEventListener("change", () => {
+    actions.setSunoVisibilityFilter(refs.sunoVisibilityFilter.value);
+    actions.renderSunoProductions();
+  });
+  refs.sunoSongList?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-song-id]");
+    if (!button) {
+      return;
+    }
+
+    actions.selectSunoProduction(button.dataset.songId).catch((error) => {
+      actions.log(`Suno song load error: ${error.message}`);
+    });
+  });
 }
 
 function bindJammerControls(context) {
@@ -666,6 +698,7 @@ function bindStageEvents(context) {
 
 export function bindRecorderEventGroups(context) {
   bindShellEvents(context);
+  bindSunoControls(context);
   bindJammerControls(context);
   bindDetectionControls(context);
   bindBenchmarkControls(context);

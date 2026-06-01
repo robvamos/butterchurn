@@ -1,6 +1,10 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import {
+  getSunoProductionDetail,
+  getSunoProductionsCatalog,
+} from '../../../scripts/sunoLibraryServerSupport.mjs';
 
 class TestServer {
   constructor() {
@@ -10,8 +14,12 @@ class TestServer {
 
   async start() {
     const projectRoot = process.cwd();
+    const defaultLibraryDir = process.env.JAMPAL_LIBRARY_DIR || 'F:\\chiavetta musica';
+    const libraryPrefix = '/__jam-library__';
     const bpmBenchmarkDir = path.join(projectRoot, 'BPMtest');
     const bpmBenchmarkPrefix = '/__jam-bpmtest__';
+    const sunoProductionsDir = process.env.JAMPAL_SUNO_LIBRARY_DIR || 'F:\\_CODEX\\Audio2VideoPal\\SunoProductions\\SongLibrary';
+    const sunoProductionsPrefix = '/__suno-productions__';
     const audioPattern = /\.(mp3|ogg|opus|wav|m4a|aac|flac)$/i;
 
     const contentTypes = {
@@ -50,6 +58,32 @@ class TestServer {
         return;
       }
 
+      if (urlPath === `${libraryPrefix}/index.json`) {
+        fs.readdir(defaultLibraryDir, { withFileTypes: true }, (err, entries) => {
+          const tracks = err
+            ? []
+            : entries
+              .filter((entry) => entry.isFile() && audioPattern.test(entry.name))
+              .map((entry) => {
+                const absoluteTrackPath = path.join(defaultLibraryDir, entry.name);
+                const size = fs.statSync(absoluteTrackPath).size;
+                return {
+                  name: entry.name,
+                  size,
+                  url: `${libraryPrefix}/files/${encodeURIComponent(entry.name)}`,
+                };
+              });
+
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({
+            label: path.basename(defaultLibraryDir),
+            path: defaultLibraryDir,
+            tracks,
+          }));
+        });
+        return;
+      }
+
       if (urlPath === `${bpmBenchmarkPrefix}/index.json`) {
         fs.readdir(bpmBenchmarkDir, { withFileTypes: true }, (err, entries) => {
           if (err) {
@@ -85,9 +119,44 @@ class TestServer {
         return;
       }
 
+      if (urlPath === `${sunoProductionsPrefix}/index.json`) {
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify(getSunoProductionsCatalog({
+          sunoProductionsDir,
+          prefix: sunoProductionsPrefix,
+        })));
+        return;
+      }
+
       if (urlPath.startsWith(`${bpmBenchmarkPrefix}/files/`)) {
         const fileName = urlPath.slice(`${bpmBenchmarkPrefix}/files/`.length);
         filePath = path.join(bpmBenchmarkDir, fileName);
+      } else if (urlPath.startsWith(`${sunoProductionsPrefix}/songs/`) && urlPath.endsWith('.json')) {
+        const songId = urlPath.slice(`${sunoProductionsPrefix}/songs/`.length, -'.json'.length);
+        const detail = getSunoProductionDetail({
+          sunoProductionsDir,
+          prefix: sunoProductionsPrefix,
+          songId,
+        });
+        if (!detail) {
+          res.writeHead(404);
+          res.end('Not found');
+          return;
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify(detail));
+        return;
+      } else if (urlPath.startsWith(`${sunoProductionsPrefix}/audio/`)) {
+        const songId = urlPath.slice(`${sunoProductionsPrefix}/audio/`.length).replace(/\.mp3$/i, '');
+        const detail = getSunoProductionDetail({
+          sunoProductionsDir,
+          prefix: sunoProductionsPrefix,
+          songId,
+        });
+        filePath = detail?.packagedAudioPath || '';
+      } else if (urlPath.startsWith(`${libraryPrefix}/files/`)) {
+        const fileName = urlPath.slice(`${libraryPrefix}/files/`.length);
+        filePath = path.join(defaultLibraryDir, fileName);
       } else if (req.url === '/' || req.url === '/test-js.html') {
         filePath = path.join(process.cwd(), 'test/visual/test-js.html');
       } else if (req.url === '/test-wasm.html') {

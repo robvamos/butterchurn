@@ -2,6 +2,10 @@ import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  getSunoProductionDetail,
+  getSunoProductionsCatalog,
+} from "./sunoLibraryServerSupport.mjs";
 
 const root = process.cwd();
 const requestedPage = process.argv[2] || "examples/demo.html";
@@ -12,6 +16,8 @@ const defaultLibraryDir = process.env.JAMPAL_LIBRARY_DIR || "F:\\chiavetta music
 const libraryPrefix = "/__jam-library__";
 const bpmBenchmarkDir = path.resolve(root, "BPMtest");
 const bpmBenchmarkPrefix = "/__jam-bpmtest__";
+const sunoProductionsDir = process.env.JAMPAL_SUNO_LIBRARY_DIR || "F:\\_CODEX\\Audio2VideoPal\\SunoProductions\\SongLibrary";
+const sunoProductionsPrefix = "/__suno-productions__";
 const audioPattern = /\.(mp3|ogg|opus|wav|m4a|aac|flac)$/i;
 
 const contentTypes = {
@@ -113,7 +119,11 @@ function resolveRequestPath(urlPath) {
 
 async function getDefaultLibraryManifest() {
   if (!fs.existsSync(defaultLibraryDir)) {
-    return null;
+    return {
+      label: path.basename(defaultLibraryDir),
+      path: defaultLibraryDir,
+      tracks: [],
+    };
   }
 
   const entries = await readdir(defaultLibraryDir, { withFileTypes: true });
@@ -196,11 +206,6 @@ const server = http.createServer((req, res) => {
   if (urlPath === `${libraryPrefix}/index.json`) {
     getDefaultLibraryManifest()
       .then((manifest) => {
-        if (!manifest) {
-          sendError(res, 404, "Library not found");
-          return;
-        }
-
         res.writeHead(200, {
           "Content-Type": "application/json; charset=utf-8",
           "Access-Control-Allow-Origin": "*",
@@ -235,6 +240,23 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (urlPath === `${sunoProductionsPrefix}/index.json`) {
+    try {
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-store",
+      });
+      res.end(JSON.stringify(getSunoProductionsCatalog({
+        sunoProductionsDir,
+        prefix: sunoProductionsPrefix,
+      })));
+    } catch {
+      sendError(res, 500, "Suno productions manifest error");
+    }
+    return;
+  }
+
   if (urlPath.startsWith(`${libraryPrefix}/files/`)) {
     const fileName = urlPath.slice(`${libraryPrefix}/files/`.length);
     const absoluteTrackPath = path.resolve(defaultLibraryDir, fileName);
@@ -244,6 +266,47 @@ const server = http.createServer((req, res) => {
       return;
     }
     streamFile(req, res, absoluteTrackPath);
+    return;
+  }
+
+  if (urlPath.startsWith(`${sunoProductionsPrefix}/songs/`) && urlPath.endsWith(".json")) {
+    const songId = urlPath.slice(`${sunoProductionsPrefix}/songs/`.length, -".json".length);
+    const detail = getSunoProductionDetail({
+      sunoProductionsDir,
+      prefix: sunoProductionsPrefix,
+      songId,
+    });
+
+    if (!detail) {
+      sendError(res, 404, "Suno production not found");
+      return;
+    }
+
+    res.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Access-Control-Allow-Origin": "*",
+      "Cache-Control": "no-store",
+    });
+    res.end(JSON.stringify(detail));
+    return;
+  }
+
+  if (urlPath.startsWith(`${sunoProductionsPrefix}/audio/`)) {
+    const fileToken = urlPath.slice(`${sunoProductionsPrefix}/audio/`.length);
+    const songId = fileToken.replace(/\.mp3$/i, "");
+    const detail = getSunoProductionDetail({
+      sunoProductionsDir,
+      prefix: sunoProductionsPrefix,
+      songId,
+    });
+    const packagedPath = detail?.packagedAudioPath || null;
+
+    if (!packagedPath || !String(packagedPath).startsWith(path.resolve(sunoProductionsDir))) {
+      sendError(res, 404, "Suno audio not found");
+      return;
+    }
+
+    streamFile(req, res, packagedPath);
     return;
   }
 
